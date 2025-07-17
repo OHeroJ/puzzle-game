@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'puzzle-738d3.firebasestorage.app',
     measurementId: 'G-3483287WSW',
   );
+
 }
