@@ -57,23 +57,33 @@ class _AboutScreenState extends State<AboutScreen> {
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
-          'Setting',
-          style: TextStyle(fontSize: 40.sp, color: palette.textColor),
+          'About',
+          style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: palette.backgroundMain,
-      body: ListView(children: [
-        _gap,
-        Image(
-          image: AssetImage('assets/images/ic_launcher.png'),
-          width: 150.w,
-          height: 150.w,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image(
+              image: AssetImage('assets/images/ic_launcher.png'),
+              width: 120.w,
+              height: 120.w,
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              "${_packageInfo.appName}",
+              style: TextStyle(fontSize: 24.sp, color: palette.textColor, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              "Version: ${_packageInfo.version}",
+              style: TextStyle(fontSize: 18.sp, color: palette.textColor.withOpacity(0.7)),
+            ),
+          ],
         ),
-        _gap,
-        Center(child: Text("${_packageInfo.appName}")),
-        _gap,
-        Center(child: Text("Ver:${_packageInfo.version}"))
-      ]),
+      ),
     );
   }
 }
@@ -84,87 +94,5 @@ Future<void> _launchInBrowser(Uri url) async {
     mode: LaunchMode.externalApplication,
   )) {
     throw Exception('Could not launch $url');
-  }
-}
-
-class _NameChangeLine extends StatelessWidget {
-  final String title;
-
-  const _NameChangeLine(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    final settings = context.watch<SettingsController>();
-
-    return InkResponse(
-      highlightShape: BoxShape.rectangle,
-      onTap: () => showCustomNameDialog(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                  fontSize: 30,
-                )),
-            const Spacer(),
-            ValueListenableBuilder(
-              valueListenable: settings.playerName,
-              builder: (context, name, child) => Text(
-                '‘$name’',
-                style: const TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SettingsLine extends StatelessWidget {
-  final String title;
-
-  final Widget icon;
-
-  final VoidCallback? onSelected;
-
-  const _SettingsLine(this.title, this.icon, {this.onSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-        color: Colors.black12,
-        width: 1,
-      ))),
-      child: InkResponse(
-        onTap: onSelected,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 20.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 35.sp,
-                  ),
-                ),
-              ),
-              icon,
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

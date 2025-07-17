@@ -24,79 +24,87 @@ class MainMenuScreen extends StatelessWidget {
       body: ResponsiveScreen(
         mainAreaProminence: 0.45,
         squarishMainArea: Center(
-          child: Transform.rotate(
-            angle: -0.1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Puzzle Game',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 55,
-                    height: 1,
-                  ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Puzzle Game',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 60,
+                  height: 1,
+                  color: palette.textColor,
+                  fontWeight: FontWeight.bold,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: InkWell(
-                    onTap: () {
-                      launchUrlString('https://www.pexels.com');
-                    },
-                    child: Text('Photos provided by Pexels'),
-                  ),
+              ),
+              SizedBox(height: 20),
+              InkWell(
+                onTap: () {
+                  launchUrlString('https://www.pexels.com');
+                },
+                child: Text(
+                  'Photos provided by Pexels',
+                  style: TextStyle(color: palette.textColor.withOpacity(0.7)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: InkWell(
-                    onTap: () {
-                      launchUrlString(
-                          'https://github.com/xfans/flutter_jigsaw_puzzle');
-                    },
-                    child:
-                        Text('https://github.com/xfans/flutter_jigsaw_puzzle'),
-                  ),
-                )
-              ],
-            ),
+              ),
+              SizedBox(height: 10),
+              InkWell(
+                onTap: () {
+                  launchUrlString(
+                      'https://github.com/xfans/flutter_jigsaw_puzzle');
+                },
+                child: Text(
+                  'https://github.com/xfans/flutter_jigsaw_puzzle',
+                  style: TextStyle(color: palette.textColor.withOpacity(0.7)),
+                ),
+              ),
+            ],
           ),
         ),
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            FilledButton(
+            ElevatedButton(
               onPressed: () {
-                // audioController.playSfx(SfxType.buttonTap);
                 GoRouter.of(context).go('/play');
               },
-              child: const Text('Play'),
-            ),
-            _gap,
-            FilledButton(
-              onPressed: () => GoRouter.of(context).push('/settings'),
-              child: const Text('Settings'),
-            ),
-            _gap,
-            Padding(
-              padding: const EdgeInsets.only(top: 32),
-              child: ValueListenableBuilder<bool>(
-                valueListenable: settingsController.muted,
-                builder: (context, muted, child) {
-                  return IconButton(
-                    onPressed: () => settingsController.toggleSoundsOn(),
-                    icon: Icon(muted ? Icons.volume_off : Icons.volume_up),
-                  );
-                },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: palette.primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              child: const Text('Play', style: TextStyle(fontSize: 20)),
             ),
-            _gap,
-            // const Text('Music by Mr Smith'),
-            // _gap,
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => GoRouter.of(context).push('/settings'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: palette.secondaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('Settings', style: TextStyle(fontSize: 20)),
+            ),
+            SizedBox(height: 30),
+            ValueListenableBuilder<bool>(
+              valueListenable: settingsController.muted,
+              builder: (context, muted, child) {
+                return IconButton(
+                  onPressed: () => settingsController.toggleSoundsOn(),
+                  icon: Icon(muted ? Icons.volume_off : Icons.volume_up, size: 30, color: palette.textColor),
+                );
+              },
+            ),
+            SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-
-  static const _gap = SizedBox(height: 10);
 }

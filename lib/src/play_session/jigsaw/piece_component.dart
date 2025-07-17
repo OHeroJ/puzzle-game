@@ -93,7 +93,7 @@ class PieceComponent extends PositionComponent
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
-    Vector2 p = event.delta;
+    Vector2 p = event.localDelta;
     setPosition(p);
     event.continuePropagation = false;
     setPriority(2);

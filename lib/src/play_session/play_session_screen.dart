@@ -57,37 +57,37 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           backgroundColor: palette.backgroundMain,
           title: Text(
             'Real Puzzle',
-            style: TextStyle(fontSize: 28.sp, color: palette.textColor),
+            style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
           ),
           actions: [
-            InkResponse(
-              onTap: () {
+            IconButton(
+              onPressed: () {
                 launchUrlString(
                     'https://github.com/xfans/flutter_jigsaw_puzzle');
               },
-              child: Icon(
+              icon: Icon(
                 Icons.code,
-                size: 40.sp,
+                size: 30.sp,
                 color: palette.textColor,
               ),
             ),
-            InkResponse(
-              onTap: () {
+            IconButton(
+              onPressed: () {
                 showReset();
               },
-              child: Icon(
-                Icons.restart_alt,
-                size: 40.sp,
+              icon: Icon(
+                Icons.refresh,
+                size: 30.sp,
                 color: palette.textColor,
               ),
             ),
-            InkResponse(
-              onTap: () {
+            IconButton(
+              onPressed: () {
                 showImage();
               },
-              child: Icon(
+              icon: Icon(
                 Icons.image,
-                size: 40.sp,
+                size: 30.sp,
                 color: palette.textColor,
               ),
             ),
@@ -104,7 +104,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                   GameWidget(
                     loadingBuilder: (context) => Center(
                       child: CircularProgressIndicator(
-                        color: palette.textColor,
+                        color: palette.primaryColor,
                       ),
                     ),
                     game: JigsawGame(
@@ -115,9 +115,6 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                       color: palette.backgroundMain,
                     ),
                   ),
-                  // AnimatedHideWidget(
-                  //   color: palette.backgroundMain,
-                  // )
                 ]),
               ),
             ),
@@ -152,10 +149,10 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
     AwesomeDialog(
         width: 400.h,
         dialogBackgroundColor: Palette().backgroundMain,
-        btnOkColor: Palette().btnOkColor,
+        btnOkColor: Palette().primaryColor,
         context: context,
         animType: AnimType.scale,
-        dialogType: DialogType.noHeader,
+        dialogType: DialogType.info,
         headerAnimationLoop: false,
         title: 'Reset pieces?',
         btnOkText: 'Reset',
@@ -203,7 +200,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       context: context,
       animType: AnimType.scale,
       headerAnimationLoop: false,
-      dialogType: DialogType.noHeader,
+      dialogType: DialogType.success,
       body: Container(
         width: 400.h,
         height: 0.3.sh,
@@ -216,13 +213,13 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                 child: Center(child: Lottie.asset('assets/lottie/win.json'))),
             Text(
               'Time: ${score.formattedTime}',
-              style: TextStyle(fontSize: 16.sp, color: Palette().textColor),
+              style: TextStyle(fontSize: 16.sp, color: Palette().textColor, fontWeight: FontWeight.bold),
             )
           ],
         ),
       ),
       dialogBackgroundColor: Palette().backgroundMain,
-      btnOkColor: Palette().btnOkColor,
+      btnOkColor: Palette().primaryColor,
       btnOkText: "Continue",
       btnOkOnPress: () {
         GoRouter.of(context).go('/play');

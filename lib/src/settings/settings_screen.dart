@@ -24,23 +24,21 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        leading: BackButton(onPressed: () {
-          Navigator.pop(context);
-        }),
+        leading: IconButton(
+          onPressed: () => GoRouter.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new),
+        ),
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
-          'Setting',
-          style: TextStyle(fontSize: 28.sp, color: palette.textColor),
+          'Settings',
+          style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: palette.backgroundMain,
       body: ListView(
         children: [
-          _gap,
-          // const _NameChangeLine(
-          //   'Name',
-          // ),
+          SizedBox(height: 20),
           ValueListenableBuilder<bool>(
             valueListenable: settings.soundsOn,
             builder: (context, soundsOn, child) => _SettingsLine(
@@ -50,13 +48,14 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: (bool value) {
                   settings.toggleSoundsOn();
                 },
+                activeColor: palette.primaryColor,
               ), // Icon(soundsOn ? Icons.volume_up : Icons.volume_off),
               onSelected: () => settings.toggleSoundsOn(),
             ),
           ),
           _SettingsLine(
             'Policy',
-            Container(),
+            Icon(Icons.policy, color: palette.textColor),
             onSelected: () {
               _launchInBrowser(Uri.parse(
                   "https://puzzle.xfans.me/puzzle/html/app-privacy-policy.html"));
@@ -64,12 +63,12 @@ class SettingsScreen extends StatelessWidget {
           ),
           _SettingsLine(
             'About',
-            Container(),
+            Icon(Icons.info, color: palette.textColor),
             onSelected: () {
               GoRouter.of(context).push('/settings/about');
             },
           ),
-          _gap,
+          SizedBox(height: 20),
         ],
       ),
     );
@@ -88,43 +87,23 @@ Future<void> _launchInBrowser(Uri url) async {
 class _SettingsLine extends StatelessWidget {
   final String title;
 
-  final Widget icon;
+  final Widget trailing;
 
   final VoidCallback? onSelected;
 
-  const _SettingsLine(this.title, this.icon, {this.onSelected});
+  const _SettingsLine(this.title, this.trailing, {this.onSelected});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-        color: Colors.black12,
-        width: 1,
-      ))),
-      child: InkResponse(
-        onTap: onSelected,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 20.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                  ),
-                ),
-              ),
-              icon,
-            ],
-          ),
-        ),
+    final palette = context.watch<Palette>();
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 18.sp, color: palette.textColor),
       ),
+      trailing: trailing,
+      onTap: onSelected,
+      contentPadding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 8.w),
     );
   }
 }

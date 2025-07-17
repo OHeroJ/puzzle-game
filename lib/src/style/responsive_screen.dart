@@ -3,6 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'palette.dart';
 
 /// A widget that makes it easy to create a screen with a square-ish
 /// main area, a smaller menu area, and a small area for a message on top.
@@ -33,10 +36,13 @@ class ResponsiveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // This widget wants to fill the whole screen.
-        final size = constraints.biggest;
+    final palette = context.watch<Palette>();
+    return Scaffold(
+      backgroundColor: palette.backgroundMain,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // This widget wants to fill the whole screen.
+          final size = constraints.biggest;
         final padding = EdgeInsets.all(size.shortestSide / 30);
 
         if (size.height >= size.width) {
@@ -120,6 +126,7 @@ class ResponsiveScreen extends StatelessWidget {
           );
         }
       },
+      ),
     );
   }
 }
