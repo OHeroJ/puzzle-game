@@ -51,7 +51,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
         appBar: AppBar(
           elevation: 0,
           leading: BackButton(onPressed: () {
-            Navigator.pop(context);
+            GoRouter.of(context).pop();
           }),
           centerTitle: true,
           backgroundColor: palette.backgroundMain,
@@ -60,17 +60,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
             style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
           ),
           actions: [
-            IconButton(
-              onPressed: () {
-                launchUrlString(
-                    'https://github.com/xfans/flutter_jigsaw_puzzle');
-              },
-              icon: Icon(
-                Icons.code,
-                size: 30.sp,
-                color: palette.textColor,
-              ),
-            ),
+
             IconButton(
               onPressed: () {
                 showReset();

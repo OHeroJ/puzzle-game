@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414324934045",
+    "project_id": "puzzle-738d3",
+    "storage_bucket": "puzzle-738d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414324934045:android:7f418435bab075531d9b74",
+        "android_client_info": {
+          "package_name": "run.oldbird.puzzle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtifPaEZMt4wPy-QdRKHHbQV2vfNVCiLE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

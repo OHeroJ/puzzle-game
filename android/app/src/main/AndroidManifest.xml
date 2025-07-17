@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.game_template">
+    package="run.oldbird.puzzle">
     <uses-sdk tools:overrideLibrary="id.co.eyro.image_compression_flutter" />
     <queries>
         <!-- If your app opens https URLs -->
@@ -12,7 +12,7 @@
     <application
         android:label="Real Puzzle"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

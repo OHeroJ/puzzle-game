@@ -47,17 +47,6 @@ class MainMenuScreen extends StatelessWidget {
                   style: TextStyle(color: palette.textColor.withOpacity(0.7)),
                 ),
               ),
-              SizedBox(height: 10),
-              InkWell(
-                onTap: () {
-                  launchUrlString(
-                      'https://github.com/xfans/flutter_jigsaw_puzzle');
-                },
-                child: Text(
-                  'https://github.com/xfans/flutter_jigsaw_puzzle',
-                  style: TextStyle(color: palette.textColor.withOpacity(0.7)),
-                ),
-              ),
             ],
           ),
         ),
