@@ -36,8 +36,11 @@ class JigsawGridItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                     color: Colors.grey,
                   ),
-                  child: Text('@${info.photographer}',overflow: TextOverflow.ellipsis,
-                    maxLines: 1,)),
+                  child: Text(
+                    '@${info.photographer}',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  )),
               bottom: 2,
               right: 6,
             )

@@ -7,17 +7,17 @@ import 'package:file/file.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_jigsaw_puzzle/src/level_selection/jigsaw_info.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart' hide Level;
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
 import '../games_services/score.dart';
 import '../settings/settings.dart';
 import '../style/palette.dart';
-import 'animated_hide_widget.dart';
 import 'jigsaw/jigsaw_game.dart';
 
 class PlaySessionScreen extends StatefulWidget {
@@ -212,11 +212,11 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-                height: 0.2.sh,child: Center(child: Lottie.asset('assets/lottie/win.json'))),
+                height: 0.2.sh,
+                child: Center(child: Lottie.asset('assets/lottie/win.json'))),
             Text(
               'Time: ${score.formattedTime}',
-              style:
-                  TextStyle(fontSize: 16.sp, color: Palette().textColor),
+              style: TextStyle(fontSize: 16.sp, color: Palette().textColor),
             )
           ],
         ),

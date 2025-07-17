@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../style/palette.dart';
 import 'settings.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -23,16 +24,14 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        leading:  BackButton(onPressed: () {
+        leading: BackButton(onPressed: () {
           Navigator.pop(context);
         }),
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
           'Setting',
-          style: TextStyle(
-              fontSize: 28.sp,
-              color: palette.textColor),
+          style: TextStyle(fontSize: 28.sp, color: palette.textColor),
         ),
       ),
       backgroundColor: palette.backgroundMain,
@@ -85,7 +84,6 @@ Future<void> _launchInBrowser(Uri url) async {
     throw Exception('Could not launch $url');
   }
 }
-
 
 class _SettingsLine extends StatelessWidget {
   final String title;

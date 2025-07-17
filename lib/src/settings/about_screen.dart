@@ -58,9 +58,7 @@ class _AboutScreenState extends State<AboutScreen> {
         backgroundColor: palette.backgroundMain,
         title: Text(
           'Setting',
-          style: TextStyle(
-              fontSize: 40.sp,
-              color: palette.textColor),
+          style: TextStyle(fontSize: 40.sp, color: palette.textColor),
         ),
       ),
       backgroundColor: palette.backgroundMain,

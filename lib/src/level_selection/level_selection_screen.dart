@@ -7,7 +7,6 @@ import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jigsaw_puzzle/src/http/api.dart';
 import 'package:flutter_jigsaw_puzzle/src/http/dio_client.dart';
-import 'package:flutter_jigsaw_puzzle/src/level_selection/piece_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';

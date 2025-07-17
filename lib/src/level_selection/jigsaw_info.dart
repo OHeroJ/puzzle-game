@@ -12,7 +12,11 @@ class JigsawInfo {
   late String title;
   late String photographer;
 
-  JigsawInfo(this.image,this.smallimage ,this.title,);
+  JigsawInfo(
+    this.image,
+    this.smallimage,
+    this.title,
+  );
 
   JigsawInfo.fromJson(dynamic json) {
     id = json['id'];

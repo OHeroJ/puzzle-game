@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
 import '../settings/settings.dart';
 import '../style/palette.dart';
 import '../style/responsive_screen.dart';
@@ -42,20 +43,18 @@ class MainMenuScreen extends StatelessWidget {
                     onTap: () {
                       launchUrlString('https://www.pexels.com');
                     },
-                    child: Text(
-                        'Photos provided by Pexels'
-                    ),
+                    child: Text('Photos provided by Pexels'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: InkWell(
                     onTap: () {
-                      launchUrlString('https://github.com/xfans/flutter_jigsaw_puzzle');
+                      launchUrlString(
+                          'https://github.com/xfans/flutter_jigsaw_puzzle');
                     },
-                    child: Text(
-                        'https://github.com/xfans/flutter_jigsaw_puzzle'
-                    ),
+                    child:
+                        Text('https://github.com/xfans/flutter_jigsaw_puzzle'),
                   ),
                 )
               ],

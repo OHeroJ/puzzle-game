@@ -4,8 +4,6 @@ import 'dart:math' as math;
 import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:audioplayers/audioplayers.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';

@@ -1,13 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter_jigsaw_puzzle/src/http/api.dart';
 
 import 'http_engine.dart';
-
 
 class DioEngine extends HttpEngine {
   late Dio _dio;
@@ -30,9 +26,7 @@ class DioEngine extends HttpEngine {
 
   @override
   void setProxy(String proxy) {
-    if (proxy.isNotEmpty) {
-
-    }
+    if (proxy.isNotEmpty) {}
   }
 
   @override

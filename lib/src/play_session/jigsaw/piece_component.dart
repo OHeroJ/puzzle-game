@@ -202,7 +202,7 @@ class PieceComponent extends PositionComponent
     }
     print('onDragEnd:${willAdd.length}');
     final root = findParent() as JigsawGame;
-    root.getResult(this.group.children.length,willAdd.length>0);
+    root.getResult(this.group.children.length, willAdd.length > 0);
     print("root:${root.toString()}");
   }
 

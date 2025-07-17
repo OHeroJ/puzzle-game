@@ -7,10 +7,9 @@ import 'package:flutter/foundation.dart';
 /// Encapsulates a score and the arithmetic to compute it.
 @immutable
 class Score {
-
   final Duration duration;
 
-  const Score( this.duration);
+  const Score(this.duration);
 
   String get formattedTime {
     final buf = StringBuffer();

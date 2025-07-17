@@ -13,7 +13,7 @@ class PuzzleHitbox extends RectangleHitbox {
     super.anchor,
   });
 
-   void inactive() {
+  void inactive() {
     collisionType = CollisionType.inactive;
   }
 }
