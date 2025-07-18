@@ -1,16 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="run.oldbird.puzzle">
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-sdk tools:overrideLibrary="id.co.eyro.image_compression_flutter" />
     <queries>
-        <!-- If your app opens https URLs -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
     </queries>
     <application
-        android:label="Real Puzzle"
+        android:label="Puzzle"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
