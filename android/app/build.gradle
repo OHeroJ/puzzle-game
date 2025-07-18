@@ -17,11 +17,12 @@ if (keystorePropertiesFile.exists()) {
 
 android {
 
-    namespace='come.example.game_template'
+    namespace='com.example.game_template'
 
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+//    ndkVersion flutter.ndkVersion
 
+    ndkVersion = "27.0.12077973"
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -29,10 +30,6 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
     }
 
     defaultConfig {
@@ -59,14 +56,6 @@ android {
 
         debug {
             signingConfig signingConfigs.release
-        }
-    }
-    android.applicationVariants.all{ variant ->
-        variant.outputs.all{
-//            def createTime = new Date().format("YYYYMMddhhmm", TimeZone.getTimeZone("GMT+08:00"))
-//            def fileName = "${project.name}_${buildType.name}_v${defaultConfig.versionName}_${createTime}.apk"
-            def fileName = "real_puzzle_${defaultConfig.versionName}.apk"
-            outputFileName = fileName
         }
     }
 }

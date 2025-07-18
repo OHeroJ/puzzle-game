@@ -72,56 +72,57 @@ class MyApp extends StatelessWidget {
   static final _router = GoRouter(
     routes: [
       GoRoute(
-          path: '/',
-          builder: (context, state) =>
-              const MainMenuScreen(key: Key('main menu')),
-          routes: [
-            GoRoute(
-                path: 'play',
-                pageBuilder: (context, state) => buildMyTransition<void>(
-                      child: const LevelSelectionScreen(
-                          key: Key('level selection')),
-                      color: context.watch<Palette>().backgroundMain,
+        path: '/',
+        builder: (context, state) =>
+            const MainMenuScreen(key: Key('main menu')),
+        routes: [
+          GoRoute(
+            path: 'play',
+            pageBuilder: (context, state) => buildMyTransition<void>(
+              child: const LevelSelectionScreen(key: Key('level selection')),
+              color: context.watch<Palette>().backgroundMain,
+            ),
+            routes: [
+              GoRoute(
+                path: 'loading',
+                pageBuilder: (context, state) {
+                  final jigsaw = state.extra! as JigsawInfo;
+                  return buildMyTransition<void>(
+                    child: LoadingSelectionScreen(
+                      key: const Key('loading session'),
+                      level: jigsaw,
                     ),
-                routes: [
-                  GoRoute(
-                    path: 'loading',
-                    pageBuilder: (context, state) {
-                      final jigsaw = state.extra! as JigsawInfo;
-                      return buildMyTransition<void>(
-                        child: LoadingSelectionScreen(
-                          key: const Key('loading session'),
-                          level: jigsaw,
-                        ),
-                        color: context.watch<Palette>().backgroundMain,
-                      );
-                    },
-                  ),
-                  GoRoute(
-                    path: 'session',
-                    pageBuilder: (context, state) {
-                      final jigsaw = state.extra! as JigsawInfo;
-                      return buildMyTransition<void>(
-                        child: PlaySessionScreen(
-                          jigsaw,
-                          key: const Key('play session'),
-                        ),
-                        color: context.watch<Palette>().backgroundMain,
-                      );
-                    },
-                  ),
-                ]),
-            GoRoute(
-                path: 'settings',
-                builder: (context, state) =>
-                    const SettingsScreen(key: Key('settings')),
-                routes: [
-                  GoRoute(
-                    path: 'about',
-                    builder: (context, state) => const AboutScreen(),
-                  )
-                ]),
-          ]),
+                    color: context.watch<Palette>().backgroundMain,
+                  );
+                },
+              ),
+              GoRoute(
+                path: 'session',
+                pageBuilder: (context, state) {
+                  final jigsaw = state.extra! as JigsawInfo;
+                  return buildMyTransition<void>(
+                    child: PlaySessionScreen(
+                      jigsaw,
+                      key: const Key('play session'),
+                    ),
+                    color: context.watch<Palette>().backgroundMain,
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+              path: 'settings',
+              builder: (context, state) =>
+                  const SettingsScreen(key: Key('settings')),
+              routes: [
+                GoRoute(
+                  path: 'about',
+                  builder: (context, state) => const AboutScreen(),
+                )
+              ]),
+        ],
+      ),
     ],
   );
 
