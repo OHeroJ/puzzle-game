@@ -55,7 +55,7 @@ class MainMenuScreen extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                GoRouter.of(context).go('/play');
+                GoRouter.of(context).push('/play');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: palette.primaryColor,

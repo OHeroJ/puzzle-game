@@ -78,7 +78,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
-          'Real Puzzle',
+          'Puzzles',
           style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -86,7 +86,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
               onPressed: () {
                 GoRouter.of(context).push('/settings');
               },
-              icon: Icon(Icons.settings, color: palette.textColor)),
+              icon: Icon(Icons.settings, color: palette.textColor),),
         ],
       ),
       body: Center(
@@ -222,7 +222,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
           child: ElevatedButton(
             onPressed: () {
               item.gridSize = gridSizeValue;
-              GoRouter.of(context).go('/play/loading/', extra: item);
+              GoRouter.of(context).push('/play/loading/', extra: item);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: palette.primaryColor,

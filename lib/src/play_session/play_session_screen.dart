@@ -56,7 +56,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           centerTitle: true,
           backgroundColor: palette.backgroundMain,
           title: Text(
-            'Real Puzzle',
+            'Puzzle',
             style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
           ),
           actions: [
@@ -212,7 +212,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       btnOkColor: Palette().primaryColor,
       btnOkText: "Continue",
       btnOkOnPress: () {
-        GoRouter.of(context).go('/play');
+        GoRouter.of(context).push('/play');
       },
     ).show();
 
