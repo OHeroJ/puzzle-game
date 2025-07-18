@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:math';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
@@ -79,14 +81,18 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         backgroundColor: palette.backgroundMain,
         title: Text(
           'Puzzles',
-          style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 28.sp,
+              color: palette.textColor,
+              fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                GoRouter.of(context).push('/settings');
-              },
-              icon: Icon(Icons.settings, color: palette.textColor),),
+            onPressed: () {
+              GoRouter.of(context).push('/settings');
+            },
+            icon: Icon(Icons.settings, color: palette.textColor),
+          ),
         ],
       ),
       body: Center(
@@ -100,7 +106,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
                     'Photos provided by Pexels',
-                    style: TextStyle(fontSize: 16.sp, color: palette.textColor.withOpacity(0.7)),
+                    style: TextStyle(
+                        fontSize: 16.sp,
+                        color: palette.textColor.withOpacity(0.7)),
                   ),
                 ),
               )),
@@ -138,12 +146,13 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   void _showDetailsDialog(
       BuildContext context, JigsawInfo item, Palette palette) {
     var gridSizeValue = 4;
+
     AwesomeDialog(
       dialogBackgroundColor: palette.backgroundMain,
       btnOkColor: palette.primaryColor,
       context: context,
       animType: AnimType.scale,
-      width: 600.w,
+      width: max(0.9.sw, 600.w),
       dialogType: DialogType.noHeader,
       body: StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -153,7 +162,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
               children: [
                 Text(
                   'Pieces:',
-                  style: TextStyle(fontStyle: FontStyle.italic, color: palette.textColor),
+                  style: TextStyle(
+                      fontStyle: FontStyle.italic, color: palette.textColor),
                 ),
                 SizedBox(
                   height: 20.h,
@@ -218,7 +228,6 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       ),
       btnOk: Center(
         child: Container(
-          width: 100.w,
           child: ElevatedButton(
             onPressed: () {
               item.gridSize = gridSizeValue;
@@ -250,9 +259,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         margin: EdgeInsets.only(left: 8.w, right: 8.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: gridSizeValue == num
-              ? palette.primaryColor
-              : palette.lightGray,
+          color:
+              gridSizeValue == num ? palette.primaryColor : palette.lightGray,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -261,7 +269,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: 26.sp,
-                    color: gridSizeValue == num ? Colors.white : palette.textColor)),
+                    color: gridSizeValue == num
+                        ? Colors.white
+                        : palette.textColor)),
           ],
         ),
       ),
