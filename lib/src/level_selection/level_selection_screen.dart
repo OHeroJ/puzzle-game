@@ -153,7 +153,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       btnOkColor: palette.primaryColor,
       context: context,
       animType: AnimType.scale,
-      width: (1.sw > 500 ? 600.w : 0.95.sw),
+      width: (1.sw > 500 ? 700.w : 0.95.sw),
       dialogType: DialogType.noHeader,
       body: StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
