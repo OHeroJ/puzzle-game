@@ -50,7 +50,7 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Future.delayed(Duration(milliseconds: 1500), () async {
                   GoRouter.of(context)
-                      .push('/play/session/', extra: widget.level);
+                      .pushReplacement('/play/session/', extra: widget.level);
                 });
               });
             },

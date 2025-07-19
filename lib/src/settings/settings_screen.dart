@@ -25,14 +25,19 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          onPressed: () => GoRouter.of(context).pop(),
+          onPressed: () {
+            GoRouter.of(context).pop();
+          },
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
           'Settings',
-          style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 28.sp,
+              color: palette.textColor,
+              fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: palette.backgroundMain,

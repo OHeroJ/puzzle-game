@@ -81,52 +81,48 @@ class MyApp extends StatelessWidget {
         path: '/',
         builder: (context, state) =>
             const MainMenuScreen(key: Key('main menu')),
+      ),
+      GoRoute(
+        path: '/play',
+        pageBuilder: (context, state) => buildMyTransition<void>(
+          child: const LevelSelectionScreen(key: Key('level selection')),
+          color: context.watch<Palette>().backgroundMain,
+        ),
+      ),
+      GoRoute(
+        path: '/play/loading',
+        pageBuilder: (context, state) {
+          final jigsaw = state.extra! as JigsawInfo;
+          return buildMyTransition<void>(
+            child: LoadingSelectionScreen(
+              key: const Key('loading session'),
+              level: jigsaw,
+            ),
+            color: context.watch<Palette>().backgroundMain,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/play/session',
+        pageBuilder: (context, state) {
+          final jigsaw = state.extra! as JigsawInfo;
+          return buildMyTransition<void>(
+            child: PlaySessionScreen(
+              jigsaw,
+              key: const Key('play session'),
+            ),
+            color: context.watch<Palette>().backgroundMain,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(key: Key('settings')),
         routes: [
           GoRoute(
-            path: 'play',
-            pageBuilder: (context, state) => buildMyTransition<void>(
-              child: const LevelSelectionScreen(key: Key('level selection')),
-              color: context.watch<Palette>().backgroundMain,
-            ),
-            routes: [
-              GoRoute(
-                path: 'loading',
-                pageBuilder: (context, state) {
-                  final jigsaw = state.extra! as JigsawInfo;
-                  return buildMyTransition<void>(
-                    child: LoadingSelectionScreen(
-                      key: const Key('loading session'),
-                      level: jigsaw,
-                    ),
-                    color: context.watch<Palette>().backgroundMain,
-                  );
-                },
-              ),
-              GoRoute(
-                path: 'session',
-                pageBuilder: (context, state) {
-                  final jigsaw = state.extra! as JigsawInfo;
-                  return buildMyTransition<void>(
-                    child: PlaySessionScreen(
-                      jigsaw,
-                      key: const Key('play session'),
-                    ),
-                    color: context.watch<Palette>().backgroundMain,
-                  );
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-              path: 'settings',
-              builder: (context, state) =>
-                  const SettingsScreen(key: Key('settings')),
-              routes: [
-                GoRoute(
-                  path: 'about',
-                  builder: (context, state) => const AboutScreen(),
-                )
-              ]),
+            path: 'about',
+            builder: (context, state) => const AboutScreen(),
+          )
         ],
       ),
     ],
@@ -179,7 +175,7 @@ class MyApp extends StatelessWidget {
 
               return MaterialApp.router(
                 builder: EasyLoading.init(),
-                title: 'Real Puzzle',
+                title: 'Puzzle',
                 theme: ThemeData(
                   textTheme: GoogleFonts.poppinsTextTheme(
                     Theme.of(context).textTheme,
@@ -193,9 +189,7 @@ class MyApp extends StatelessWidget {
                   ),
                   useMaterial3: true,
                 ),
-                routeInformationProvider: _router.routeInformationProvider,
-                routeInformationParser: _router.routeInformationParser,
-                routerDelegate: _router.routerDelegate,
+                routerConfig: _router,
                 scaffoldMessengerKey: scaffoldMessengerKey,
                 showPerformanceOverlay: false,
               );

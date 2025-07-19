@@ -27,37 +27,30 @@ class LevelSelectionScreen extends StatefulWidget {
 }
 
 class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
-  final PagingController<int, JigsawInfo> _pagingController =
-      PagingController(firstPageKey: 1);
+  late final PagingController<int, JigsawInfo> _pagingController;
 
   @override
   void initState() {
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey);
-    });
+    _pagingController = PagingController<int, JigsawInfo>(
+        fetchPage: _fetchPage,
+        getNextPageKey: (PagingState<int, JigsawInfo> state) {
+          return state.lastPageIsEmpty ? null : state.nextIntPageKey;
+        });
+
     super.initState();
   }
 
-  Future<void> _fetchPage(int pageId) async {
+  Future<List<JigsawInfo>> _fetchPage(int pageId) async {
     try {
       final response = await DioClient.getInstance()
           .get(Api.image, params: {"page": pageId, "per_page": 15});
       final List<JigsawInfo> newLists = (response["photos"] as List)
           .map((ele) => JigsawInfo.fromJson(ele))
           .toList();
-      final isLastPage = response["next_page"] == null;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newLists);
-      } else {
-        final nextPageId = pageId + 1;
-        _pagingController.appendPage(newLists, nextPageId);
-      }
+      return newLists;
     } catch (error) {
-      _pagingController.error = error;
-      if (mounted) {
-        CherryToast.error(title: Text(error.toString())).show(context);
-      }
-      print(error);
+      _pagingController.value = _pagingController.value.copyWith(error: error);
+      return [];
     }
   }
 
@@ -74,7 +67,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          onPressed: () => GoRouter.of(context).pop(),
+          onPressed: () => GoRouter.of(context).go("/"),
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
@@ -112,25 +105,32 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                   ),
                 ),
               )),
-              PagedSliverGrid<int, JigsawInfo>(
-                pagingController: _pagingController,
-                showNewPageProgressIndicatorAsGridChild: false,
-                showNewPageErrorIndicatorAsGridChild: false,
-                showNoMoreItemsIndicatorAsGridChild: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 50 / 33,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: 4,
-                ),
-                builderDelegate: PagedChildBuilderDelegate<JigsawInfo>(
-                  itemBuilder: (context, item, index) => JigsawGridItem(
-                    info: item,
-                    onTap: () {
-                      _showDetailsDialog(context, item, palette);
-                    },
-                  ),
-                ),
+              PagingListener(
+                controller: _pagingController,
+                builder: (context, state, fetchNextPage) {
+                  return PagedSliverGrid<int, JigsawInfo>(
+                    showNewPageProgressIndicatorAsGridChild: false,
+                    showNewPageErrorIndicatorAsGridChild: false,
+                    showNoMoreItemsIndicatorAsGridChild: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 50 / 33,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      crossAxisCount: 4,
+                    ),
+                    builderDelegate: PagedChildBuilderDelegate<JigsawInfo>(
+                      itemBuilder: (context, item, index) => JigsawGridItem(
+                        info: item,
+                        onTap: () {
+                          _showDetailsDialog(context, item, palette);
+                        },
+                      ),
+                    ),
+                    state: state,
+                    fetchNextPage: fetchNextPage,
+                  );
+                },
               ),
               SliverToBoxAdapter(
                   child: SizedBox(
@@ -146,8 +146,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   void _showDetailsDialog(
       BuildContext context, JigsawInfo item, Palette palette) {
     var gridSizeValue = 4;
-
-    AwesomeDialog(
+    late AwesomeDialog dialog;
+    dialog = AwesomeDialog(
       dialogBackgroundColor: palette.backgroundMain,
       btnOkColor: palette.primaryColor,
       context: context,
@@ -230,8 +230,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         child: Container(
           child: ElevatedButton(
             onPressed: () {
+              dialog.dismiss();
               item.gridSize = gridSizeValue;
-              GoRouter.of(context).push('/play/loading/', extra: item);
+              GoRouter.of(context).push('/play/loading', extra: item);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: palette.primaryColor,
@@ -244,7 +245,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
           ),
         ),
       ),
-    ).show();
+    )..show();
   }
 
   Widget buildSelectGridSize(
