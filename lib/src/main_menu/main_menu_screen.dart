@@ -2,7 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -23,32 +25,39 @@ class MainMenuScreen extends StatelessWidget {
       backgroundColor: palette.backgroundMain,
       body: ResponsiveScreen(
         mainAreaProminence: 0.45,
-        squarishMainArea: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Puzzle Game',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 60,
-                  height: 1,
-                  color: palette.textColor,
-                  fontWeight: FontWeight.bold,
-                ),
+        squarishMainArea: Column(
+          children: [
+            Expanded(
+                child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Puzzle Game',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 60,
+                      height: 1,
+                      color: palette.textColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  InkWell(
+                    onTap: () {
+                      launchUrlString('https://www.pexels.com');
+                    },
+                    child: Text(
+                      'Photos provided by Pexels',
+                      style:
+                          TextStyle(color: palette.textColor.withOpacity(0.7)),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              InkWell(
-                onTap: () {
-                  launchUrlString('https://www.pexels.com');
-                },
-                child: Text(
-                  'Photos provided by Pexels',
-                  style: TextStyle(color: palette.textColor.withOpacity(0.7)),
-                ),
-              ),
-            ],
-          ),
+            )),
+            _buildBAH(),
+          ],
         ),
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -96,5 +105,56 @@ class MainMenuScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildBAH() {
+    if (kIsWeb)
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 30.h,
+          ),
+          GestureDetector(
+            onTap: () {
+              launchUrlString('https://beian.miit.gov.cn');
+            },
+            child: Text(
+              '赣ICP备2021010021号-1',
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          GestureDetector(
+            onTap: () {
+              launchUrlString(
+                  'https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=36011102000528');
+            },
+            child: Row(
+              children: [
+                Image.asset(
+                  "assets/images/beanh.png",
+                  width: 12,
+                  height: 12,
+                ),
+                Text(
+                  '赣公网安备 36011102000528号',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey,
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      );
+    else
+      return SizedBox();
   }
 }
