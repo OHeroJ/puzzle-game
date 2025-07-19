@@ -57,10 +57,12 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           backgroundColor: palette.backgroundMain,
           title: Text(
             'Puzzle',
-            style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                fontSize: 28.sp,
+                color: palette.textColor,
+                fontWeight: FontWeight.bold),
           ),
           actions: [
-
             IconButton(
               onPressed: () {
                 showReset();
@@ -203,7 +205,10 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                 child: Center(child: Lottie.asset('assets/lottie/win.json'))),
             Text(
               'Time: ${score.formattedTime}',
-              style: TextStyle(fontSize: 16.sp, color: Palette().textColor, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Palette().textColor,
+                  fontWeight: FontWeight.bold),
             )
           ],
         ),
@@ -212,7 +217,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       btnOkColor: Palette().primaryColor,
       btnOkText: "Continue",
       btnOkOnPress: () {
-        GoRouter.of(context).push('/play');
+        GoRouter.of(context).pop();
       },
     ).show();
 
