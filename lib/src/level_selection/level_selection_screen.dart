@@ -67,7 +67,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          onPressed: () => GoRouter.of(context).go("/"),
+          onPressed: () => GoRouter.of(context).pop(),
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
         centerTitle: true,
@@ -92,6 +92,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         child: Container(
           width: 0.9.sw,
           child: CustomScrollView(
+            scrollBehavior:
+                MaterialScrollBehavior().copyWith(scrollbars: false),
             slivers: [
               SliverToBoxAdapter(
                   child: Center(
@@ -112,12 +114,11 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                     showNewPageProgressIndicatorAsGridChild: false,
                     showNewPageErrorIndicatorAsGridChild: false,
                     showNoMoreItemsIndicatorAsGridChild: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: 50 / 33,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      crossAxisCount: 4,
+                      crossAxisCount: 1.sw > 500 ? 4 : 3,
                     ),
                     builderDelegate: PagedChildBuilderDelegate<JigsawInfo>(
                       itemBuilder: (context, item, index) => JigsawGridItem(
@@ -152,7 +153,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       btnOkColor: palette.primaryColor,
       context: context,
       animType: AnimType.scale,
-      width: max(0.9.sw, 600.w),
+      width: (1.sw > 500 ? 600.w : 0.95.sw),
       dialogType: DialogType.noHeader,
       body: StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -161,7 +162,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             child: Column(
               children: [
                 Text(
-                  'Pieces:',
+                  'Pieces',
                   style: TextStyle(
                       fontStyle: FontStyle.italic, color: palette.textColor),
                 ),
@@ -255,9 +256,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         f(num);
       },
       child: Container(
-        width: 100.w,
-        padding: EdgeInsets.only(left: 20.w, right: 20.w),
-        margin: EdgeInsets.only(left: 8.w, right: 8.w),
+        width: 120.w,
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+        margin: EdgeInsets.only(left: 10.w, right: 10.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color:
@@ -269,7 +270,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             Text("${num * num}",
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
-                    fontSize: 26.sp,
+                    fontSize: 28.sp,
                     color: gridSizeValue == num
                         ? Colors.white
                         : palette.textColor)),

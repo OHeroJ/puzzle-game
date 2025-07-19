@@ -84,10 +84,13 @@ class MyApp extends StatelessWidget {
       ),
       GoRoute(
         path: '/play',
-        pageBuilder: (context, state) => buildMyTransition<void>(
-          child: const LevelSelectionScreen(key: Key('level selection')),
-          color: context.watch<Palette>().backgroundMain,
-        ),
+        builder: (context, state) {
+          return const LevelSelectionScreen(key: Key('level selection'));
+        },
+        // pageBuilder: (context, state) => buildMyTransition<void>(
+        //   child: const LevelSelectionScreen(key: Key('level selection')),
+        //   color: context.watch<Palette>().backgroundMain,
+        // ),
       ),
       GoRoute(
         path: '/play/loading',
