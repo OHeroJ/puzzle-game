@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jigsaw_puzzle/src/level_selection/jigsaw_info.dart';
-import 'package:flutter_jigsaw_puzzle/src/level_selection/piece_image.dart';
+import 'package:puzzle/src/level_selection/jigsaw_info.dart';
+import 'package:puzzle/src/level_selection/piece_image.dart';
 import 'package:provider/provider.dart';
 
 import '../style/palette.dart';
 
 class JigsawGridItem extends StatelessWidget {
-  const JigsawGridItem({
-    required this.info,
-    Key? key,
-    this.onTap,
-  }) : super(key: key);
+  const JigsawGridItem({required this.info, Key? key, this.onTap})
+    : super(key: key);
   final JigsawInfo info;
   final GestureTapCallback? onTap;
 
@@ -36,15 +33,16 @@ class JigsawGridItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Stack(
             children: [
-              Positioned.fill(
-                child: PieceImage(pictureUrl: info.smallimage),
-              ),
+              Positioned.fill(child: PieceImage(pictureUrl: info.smallimage)),
               Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 4.0,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.5),
                   ),
@@ -55,7 +53,7 @@ class JigsawGridItem extends StatelessWidget {
                     style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -7,7 +7,7 @@ import 'package:file/file.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_jigsaw_puzzle/src/level_selection/jigsaw_info.dart';
+import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart' hide Level;
@@ -50,72 +50,65 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
-          leading: BackButton(onPressed: () {
-            GoRouter.of(context).pop();
-          }),
+          leading: BackButton(
+            onPressed: () {
+              GoRouter.of(context).pop();
+            },
+          ),
           centerTitle: true,
           backgroundColor: palette.backgroundMain,
           title: Text(
             'Puzzle',
             style: TextStyle(
-                fontSize: 28.sp,
-                color: palette.textColor,
-                fontWeight: FontWeight.bold),
+              fontSize: 28.sp,
+              color: palette.textColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: [
             IconButton(
               onPressed: () {
                 showReset();
               },
-              icon: Icon(
-                Icons.refresh,
-                size: 30.sp,
-                color: palette.textColor,
-              ),
+              icon: Icon(Icons.refresh, size: 30.sp, color: palette.textColor),
             ),
             IconButton(
               onPressed: () {
                 showImage();
               },
-              icon: Icon(
-                Icons.image,
-                size: 30.sp,
-                color: palette.textColor,
-              ),
+              icon: Icon(Icons.image, size: 30.sp, color: palette.textColor),
             ),
-            SizedBox(
-              width: 16.w,
-            )
+            SizedBox(width: 16.w),
           ],
         ),
         body: Column(
           children: [
             Expanded(
               child: Container(
-                child: Stack(children: [
-                  GameWidget(
-                    loadingBuilder: (context) => Center(
-                      child: CircularProgressIndicator(
-                        color: palette.primaryColor,
+                child: Stack(
+                  children: [
+                    GameWidget(
+                      loadingBuilder: (context) => Center(
+                        child: CircularProgressIndicator(
+                          color: palette.primaryColor,
+                        ),
                       ),
+                      game: JigsawGame(
+                        widget.level,
+                        settingsController.soundsOn.value,
+                        () {
+                          playerWon();
+                        },
+                      ),
+                      backgroundBuilder: (context) =>
+                          Container(color: palette.backgroundMain),
                     ),
-                    game: JigsawGame(
-                        widget.level, settingsController.soundsOn.value, () {
-                      playerWon();
-                    }),
-                    backgroundBuilder: (context) => Container(
-                      color: palette.backgroundMain,
-                    ),
-                  ),
-                ]),
+                  ],
+                ),
               ),
             ),
-            SizedBox(
-              height: 8.h,
-            ),
-            SizedBox(
-              height: 8.h,
-            )
+            SizedBox(height: 8.h),
+            SizedBox(height: 8.h),
           ],
         ),
       ),
@@ -139,20 +132,21 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
   void showReset() async {
     AwesomeDialog(
-        width: 400.h,
-        dialogBackgroundColor: Palette().backgroundMain,
-        btnOkColor: Palette().primaryColor,
-        context: context,
-        animType: AnimType.scale,
-        dialogType: DialogType.info,
-        headerAnimationLoop: false,
-        title: 'Reset pieces?',
-        btnOkText: 'Reset',
-        btnCancelText: 'Cancel',
-        btnCancelOnPress: () {},
-        btnOkOnPress: () {
-          setState(() {});
-        }).show();
+      width: 400.h,
+      dialogBackgroundColor: Palette().backgroundMain,
+      btnOkColor: Palette().primaryColor,
+      context: context,
+      animType: AnimType.scale,
+      dialogType: DialogType.info,
+      headerAnimationLoop: false,
+      title: 'Reset pieces?',
+      btnOkText: 'Reset',
+      btnCancelText: 'Cancel',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        setState(() {});
+      },
+    ).show();
   }
 
   void showImage() async {
@@ -169,9 +163,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           height: 300.h,
           padding: EdgeInsets.all(20.h),
           clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.r),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.r)),
           child: Image.file(file, fit: BoxFit.contain),
         ),
       ),
@@ -179,11 +171,9 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
   }
 
   Future<void> playerWon() async {
-//   _log.info('Level ${widget.level.number} won');
-//
-    final score = Score(
-      DateTime.now().difference(_startOfPlay),
-    );
+    //   _log.info('Level ${widget.level.number} won');
+    //
+    final score = Score(DateTime.now().difference(_startOfPlay));
     AwesomeDialog(
       width: 400.h,
       bodyHeaderDistance: 0,
@@ -201,15 +191,17 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-                height: 0.2.sh,
-                child: Center(child: Lottie.asset('assets/lottie/win.json'))),
+              height: 0.2.sh,
+              child: Center(child: Lottie.asset('assets/lottie/win.json')),
+            ),
             Text(
               'Time: ${score.formattedTime}',
               style: TextStyle(
-                  fontSize: 16.sp,
-                  color: Palette().textColor,
-                  fontWeight: FontWeight.bold),
-            )
+                fontSize: 16.sp,
+                color: Palette().textColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),

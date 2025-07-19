@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_jigsaw_puzzle/src/http/api.dart';
+import 'package:puzzle/src/http/api.dart';
 
 import 'http_engine.dart';
 
@@ -16,12 +16,15 @@ class DioEngine extends HttpEngine {
     );
     _dio = Dio(options);
     // _dio.options.headers.addAll(AppConfig.headerMap);
-    _dio.interceptors.add(LogInterceptor(
+    _dio.interceptors.add(
+      LogInterceptor(
         requestHeader: false,
         responseHeader: false,
         requestBody: true,
         responseBody: true,
-        request: false)); //开启请求日志
+        request: false,
+      ),
+    ); //开启请求日志
   }
 
   @override
@@ -34,8 +37,11 @@ class DioEngine extends HttpEngine {
     await checkRequest(url);
     CancelToken token = addUrlToken(url);
     try {
-      var response =
-          await _dio.get(url, queryParameters: params, cancelToken: token);
+      var response = await _dio.get(
+        url,
+        queryParameters: params,
+        cancelToken: token,
+      );
 
       Map<String, dynamic> map = json.decode(response.toString());
       return map;

@@ -1,8 +1,8 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
-import 'package:flutter_jigsaw_puzzle/src/play_session/collision/PuzzleHitbox.dart';
-import 'package:flutter_jigsaw_puzzle/src/play_session/shape_type.dart';
+import 'package:puzzle/src/play_session/collision/PuzzleHitbox.dart';
+import 'package:puzzle/src/play_session/shape_type.dart';
 
 /// The default implementation of [CollisionDetection].
 /// Checks whether any [ShapeHitbox]s in [items] collide with each other and
@@ -13,15 +13,12 @@ import 'package:flutter_jigsaw_puzzle/src/play_session/shape_type.dart';
 class PuzzleCollisionDetection<B extends Broadphase<ShapeHitbox>>
     extends CollisionDetection<ShapeHitbox, B> {
   PuzzleCollisionDetection({B? broadphase})
-      : super(broadphase: broadphase ?? Sweep<ShapeHitbox>() as B);
+    : super(broadphase: broadphase ?? Sweep<ShapeHitbox>() as B);
 
   /// Check what the intersection points of two collidables are,
   /// returns an empty list if there are no intersections.
   @override
-  Set<Vector2> intersections(
-    ShapeHitbox hitboxA,
-    ShapeHitbox hitboxB,
-  ) {
+  Set<Vector2> intersections(ShapeHitbox hitboxA, ShapeHitbox hitboxB) {
     return hitboxA.intersections(hitboxB);
   }
 
@@ -73,18 +70,22 @@ class PuzzleCollisionDetection<B extends Broadphase<ShapeHitbox>>
   static final _temporaryRaycastResult = RaycastResult<ShapeHitbox>();
 
   @override
-  RaycastResult<ShapeHitbox>? raycast(Ray2 ray,
-      {double? maxDistance,
-      bool Function(ShapeHitbox candidate)? hitboxFilter,
-      List<ShapeHitbox>? ignoreHitboxes,
-      RaycastResult<ShapeHitbox>? out}) {
+  RaycastResult<ShapeHitbox>? raycast(
+    Ray2 ray, {
+    double? maxDistance,
+    bool Function(ShapeHitbox candidate)? hitboxFilter,
+    List<ShapeHitbox>? ignoreHitboxes,
+    RaycastResult<ShapeHitbox>? out,
+  }) {
     var finalResult = out?..reset();
     for (final item in items) {
       if (ignoreHitboxes?.contains(item) ?? false) {
         continue;
       }
-      final currentResult =
-          item.rayIntersection(ray, out: _temporaryRaycastResult);
+      final currentResult = item.rayIntersection(
+        ray,
+        out: _temporaryRaycastResult,
+      );
       final possiblyFirstResult = !(finalResult?.isActive ?? false);
       if (currentResult != null &&
           (possiblyFirstResult ||
@@ -101,15 +102,17 @@ class PuzzleCollisionDetection<B extends Broadphase<ShapeHitbox>>
   }
 
   @override
-  List<RaycastResult<ShapeHitbox>> raycastAll(Vector2 origin,
-      {required int numberOfRays,
-      double startAngle = 0,
-      double sweepAngle = tau,
-      double? maxDistance,
-      List<Ray2>? rays,
-      bool Function(ShapeHitbox candidate)? hitboxFilter,
-      List<ShapeHitbox>? ignoreHitboxes,
-      List<RaycastResult<ShapeHitbox>>? out}) {
+  List<RaycastResult<ShapeHitbox>> raycastAll(
+    Vector2 origin, {
+    required int numberOfRays,
+    double startAngle = 0,
+    double sweepAngle = tau,
+    double? maxDistance,
+    List<Ray2>? rays,
+    bool Function(ShapeHitbox candidate)? hitboxFilter,
+    List<ShapeHitbox>? ignoreHitboxes,
+    List<RaycastResult<ShapeHitbox>>? out,
+  }) {
     final isFullCircle = (sweepAngle % tau).abs() < 0.0001;
     final angle = sweepAngle / (numberOfRays + (isFullCircle ? 0 : -1));
     final results = <RaycastResult<ShapeHitbox>>[];
@@ -150,17 +153,20 @@ class PuzzleCollisionDetection<B extends Broadphase<ShapeHitbox>>
   }
 
   @override
-  Iterable<RaycastResult<ShapeHitbox>> raytrace(Ray2 ray,
-      {int maxDepth = 10,
-      bool Function(ShapeHitbox candidate)? hitboxFilter,
-      List<ShapeHitbox>? ignoreHitboxes,
-      List<RaycastResult<ShapeHitbox>>? out}) sync* {
+  Iterable<RaycastResult<ShapeHitbox>> raytrace(
+    Ray2 ray, {
+    int maxDepth = 10,
+    bool Function(ShapeHitbox candidate)? hitboxFilter,
+    List<ShapeHitbox>? ignoreHitboxes,
+    List<RaycastResult<ShapeHitbox>>? out,
+  }) sync* {
     out?.forEach((e) => e.reset());
     var currentRay = ray;
     for (var i = 0; i < maxDepth; i++) {
       final hasResultObject = (out?.length ?? 0) > i;
-      final storeResult =
-          hasResultObject ? out![i] : RaycastResult<ShapeHitbox>();
+      final storeResult = hasResultObject
+          ? out![i]
+          : RaycastResult<ShapeHitbox>();
       final currentResult = raycast(
         currentRay,
         ignoreHitboxes: ignoreHitboxes,

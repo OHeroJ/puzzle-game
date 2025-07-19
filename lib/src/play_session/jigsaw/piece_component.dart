@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_jigsaw_puzzle/src/play_session/jigsaw/jigsaw_game.dart';
+import 'package:puzzle/src/play_session/jigsaw/jigsaw_game.dart';
 
 import '../collision/PuzzleHitbox.dart';
 import '../shape_type.dart';
@@ -33,9 +33,13 @@ class PieceComponent extends PositionComponent
 
   List<PieceComponent> hitOthers = [];
 
-  PieceComponent(SpriteComponent sprite, Shape shape, double pieceSize,
-      this.xSort, this.ySort)
-      : super(size: sprite.size) {
+  PieceComponent(
+    SpriteComponent sprite,
+    Shape shape,
+    double pieceSize,
+    this.xSort,
+    this.ySort,
+  ) : super(size: sprite.size) {
     this.shape = shape;
     this.sprite = sprite;
     add(sprite);
@@ -47,38 +51,57 @@ class PieceComponent extends PositionComponent
     bottomRight = Offset(size.x, size.y);
     bottomLeft = Offset(0, size.y);
 
-    topLeft = Offset(shape.leftTab != 0 ? _pieceSize : 0,
-            (shape.topTab != 0) ? _pieceSize : 0) +
+    topLeft =
+        Offset(
+          shape.leftTab != 0 ? _pieceSize : 0,
+          (shape.topTab != 0) ? _pieceSize : 0,
+        ) +
         topLeft;
-    topRight = Offset(shape.rightTab != 0 ? -_pieceSize : 0,
-            (shape.topTab != 0) ? _pieceSize : 0) +
+    topRight =
+        Offset(
+          shape.rightTab != 0 ? -_pieceSize : 0,
+          (shape.topTab != 0) ? _pieceSize : 0,
+        ) +
         topRight;
-    bottomRight = Offset(shape.rightTab != 0 ? -_pieceSize : 0,
-            (shape.bottomTab != 0) ? -_pieceSize : 0) +
+    bottomRight =
+        Offset(
+          shape.rightTab != 0 ? -_pieceSize : 0,
+          (shape.bottomTab != 0) ? -_pieceSize : 0,
+        ) +
         bottomRight;
-    bottomLeft = Offset(shape.leftTab != 0 ? _pieceSize : 0,
-            (shape.bottomTab != 0) ? -_pieceSize : 0) +
+    bottomLeft =
+        Offset(
+          shape.leftTab != 0 ? _pieceSize : 0,
+          (shape.bottomTab != 0) ? -_pieceSize : 0,
+        ) +
         bottomLeft;
     _path.moveTo(topLeft.dx, topLeft.dy);
     if (shape.topTab != 0) {
       _path.extendWithPath(
-          _calculatePoint(ShapeType.top, topLeft, topRight), Offset.zero);
+        _calculatePoint(ShapeType.top, topLeft, topRight),
+        Offset.zero,
+      );
     }
     _path.lineTo(topRight.dx, topRight.dy);
     if (shape.rightTab != 0) {
       _path.extendWithPath(
-          _calculatePoint(ShapeType.right, topRight, bottomRight), Offset.zero);
+        _calculatePoint(ShapeType.right, topRight, bottomRight),
+        Offset.zero,
+      );
     }
     _path.lineTo(bottomRight.dx, bottomRight.dy);
     if (shape.bottomTab != 0) {
       _path.extendWithPath(
-          _calculatePoint(ShapeType.bottom, bottomRight, bottomLeft),
-          Offset.zero);
+        _calculatePoint(ShapeType.bottom, bottomRight, bottomLeft),
+        Offset.zero,
+      );
     }
     _path.lineTo(bottomLeft.dx, bottomLeft.dy);
     if (shape.leftTab != 0) {
       _path.extendWithPath(
-          _calculatePoint(ShapeType.left, bottomLeft, topLeft), Offset.zero);
+        _calculatePoint(ShapeType.left, bottomLeft, topLeft),
+        Offset.zero,
+      );
     }
     _path.lineTo(topLeft.dx, topLeft.dy);
     _path.close();
@@ -228,22 +251,27 @@ class PieceComponent extends PositionComponent
       final double topMiddleY = shape.topTab == 0
           ? end.dy
           : (shape.topTab > 0
-              ? end.dy - _pieceSize / 5 * 4
-              : end.dy + _pieceSize / 5 * 4);
+                ? end.dy - _pieceSize / 5 * 4
+                : end.dy + _pieceSize / 5 * 4);
       var centerX =
           (end.dx - start.dx) / 2 + (shape.leftTab != 0 ? _pieceSize : 0);
-      topHitbox = PuzzleHitbox(ShapeType.top, shape.topTab,
-          position: Vector2(centerX, end.dy),
-          size: Vector2(_pieceSize, _pieceSize / 2),
-          anchor: Anchor.center)
-        ..renderShape = isDebug
-        ..paint.color = Colors.red;
+      topHitbox =
+          PuzzleHitbox(
+              ShapeType.top,
+              shape.topTab,
+              position: Vector2(centerX, end.dy),
+              size: Vector2(_pieceSize, _pieceSize / 2),
+              anchor: Anchor.center,
+            )
+            ..renderShape = isDebug
+            ..paint.color = Colors.red;
       add(topHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
       list.add(Offset(centerX - _pieceSize / 3, start.dy));
       list.add(
-          Offset(centerX - _pieceSize / 2 + _pieceSize.abs() / 5, topMiddleY));
+        Offset(centerX - _pieceSize / 2 + _pieceSize.abs() / 5, topMiddleY),
+      );
       list.add(Offset(centerX + _pieceSize / 2, topMiddleY));
       list.add(Offset(centerX + _pieceSize / 3, start.dy));
       list.add(end);
@@ -257,21 +285,26 @@ class PieceComponent extends PositionComponent
       final double bottomMiddleY = shape.bottomTab == 0
           ? end.dy
           : (shape.bottomTab > 0
-              ? end.dy + _pieceSize / 5 * 4
-              : end.dy - _pieceSize / 5 * 4);
-      bottomHitbox = PuzzleHitbox(ShapeType.bottom, shape.bottomTab,
-          position: Vector2(centerX, end.dy),
-          size: Vector2(_pieceSize, _pieceSize / 2),
-          anchor: Anchor.center)
-        ..renderShape = isDebug
-        ..paint.color = Colors.red;
+                ? end.dy + _pieceSize / 5 * 4
+                : end.dy - _pieceSize / 5 * 4);
+      bottomHitbox =
+          PuzzleHitbox(
+              ShapeType.bottom,
+              shape.bottomTab,
+              position: Vector2(centerX, end.dy),
+              size: Vector2(_pieceSize, _pieceSize / 2),
+              anchor: Anchor.center,
+            )
+            ..renderShape = isDebug
+            ..paint.color = Colors.red;
       add(bottomHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
       list.add(Offset(centerX + _pieceSize / 3, start.dy));
       list.add(Offset(centerX + _pieceSize / 2, bottomMiddleY));
-      list.add(Offset(
-          centerX - _pieceSize / 2 + _pieceSize.abs() / 5, bottomMiddleY));
+      list.add(
+        Offset(centerX - _pieceSize / 2 + _pieceSize.abs() / 5, bottomMiddleY),
+      );
       list.add(Offset(centerX - _pieceSize / 3, start.dy));
       list.add(end);
       final spline = CatmullRomSpline(list);
@@ -282,22 +315,27 @@ class PieceComponent extends PositionComponent
       final double rightMiddleX = shape.rightTab == 0
           ? start.dx
           : (shape.rightTab > 0
-              ? start.dx + _pieceSize / 5 * 4
-              : start.dx - _pieceSize / 5 * 4);
+                ? start.dx + _pieceSize / 5 * 4
+                : start.dx - _pieceSize / 5 * 4);
       var centerY =
           (end.dy - start.dy) / 2 + (shape.topTab != 0 ? _pieceSize : 0);
-      rightHitbox = PuzzleHitbox(ShapeType.right, shape.rightTab,
-          position: Vector2(end.dx, centerY),
-          size: Vector2(_pieceSize / 2, _pieceSize),
-          anchor: Anchor.center)
-        ..renderShape = isDebug
-        ..paint.color = Colors.red;
+      rightHitbox =
+          PuzzleHitbox(
+              ShapeType.right,
+              shape.rightTab,
+              position: Vector2(end.dx, centerY),
+              size: Vector2(_pieceSize / 2, _pieceSize),
+              anchor: Anchor.center,
+            )
+            ..renderShape = isDebug
+            ..paint.color = Colors.red;
       add(rightHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
       list.add(Offset(start.dx, centerY - _pieceSize / 3));
-      list.add(Offset(
-          rightMiddleX, centerY - _pieceSize / 2 + _pieceSize.abs() / 5));
+      list.add(
+        Offset(rightMiddleX, centerY - _pieceSize / 2 + _pieceSize.abs() / 5),
+      );
       list.add(Offset(rightMiddleX, centerY + _pieceSize / 2));
       list.add(Offset(start.dx, centerY + _pieceSize / 3));
       list.add(end);
@@ -311,21 +349,26 @@ class PieceComponent extends PositionComponent
       final double leftMiddleX = shape.leftTab == 0
           ? start.dx
           : (shape.leftTab > 0
-              ? start.dx - _pieceSize / 5 * 4
-              : start.dx + _pieceSize / 5 * 4);
-      leftHitbox = PuzzleHitbox(ShapeType.left, shape.leftTab,
-          position: Vector2(end.dx, centerY),
-          size: Vector2(_pieceSize / 2, _pieceSize),
-          anchor: Anchor.center)
-        ..renderShape = isDebug
-        ..paint.color = Colors.red;
+                ? start.dx - _pieceSize / 5 * 4
+                : start.dx + _pieceSize / 5 * 4);
+      leftHitbox =
+          PuzzleHitbox(
+              ShapeType.left,
+              shape.leftTab,
+              position: Vector2(end.dx, centerY),
+              size: Vector2(_pieceSize / 2, _pieceSize),
+              anchor: Anchor.center,
+            )
+            ..renderShape = isDebug
+            ..paint.color = Colors.red;
       add(leftHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
       list.add(Offset(start.dx, centerY + _pieceSize / 3));
       list.add(Offset(leftMiddleX, centerY + _pieceSize / 2));
       list.add(
-          Offset(leftMiddleX, centerY - _pieceSize / 2 + _pieceSize.abs() / 5));
+        Offset(leftMiddleX, centerY - _pieceSize / 2 + _pieceSize.abs() / 5),
+      );
       list.add(Offset(start.dx, centerY - _pieceSize / 3));
       list.add(end);
       final spline = CatmullRomSpline(list);

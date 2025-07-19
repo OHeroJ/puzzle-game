@@ -7,8 +7,8 @@ import 'dart:math';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_jigsaw_puzzle/src/http/api.dart';
-import 'package:flutter_jigsaw_puzzle/src/http/dio_client.dart';
+import 'package:puzzle/src/http/api.dart';
+import 'package:puzzle/src/http/dio_client.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,18 +32,21 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   @override
   void initState() {
     _pagingController = PagingController<int, JigsawInfo>(
-        fetchPage: _fetchPage,
-        getNextPageKey: (PagingState<int, JigsawInfo> state) {
-          return state.lastPageIsEmpty ? null : state.nextIntPageKey;
-        });
+      fetchPage: _fetchPage,
+      getNextPageKey: (PagingState<int, JigsawInfo> state) {
+        return state.lastPageIsEmpty ? null : state.nextIntPageKey;
+      },
+    );
 
     super.initState();
   }
 
   Future<List<JigsawInfo>> _fetchPage(int pageId) async {
     try {
-      final response = await DioClient.getInstance()
-          .get(Api.image, params: {"page": pageId, "per_page": 15});
+      final response = await DioClient.getInstance().get(
+        Api.image,
+        params: {"page": pageId, "per_page": 15},
+      );
       final List<JigsawInfo> newLists = (response["photos"] as List)
           .map((ele) => JigsawInfo.fromJson(ele))
           .toList();
@@ -75,9 +78,10 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         title: Text(
           'Puzzles',
           style: TextStyle(
-              fontSize: 28.sp,
-              color: palette.textColor,
-              fontWeight: FontWeight.bold),
+            fontSize: 28.sp,
+            color: palette.textColor,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -92,21 +96,24 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         child: Container(
           width: 0.9.sw,
           child: CustomScrollView(
-            scrollBehavior:
-                MaterialScrollBehavior().copyWith(scrollbars: false),
+            scrollBehavior: MaterialScrollBehavior().copyWith(
+              scrollbars: false,
+            ),
             slivers: [
               SliverToBoxAdapter(
-                  child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'Photos provided by Pexels',
-                    style: TextStyle(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      'Photos provided by Pexels',
+                      style: TextStyle(
                         fontSize: 16.sp,
-                        color: palette.textColor.withOpacity(0.7)),
+                        color: palette.textColor.withOpacity(0.7),
+                      ),
+                    ),
                   ),
                 ),
-              )),
+              ),
               PagingListener(
                 controller: _pagingController,
                 builder: (context, state, fetchNextPage) {
@@ -133,10 +140,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                   );
                 },
               ),
-              SliverToBoxAdapter(
-                  child: SizedBox(
-                height: 30.h,
-              ))
+              SliverToBoxAdapter(child: SizedBox(height: 30.h)),
             ],
           ),
         ),
@@ -145,7 +149,10 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   }
 
   void _showDetailsDialog(
-      BuildContext context, JigsawInfo item, Palette palette) {
+    BuildContext context,
+    JigsawInfo item,
+    Palette palette,
+  ) {
     var gridSizeValue = 4;
     late AwesomeDialog dialog;
     dialog = AwesomeDialog(
@@ -164,11 +171,11 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                 Text(
                   'Pieces',
                   style: TextStyle(
-                      fontStyle: FontStyle.italic, color: palette.textColor),
+                    fontStyle: FontStyle.italic,
+                    color: palette.textColor,
+                  ),
                 ),
-                SizedBox(
-                  height: 20.h,
-                ),
+                SizedBox(height: 20.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -194,9 +201,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                     }, palette),
                   ],
                 ),
-                SizedBox(
-                  height: 20.h,
-                ),
+                SizedBox(height: 20.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -219,7 +224,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                       setState(() {
                         gridSizeValue = v;
                       });
-                    }, palette)
+                    }, palette),
                   ],
                 ),
               ],
@@ -250,7 +255,11 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   }
 
   Widget buildSelectGridSize(
-      int num, int gridSizeValue, f(v), Palette palette) {
+    int num,
+    int gridSizeValue,
+    f(v),
+    Palette palette,
+  ) {
     return GestureDetector(
       onTap: () {
         f(num);
@@ -261,19 +270,21 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         margin: EdgeInsets.only(left: 10.w, right: 10.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color:
-              gridSizeValue == num ? palette.primaryColor : palette.lightGray,
+          color: gridSizeValue == num
+              ? palette.primaryColor
+              : palette.lightGray,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("${num * num}",
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 28.sp,
-                    color: gridSizeValue == num
-                        ? Colors.white
-                        : palette.textColor)),
+            Text(
+              "${num * num}",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 28.sp,
+                color: gridSizeValue == num ? Colors.white : palette.textColor,
+              ),
+            ),
           ],
         ),
       ),

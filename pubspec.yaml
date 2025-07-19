@@ -1,10 +1,10 @@
-name: flutter_jigsaw_puzzle
-description: A jigsaw puzzle game
+name: puzzle
+description: A puzzle game
 
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 0.0.1+1
+version: 0.1.1+1
 
 environment:
   sdk: ^3.0.0
@@ -60,4 +60,5 @@ flutter:
     - assets/sfx/
     - assets/lottie/
     - assets/audio/
+    - assets/icon/
 

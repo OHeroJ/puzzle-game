@@ -9,9 +9,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_jigsaw_puzzle/src/loading_selection/loading_selection_screen.dart';
-import 'package:flutter_jigsaw_puzzle/src/settings/about_screen.dart';
-import 'package:flutter_jigsaw_puzzle/src/utils/sp_util.dart';
+import 'package:puzzle/src/loading_selection/loading_selection_screen.dart';
+import 'package:puzzle/src/settings/about_screen.dart';
+import 'package:puzzle/src/utils/sp_util.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,25 +39,27 @@ Future<void> main() async {
     Logger.root.level = Level.WARNING;
   }
   Logger.root.onRecord.listen((record) {
-    debugPrint('${record.level.name}: ${record.time}: '
-        '${record.loggerName}: '
-        '${record.message}');
+    debugPrint(
+      '${record.level.name}: ${record.time}: '
+      '${record.loggerName}: '
+      '${record.message}',
+    );
   });
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarDividerColor: Colors.transparent,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
@@ -67,11 +69,7 @@ Future<void> main() async {
   }
   await SpUtil().init();
 
-  runApp(
-    MyApp(
-      settingsPersistence: LocalStorageSettingsPersistence(),
-    ),
-  );
+  runApp(MyApp(settingsPersistence: LocalStorageSettingsPersistence()));
 }
 
 class MyApp extends StatelessWidget {
@@ -110,10 +108,7 @@ class MyApp extends StatelessWidget {
         pageBuilder: (context, state) {
           final jigsaw = state.extra! as JigsawInfo;
           return buildMyTransition<void>(
-            child: PlaySessionScreen(
-              jigsaw,
-              key: const Key('play session'),
-            ),
+            child: PlaySessionScreen(jigsaw, key: const Key('play session')),
             color: context.watch<Palette>().backgroundMain,
           );
         },
@@ -125,7 +120,7 @@ class MyApp extends StatelessWidget {
           GoRoute(
             path: 'about',
             builder: (context, state) => const AboutScreen(),
-          )
+          ),
         ],
       ),
     ],
@@ -133,10 +128,7 @@ class MyApp extends StatelessWidget {
 
   final SettingsPersistence settingsPersistence;
 
-  const MyApp({
-    required this.settingsPersistence,
-    super.key,
-  });
+  const MyApp({required this.settingsPersistence, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -150,12 +142,15 @@ class MyApp extends StatelessWidget {
             providers: [
               Provider<SettingsController>(
                 lazy: false,
-                create: (context) => SettingsController(
-                  persistence: settingsPersistence,
-                )..loadStateFromPersistence(),
+                create: (context) =>
+                    SettingsController(persistence: settingsPersistence)
+                      ..loadStateFromPersistence(),
               ),
-              ProxyProvider2<SettingsController,
-                  ValueNotifier<AppLifecycleState>, AudioController>(
+              ProxyProvider2<
+                SettingsController,
+                ValueNotifier<AppLifecycleState>,
+                AudioController
+              >(
                 // Ensures that the AudioController is created on startup,
                 // and not "only when it's needed", as is default behavior.
                 // This way, music starts immediately.
@@ -169,34 +164,35 @@ class MyApp extends StatelessWidget {
                 },
                 dispose: (context, audio) => audio.dispose(),
               ),
-              Provider(
-                create: (context) => Palette(),
-              ),
+              Provider(create: (context) => Palette()),
             ],
-            child: Builder(builder: (context) {
-              final palette = context.watch<Palette>();
+            child: Builder(
+              builder: (context) {
+                final palette = context.watch<Palette>();
 
-              return MaterialApp.router(
-                builder: EasyLoading.init(),
-                title: 'Puzzle',
-                theme: ThemeData(
-                  textTheme: GoogleFonts.poppinsTextTheme(
-                    Theme.of(context).textTheme,
-                  ).apply(
-                    bodyColor: palette.textColor,
-                    displayColor: palette.textColor,
+                return MaterialApp.router(
+                  builder: EasyLoading.init(),
+                  title: 'Puzzle',
+                  theme: ThemeData(
+                    textTheme:
+                        GoogleFonts.poppinsTextTheme(
+                          Theme.of(context).textTheme,
+                        ).apply(
+                          bodyColor: palette.textColor,
+                          displayColor: palette.textColor,
+                        ),
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: palette.primaryColor,
+                      background: palette.backgroundMain,
+                    ),
+                    useMaterial3: true,
                   ),
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: palette.primaryColor,
-                    background: palette.backgroundMain,
-                  ),
-                  useMaterial3: true,
-                ),
-                routerConfig: _router,
-                scaffoldMessengerKey: scaffoldMessengerKey,
-                showPerformanceOverlay: false,
-              );
-            }),
+                  routerConfig: _router,
+                  scaffoldMessengerKey: scaffoldMessengerKey,
+                  showPerformanceOverlay: false,
+                );
+              },
+            ),
           ),
         );
       },

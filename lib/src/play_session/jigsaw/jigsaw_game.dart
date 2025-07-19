@@ -10,7 +10,7 @@ import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_jigsaw_puzzle/src/level_selection/jigsaw_info.dart';
+import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 
 import '../collision/puzzle_collision_detection.dart';
 import '../shape_type.dart';
@@ -35,8 +35,12 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     // add(FpsTextComponent(position: Vector2(0, 50)));
     var file = await DefaultCacheManager().getSingleFile(jigsawInfo.image);
     Image image = await getFileImage(file);
-    _scale = ImageUtils.calculateScale(size.x / 3.0 * 2.0, size.y / 3.0 * 2.0,
-        image.width.toDouble(), image.height.toDouble());
+    _scale = ImageUtils.calculateScale(
+      size.x / 3.0 * 2.0,
+      size.y / 3.0 * 2.0,
+      image.width.toDouble(),
+      image.height.toDouble(),
+    );
     print("scale:$_scale");
     gridSize = jigsawInfo.gridSize;
     final double widthPerBlock = image.width / gridSize;
@@ -46,8 +50,13 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
       final tmpPieces = <PieceComponent>[];
       pieces.add(tmpPieces);
       for (var x = 0; x < gridSize; x++) {
-        PieceComponent player =
-            getPiece(widthPerBlock, heightPerBlock, x, y, image);
+        PieceComponent player = getPiece(
+          widthPerBlock,
+          heightPerBlock,
+          x,
+          y,
+          image,
+        );
         pieces[y].add(player);
       }
     }
@@ -111,29 +120,36 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
   }
 
   PieceComponent getPiece(
-      double widthPerBlock, double heightPerBlock, int x, int y, Image image) {
+    double widthPerBlock,
+    double heightPerBlock,
+    int x,
+    int y,
+    Image image,
+  ) {
     Shape shape = _getShape(gridSize, x, y);
     double xAxis = widthPerBlock * x;
     double yAxis = heightPerBlock * y;
     //相对于扩大后图片的起点
     xAxis -= shape.leftTab != 0 ? pieceSize : 0;
     yAxis -= shape.topTab != 0 ? pieceSize : 0;
-    final double widthPerBlockTemp = widthPerBlock +
+    final double widthPerBlockTemp =
+        widthPerBlock +
         (shape.leftTab != 0 ? pieceSize : 0) +
         (shape.rightTab != 0 ? pieceSize : 0);
-    final double heightPerBlockTemp = heightPerBlock +
+    final double heightPerBlockTemp =
+        heightPerBlock +
         (shape.topTab != 0 ? pieceSize : 0) +
         (shape.bottomTab != 0 ? pieceSize : 0);
 
     final piece = PieceComponent(
       SpriteComponent(
-          sprite: Sprite(
-            image,
-            srcPosition: Vector2(xAxis, yAxis),
-            srcSize: Vector2(widthPerBlockTemp, heightPerBlockTemp),
-          ),
-          size:
-              Vector2(widthPerBlockTemp * _scale, heightPerBlockTemp * _scale)),
+        sprite: Sprite(
+          image,
+          srcPosition: Vector2(xAxis, yAxis),
+          srcSize: Vector2(widthPerBlockTemp, heightPerBlockTemp),
+        ),
+        size: Vector2(widthPerBlockTemp * _scale, heightPerBlockTemp * _scale),
+      ),
       shape,
       pieceSize * _scale,
       x,
