@@ -62,8 +62,8 @@ class SettingsScreen extends StatelessWidget {
             'Policy',
             Icon(Icons.policy, color: palette.textColor),
             onSelected: () {
-              _launchInBrowser(Uri.parse(
-                  "https://puzzle.xfans.me/puzzle/html/app-privacy-policy.html"));
+              _launchInBrowser(
+                  Uri.parse("https://oldbird.run/puzzle-sec.html"));
             },
           ),
           _SettingsLine(
