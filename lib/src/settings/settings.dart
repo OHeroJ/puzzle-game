@@ -6,27 +6,48 @@ import 'package:flutter/foundation.dart';
 
 import 'persistence/settings_persistence.dart';
 
-/// An class that holds settings like [playerName] or [musicOn],
-/// and saves them to an injected persistence store.
-class SettingsController {
+/// An class that holds the settings of the game, and persists them
+/// to and from [SettingsPersistence].
+///
+/// This class is designed to be used with [ChangeNotifierProvider] to make
+/// the settings available throughout the widget tree. For example:
+///
+/// ```dart
+/// ChangeNotifierProvider(
+///   create: (context) => SettingsController(
+///     persistence: LocalStorageSettingsPersistence(),
+///   ),
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// Then, in any widget down the tree:
+///
+/// ```dart
+/// final settings = context.watch<SettingsController>();
+/// ```
+class SettingsController extends ChangeNotifier {
   final SettingsPersistence _persistence;
 
+  /// Controls whether music is played during a game.
+  final ValueNotifier<bool> musicOn = ValueNotifier(true);
+
+  /// Controls whether sound effects are played during a game.
+  final ValueNotifier<bool> soundsOn = ValueNotifier(true);
+  
   /// Whether or not the sound is on at all. This overrides both music
   /// and sound.
-  ValueNotifier<bool> muted = ValueNotifier(false);
+  final ValueNotifier<bool> muted = ValueNotifier(false);
 
-  ValueNotifier<String> playerName = ValueNotifier('Player');
+  /// The player's name.
+  final ValueNotifier<String> playerName = ValueNotifier('Player');
 
-  ValueNotifier<bool> soundsOn = ValueNotifier(false);
-
-  ValueNotifier<bool> musicOn = ValueNotifier(false);
-
-  /// Creates a new instance of [SettingsController] backed by [persistence].
   SettingsController({required SettingsPersistence persistence})
-      : _persistence = persistence;
+      : _persistence = persistence {
+    _loadSettings();
+  }
 
-  /// Asynchronously loads values from the injected persistence store.
-  Future<void> loadStateFromPersistence() async {
+  Future<void> _loadSettings() async {
     await Future.wait([
       _persistence
           // On the web, sound can only start after user interaction, so
@@ -35,29 +56,43 @@ class SettingsController {
           .getMuted(defaultValue: kIsWeb)
           .then((value) => muted.value = value),
       _persistence.getSoundsOn().then((value) => soundsOn.value = value),
-      _persistence.getMusicOn().then((value) => musicOn.value = false),
+      _persistence.getMusicOn().then((value) => musicOn.value = value),
       _persistence.getPlayerName().then((value) => playerName.value = value),
     ]);
+    
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    musicOn.dispose();
+    soundsOn.dispose();
+    muted.dispose();
+    playerName.dispose();
+    super.dispose();
   }
 
   void setPlayerName(String name) {
     playerName.value = name;
     _persistence.savePlayerName(playerName.value);
+    notifyListeners();
   }
-
-  // void toggleMusicOn() {
-  //   musicOn.value = !musicOn.value;
-  //   print("SettingsController toggleMusicOn:${musicOn.value}");
-  //   _persistence.saveMusicOn(musicOn.value);
-  // }
 
   void toggleMuted() {
     muted.value = !muted.value;
     _persistence.saveMuted(muted.value);
+    notifyListeners();
+  }
+
+  void toggleMusicOn() {
+    musicOn.value = !musicOn.value;
+    _persistence.saveMusicOn(musicOn.value);
+    notifyListeners();
   }
 
   void toggleSoundsOn() {
     soundsOn.value = !soundsOn.value;
     _persistence.saveSoundsOn(soundsOn.value);
+    notifyListeners();
   }
 }

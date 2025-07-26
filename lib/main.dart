@@ -2,200 +2,253 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:io';
-
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:puzzle/src/loading_selection/loading_selection_screen.dart';
-import 'package:puzzle/src/settings/about_screen.dart';
-import 'package:puzzle/src/utils/sp_util.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase/supabase.dart' as supabase;
 
 import 'firebase_options.dart';
 import 'src/app_lifecycle/app_lifecycle.dart';
-import 'src/audio/audio_controller.dart';
-import 'src/level_selection/jigsaw_info.dart';
+import 'src/config/supabase_config.dart';
 import 'src/level_selection/level_selection_screen.dart';
+import 'src/level_selection/jigsaw_info.dart';
+import 'src/loading_selection/loading_selection_screen.dart';
 import 'src/main_menu/main_menu_screen.dart';
 import 'src/play_session/play_session_screen.dart';
-import 'src/settings/persistence/local_storage_settings_persistence.dart';
-import 'src/settings/persistence/settings_persistence.dart';
+import 'src/ranking/ranking_manager.dart';
+import 'src/ranking/ranking_screen.dart';
 import 'src/settings/settings.dart';
+import 'src/settings/persistence/local_storage_settings_persistence.dart';
 import 'src/settings/settings_screen.dart';
-import 'src/style/my_transition.dart';
 import 'src/style/palette.dart';
-import 'src/style/snack_bar.dart';
+import 'src/user/login_screen.dart';
+import 'src/user/register_screen.dart';
+import 'src/user/user_manager.dart';
 
 Future<void> main() async {
-  if (kReleaseMode) {
-    // Don't log anything below warnings in production.
-    Logger.root.level = Level.WARNING;
-  }
-  Logger.root.onRecord.listen((record) {
-    debugPrint(
-      '${record.level.name}: ${record.time}: '
-      '${record.loggerName}: '
-      '${record.message}',
+  // A temporary workaround to avoid issues on web.
+  // See: https://github.com/firebase/firebase-dart/issues/746
+  if (!kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
-  });
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-    ),
-  );
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
-  if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-    /// Prepare the google_mobile_ads plugin so that the first ad loads
-    /// faster. This can be done later or with a delay if startup
-    /// experience suffers.
   }
-  await SpUtil().init();
 
-  runApp(MyApp(settingsPersistence: LocalStorageSettingsPersistence()));
-}
+  // Disable print() in production.
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
 
-class MyApp extends StatelessWidget {
-  static final _router = GoRouter(
-    routes: [
+  // Enable logging (release and debug) in the console.
+  Logger.root.level = kReleaseMode ? Level.WARNING : Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    if (kReleaseMode) {
+      // In release mode, only log warnings and errors.
+      if (record.level >= Level.WARNING) {
+        debugPrint('${record.level.name}: ${record.time}: '
+            '${record.loggerName}: '
+            '${record.message}');
+      }
+    } else {
+      // In debug mode, log everything.
+      debugPrint('${record.level.name}: ${record.time}: '
+          '${record.loggerName}: '
+          '${record.message}');
+    }
+  });
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    Logger('FlutterError')
+        .severe(details.exception, details.stack);
+  };
+
+  if (!kIsWeb) {
+    // Report uncaught errors.
+    PlatformDispatcher.instance.onError = (error, stack) {
+      Logger('PlatformDispatcher').severe('Uncaught error', error, stack);
+      if (!kReleaseMode) {
+        // In debug mode, print the error to the console.
+        debugPrint('PlatformDispatcher: $error\n$stack');
+      }
+      return true;
+    };
+  }
+
+  // Report errors to Crashlytics.
+  if (!kDebugMode && !kIsWeb) {
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
+
+  // Set up routing.
+  final GoRouter router = GoRouter(
+    routes: <RouteBase>[
       GoRoute(
         path: '/',
-        builder: (context, state) =>
-            const MainMenuScreen(key: Key('main menu')),
-      ),
-      GoRoute(
-        path: '/play',
-        builder: (context, state) {
-          return const LevelSelectionScreen(key: Key('level selection'));
+        builder: (BuildContext context, GoRouterState state) {
+          return const MainMenuScreen();
         },
-        // pageBuilder: (context, state) => buildMyTransition<void>(
-        //   child: const LevelSelectionScreen(key: Key('level selection')),
-        //   color: context.watch<Palette>().backgroundMain,
-        // ),
-      ),
-      GoRoute(
-        path: '/play/loading',
-        pageBuilder: (context, state) {
-          final jigsaw = state.extra! as JigsawInfo;
-          return buildMyTransition<void>(
-            child: LoadingSelectionScreen(
-              key: const Key('loading session'),
-              level: jigsaw,
-            ),
-            color: context.watch<Palette>().backgroundMain,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/play/session',
-        pageBuilder: (context, state) {
-          final jigsaw = state.extra! as JigsawInfo;
-          return buildMyTransition<void>(
-            child: PlaySessionScreen(jigsaw, key: const Key('play session')),
-            color: context.watch<Palette>().backgroundMain,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(key: Key('settings')),
-        routes: [
+        routes: <RouteBase>[
           GoRoute(
-            path: 'about',
-            builder: (context, state) => const AboutScreen(),
+            path: 'play',
+            builder: (BuildContext context, GoRouterState state) {
+              // 创建一个默认的JigsawInfo对象
+              final level = JigsawInfo(
+                'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
+                'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
+                'Default Puzzle',
+                3,
+                'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
+              );
+              return LoadingSelectionScreen(level: level);
+            },
+          ),
+          GoRoute(
+            path: 'levelSelection',
+            builder: (BuildContext context, GoRouterState state) {
+              return const LevelSelectionScreen();
+            },
+          ),
+          GoRoute(
+            path: 'playSession/:levelId',
+            builder: (BuildContext context, GoRouterState state) {
+              final levelId = state.pathParameters['levelId']!;
+              final level = JigsawInfo.getJigsawInfo(levelId);
+              return PlaySessionScreen(level);
+            },
+          ),
+          GoRoute(
+            path: 'settings',
+            builder: (BuildContext context, GoRouterState state) {
+              return const SettingsScreen();
+            },
+          ),
+          GoRoute(
+            path: 'login',
+            builder: (BuildContext context, GoRouterState state) {
+              return const LoginScreen();
+            },
+          ),
+          GoRoute(
+            path: 'register',
+            builder: (BuildContext context, GoRouterState state) {
+              return const RegisterScreen();
+            },
+          ),
+          GoRoute(
+            path: 'ranking',
+            builder: (BuildContext context, GoRouterState state) {
+              return const RankingScreen();
+            },
           ),
         ],
       ),
     ],
   );
 
-  final SettingsPersistence settingsPersistence;
+  // Set up analytics.
+  FirebaseAnalytics? analytics;
+  if (!kIsWeb) {
+    analytics = FirebaseAnalytics.instance;
+  }
 
-  const MyApp({required this.settingsPersistence, super.key});
+  // Run the app.
+  runApp(
+    MyApp(
+      router: router,
+      analytics: analytics,
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  final GoRouter router;
+  final FirebaseAnalytics? analytics;
+
+  const MyApp({
+    required this.router,
+    this.analytics,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(1067, 750),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return AppLifecycleObserver(
-          child: MultiProvider(
-            providers: [
-              Provider<SettingsController>(
-                lazy: false,
-                create: (context) =>
-                    SettingsController(persistence: settingsPersistence)
-                      ..loadStateFromPersistence(),
-              ),
-              ProxyProvider2<
-                SettingsController,
-                ValueNotifier<AppLifecycleState>,
-                AudioController
-              >(
-                // Ensures that the AudioController is created on startup,
-                // and not "only when it's needed", as is default behavior.
-                // This way, music starts immediately.
-                lazy: false,
-                create: (context) => AudioController()..initialize(),
-                update: (context, settings, lifecycleNotifier, audio) {
-                  if (audio == null) throw ArgumentError.notNull();
-                  audio.attachSettings(settings);
-                  audio.attachLifecycleNotifier(lifecycleNotifier);
-                  return audio;
-                },
-                dispose: (context, audio) => audio.dispose(),
-              ),
-              Provider(create: (context) => Palette()),
-            ],
-            child: Builder(
-              builder: (context) {
-                final palette = context.watch<Palette>();
-
+    return AppLifecycleObserver(
+      child: MultiProvider(
+        providers: [
+          Provider<GoRouter>.value(value: router),
+          Provider<FirebaseAnalytics?>.value(value: analytics),
+          ChangeNotifierProvider(
+            create: (context) => Palette(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => SettingsController(
+              persistence: LocalStorageSettingsPersistence(),
+            ),
+          ),
+          // 初始化Supabase客户端
+          Provider<supabase.SupabaseClient>(
+            create: (context) => supabase.SupabaseClient(
+              SupabaseConfig.supabaseUrl,
+              SupabaseConfig.supabaseAnonKey,
+            ),
+          ),
+          // 初始化用户管理器
+          ChangeNotifierProvider(
+            create: (context) => UserManager(),
+          ),
+          // 初始化排行榜管理器
+          ChangeNotifierProvider(
+            create: (context) {
+              final supabaseClient = context.read<supabase.SupabaseClient>();
+              final userManager = context.read<UserManager>();
+              return RankingManager(supabaseClient, userManager);
+            },
+          ),
+        ],
+        child: Consumer2<Palette, SettingsController>(
+          builder: (context, palette, settings, child) {
+            return ScreenUtilInit(
+              designSize: const Size(411, 839),
+              minTextAdapt: true,
+              splitScreenMode: true,
+              builder: (context, child) {
                 return MaterialApp.router(
-                  builder: EasyLoading.init(),
                   title: 'Puzzle',
+                  debugShowCheckedModeBanner: false,
                   theme: ThemeData(
-                    textTheme:
-                        GoogleFonts.poppinsTextTheme(
-                          Theme.of(context).textTheme,
-                        ).apply(
-                          bodyColor: palette.textColor,
-                          displayColor: palette.textColor,
-                        ),
+                    useMaterial3: true,
                     colorScheme: ColorScheme.fromSeed(
                       seedColor: palette.primaryColor,
                       background: palette.backgroundMain,
                     ),
-                    useMaterial3: true,
+                    scaffoldBackgroundColor: palette.backgroundMain,
+                    textSelectionTheme: TextSelectionThemeData(
+                      cursorColor: palette.primaryColor,
+                      selectionColor: palette.primaryColor.withOpacity(0.3),
+                      selectionHandleColor: palette.primaryColor,
+                    ),
                   ),
-                  routerConfig: _router,
-                  scaffoldMessengerKey: scaffoldMessengerKey,
-                  showPerformanceOverlay: false,
+                  routeInformationProvider: router.routeInformationProvider,
+                  routeInformationParser: router.routeInformationParser,
+                  routerDelegate: router.routerDelegate,
                 );
               },
-            ),
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 }

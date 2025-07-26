@@ -18,6 +18,8 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../games_services/score.dart';
 import '../settings/settings.dart';
 import '../style/palette.dart';
+import '../ranking/score_calculator.dart';
+import '../ranking/ranking_manager.dart';
 import 'jigsaw/jigsaw_game.dart';
 
 class PlaySessionScreen extends StatefulWidget {
@@ -40,6 +42,85 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
   bool isLoading = true;
 
   late DateTime _startOfPlay;
+
+  @override
+  void initState() {
+    super.initState();
+    _startOfPlay = DateTime.now();
+  }
+
+  void playerWon() async {
+    final gameDuration = DateTime.now().difference(_startOfPlay);
+    
+    // 获取游戏步数
+    final gameWidget = context.read<GameWidget>();
+    final jigsawGame = gameWidget.game as JigsawGame;
+    final moves = jigsawGame.moves;
+    
+    // 计算分数
+    final score = ScoreCalculator.calculateScore(
+      time: gameDuration,
+      moves: moves,
+      difficulty: widget.level.gridSize, // 修复：使用gridSize而不是level
+    );
+
+    final settingsController = context.read<SettingsController>();
+    if (settingsController.soundsOn.value) {
+      jigsawGame.toggleMusic();
+    }
+
+    setState(() {
+      _duringCelebration = true;
+    });
+
+    // 显示庆祝动画
+    await Future.delayed(_preCelebrationDuration);
+    // 修复：正确使用Lottie动画
+    final lottieWidget = Lottie.asset('assets/lottie/win.json');
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Container(
+          width: 300.w,
+          height: 300.h,
+          child: lottieWidget,
+        ),
+      ),
+    );
+
+    // 提交分数到排行榜
+    final rankingManager = context.read<RankingManager>();
+    final success = await rankingManager.submitScore(score);
+    
+    if (!success) {
+      _log.warning('Failed to submit score to ranking');
+    }
+
+    // 显示游戏结果
+    if (mounted) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.scale,
+        title: 'Congratulations',
+        desc: 'You solved the puzzle in ${Score(gameDuration).formattedTime} with $moves moves\nScore: $score',
+        btnCancelOnPress: () {
+          GoRouter.of(context).pop();
+        },
+        btnOkOnPress: () {
+          GoRouter.of(context).pop();
+        },
+      ).show();
+    }
+
+    await Future.delayed(_celebrationDuration);
+    if (mounted) {
+      setState(() {
+        _duringCelebration = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,124 +181,61 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                           playerWon();
                         },
                       ),
-                      backgroundBuilder: (context) =>
-                          Container(color: palette.backgroundMain),
                     ),
+                    isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: palette.primaryColor,
+                            ),
+                          )
+                        : const SizedBox(),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 8.h),
-            SizedBox(height: 8.h),
           ],
         ),
       ),
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    _startOfPlay = DateTime.now();
-
-    // Preload ad for the win screen.
-    // final adsRemoved =
-    //     context.read<InAppPurchaseController?>()?.adRemoval.active ?? false;
-    // if (!adsRemoved) {
-    //   final adsController = context.read<AdsController?>();
-    //   adsController?.preloadAd();
-    // }
-  }
-
-  void showReset() async {
+  showReset() {
     AwesomeDialog(
-      width: 400.h,
-      dialogBackgroundColor: Palette().backgroundMain,
-      btnOkColor: Palette().primaryColor,
       context: context,
+      dialogType: DialogType.question,
       animType: AnimType.scale,
-      dialogType: DialogType.info,
-      headerAnimationLoop: false,
-      title: 'Reset pieces?',
-      btnOkText: 'Reset',
-      btnCancelText: 'Cancel',
+      title: '重新开始',
+      desc: '确定要重新开始吗？',
       btnCancelOnPress: () {},
       btnOkOnPress: () {
-        setState(() {});
+        // 修复：正确调用重置游戏方法
+        final gameWidget = context.read<GameWidget>();
+        final jigsawGame = gameWidget.game as JigsawGame;
+        jigsawGame.resetGame();
+        setState(() {
+          _startOfPlay = DateTime.now();
+        });
       },
     ).show();
   }
 
-  void showImage() async {
-    File file = await DefaultCacheManager().getSingleFile(widget.level.image);
-    AwesomeDialog(
-      width: 400.h,
+  showImage() async {
+    final info = widget.level;
+    final file = await DefaultCacheManager().getSingleFile(info.url);
+    final image = Image.file(
+      file as File,
+      fit: BoxFit.contain,
+    );
+    await showDialog(
       context: context,
-      animType: AnimType.scale,
-      headerAnimationLoop: false,
-      dialogType: DialogType.noHeader,
-      body: Center(
-        child: Container(
-          width: 400.h,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Container(
+          width: 300.w,
           height: 300.h,
-          padding: EdgeInsets.all(20.h),
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.r)),
-          child: Image.file(file, fit: BoxFit.contain),
+          child: image,
         ),
       ),
-    ).show();
-  }
-
-  Future<void> playerWon() async {
-    //   _log.info('Level ${widget.level.number} won');
-    //
-    final score = Score(DateTime.now().difference(_startOfPlay));
-    AwesomeDialog(
-      width: 400.h,
-      bodyHeaderDistance: 0,
-      padding: const EdgeInsets.all(0),
-      dismissOnTouchOutside: false,
-      context: context,
-      animType: AnimType.scale,
-      headerAnimationLoop: false,
-      dialogType: DialogType.success,
-      body: Container(
-        width: 400.h,
-        height: 0.3.sh,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 0.2.sh,
-              child: Center(child: Lottie.asset('assets/lottie/win.json')),
-            ),
-            Text(
-              'Time: ${score.formattedTime}',
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Palette().textColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-      dialogBackgroundColor: Palette().backgroundMain,
-      btnOkColor: Palette().primaryColor,
-      btnOkText: "Continue",
-      btnOkOnPress: () {
-        GoRouter.of(context).pop();
-      },
-    ).show();
-
-    // GoRouter.of(context).go('/play/won', extra: {'score': score});
-  }
-
-  Future<File> _getImage() async {
-    File file = await DefaultCacheManager().getSingleFile(widget.level.image);
-    return file;
+    );
   }
 }

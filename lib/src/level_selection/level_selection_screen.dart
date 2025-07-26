@@ -47,9 +47,22 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         Api.image,
         params: {"page": pageId, "per_page": 15},
       );
-      final List<JigsawInfo> newLists = (response["photos"] as List)
-          .map((ele) => JigsawInfo.fromJson(ele))
-          .toList();
+      final List<JigsawInfo> newLists = [];
+      final photos = response["photos"] as List;
+      
+      // 为每个图片创建不同难度级别的拼图
+      for (int i = 0; i < photos.length; i++) {
+        // 只为前9个图片创建多个难度级别
+        if (i < 9) {
+          newLists.add(JigsawInfo.fromJson(photos[i], 3)); // 3x3 难度
+          newLists.add(JigsawInfo.fromJson(photos[i], 4)); // 4x4 难度
+          newLists.add(JigsawInfo.fromJson(photos[i], 5)); // 5x5 难度
+        } else {
+          // 其他图片只创建默认难度
+          newLists.add(JigsawInfo.fromJson(photos[i], 3)); // 默认3x3难度
+        }
+      }
+      
       return newLists;
     } catch (error) {
       _pagingController.value = _pagingController.value.copyWith(error: error);
@@ -153,7 +166,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
     JigsawInfo item,
     Palette palette,
   ) {
-    var gridSizeValue = 4;
+    // 使用item.difficultyLevel作为初始值
+    var gridSizeValue = item.difficultyLevel;
     late AwesomeDialog dialog;
     dialog = AwesomeDialog(
       dialogBackgroundColor: palette.backgroundMain,
@@ -179,7 +193,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    buildSelectGridSize(2, gridSizeValue, (v) {
+                    buildSelectGridSize(3, gridSizeValue, (v) {
                       setState(() {
                         gridSizeValue = v;
                       });
@@ -238,6 +252,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             onPressed: () {
               dialog.dismiss();
               item.gridSize = gridSizeValue;
+              item.difficultyLevel = gridSizeValue; // 更新难度级别
               GoRouter.of(context).push('/play/loading', extra: item);
             },
             style: ElevatedButton.styleFrom(
@@ -272,7 +287,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
           borderRadius: BorderRadius.circular(10),
           color: gridSizeValue == num
               ? palette.primaryColor
-              : palette.lightGray,
+              : palette.lightGrayColor,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

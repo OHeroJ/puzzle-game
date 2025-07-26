@@ -26,6 +26,7 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
   double _scale = 1.0;
   bool isMusicOn;
   Function win;
+  int moves = 0; // 添加moves属性来记录移动次数
 
   JigsawGame(this.jigsawInfo, this.isMusicOn, this.win);
 
@@ -98,6 +99,7 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     var minWidth = (size.x / 3.0 * 2.0).toInt();
     print("minHeight:$minHeight minWidth:$minWidth");
     // var list = await FlutterImageCompress.compressWithFile(
+    //   filePath,
     //   filePath,
     //   minHeight: minHeight,
     //   minWidth: minWidth,
@@ -216,5 +218,24 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     }
     // print(" pieceX:$pieceX pieceY:$pieceY");
     positions.add(Vector2(pieceX, pieceY));
+  }
+
+  // 添加重置游戏方法
+  void resetGame() {
+    // 移除所有组件
+    removeAll(children.toList()); // 修复：正确调用removeAll方法
+    
+    // 重置游戏状态
+    pieces = [[]];
+    positions = [];
+    moves = 0;
+    
+    // 重新加载游戏
+    onLoad();
+  }
+  
+  // 添加切换音乐方法
+  void toggleMusic() {
+    isMusicOn = !isMusicOn;
   }
 }
