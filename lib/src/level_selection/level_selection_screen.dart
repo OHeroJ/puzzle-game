@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../style/palette.dart';
 import 'jigsaw_grid.dart';
 import 'jigsaw_info.dart';
+import 'jigsaw_service.dart';
 
 class LevelSelectionScreen extends StatefulWidget {
   const LevelSelectionScreen({super.key});
@@ -20,6 +22,8 @@ class LevelSelectionScreen extends StatefulWidget {
 
 class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   List<JigsawInfo> jigsaws = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -28,27 +32,27 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   }
 
   Future<void> _loadJigsaws() async {
-    // 模拟加载拼图数据
-    final List<JigsawInfo> loadedJigsaws = [
-      JigsawInfo(
-        'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
-        'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
-        'Mountain Landscape',
-        3,
-        'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
-      ),
-      JigsawInfo(
-        'https://images.pexels.com/photos/247599/pexels-photo-247599.jpeg',
-        'https://images.pexels.com/photos/247599/pexels-photo-247599.jpeg',
-        'Forest Path',
-        4,
-        'https://images.pexels.com/photos/247599/pexels-photo-247599.jpeg',
-      ),
-    ];
+    try {
+      // 获取Supabase客户端
+      final supabaseClient = supabase.Supabase.instance.client;
+      
+      // 创建拼图服务实例
+      final jigsawService = JigsawService(supabaseClient);
+      
+      // 从Supabase获取拼图数据
+      final loadedJigsaws = await jigsawService.getJigsawInfos();
 
-    setState(() {
-      jigsaws = loadedJigsaws;
-    });
+      setState(() {
+        jigsaws = loadedJigsaws;
+        _isLoading = false;
+        _errorMessage = '';
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = '加载拼图数据失败: $e';
+      });
+    }
   }
 
   @override
@@ -102,9 +106,80 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
           SizedBox(height: 20.h),
           // 关卡选择区域
           Expanded(
-            child: JigsawGrid(
-              jigsaws: jigsaws,
-            ),
+            child: _isLoading
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircularProgressIndicator(),
+                        SizedBox(height: 16.h),
+                        Text(
+                          '正在加载拼图...',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: palette.textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : _errorMessage.isNotEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              color: palette.textColor,
+                              size: 48.w,
+                            ),
+                            SizedBox(height: 16.h),
+                            Text(
+                              _errorMessage,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                color: palette.textColor,
+                              ),
+                            ),
+                            SizedBox(height: 16.h),
+                            ElevatedButton(
+                              onPressed: _loadJigsaws,
+                              child: Text(
+                                '重新加载',
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  color: palette.backgroundMain,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : jigsaws.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.hourglass_empty,
+                                  color: palette.textColor,
+                                  size: 48.w,
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  '暂无拼图数据',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: palette.textColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : JigsawGrid(
+                            jigsaws: jigsaws,
+                          ),
           ),
         ],
       ),

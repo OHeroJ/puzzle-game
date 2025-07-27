@@ -56,4 +56,17 @@ class JigsawInfo {
       'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg', // url参数
     );
   }
+  
+  // 修复setter方法
+  set setId(int value) {
+    id = value;
+  }
+  
+  set setPhotographer(String value) {
+    photographer = value;
+  }
+  
+  set setDifficultyLevel(int value) {
+    difficultyLevel = value;
+  }
 }

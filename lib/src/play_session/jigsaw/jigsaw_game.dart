@@ -19,7 +19,7 @@ import 'piece_component.dart';
 
 class JigsawGame extends FlameGame with HasCollisionDetection {
   int gridSize = 6;
-  List<List<PieceComponent>> pieces = [[]];
+  List<List<PieceComponent>> pieces = [];
   List<Vector2> positions = [];
   double pieceSize = 0;
   JigsawInfo jigsawInfo;
@@ -47,9 +47,14 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     final double widthPerBlock = image.width / gridSize;
     final double heightPerBlock = image.height / gridSize;
     pieceSize = min(widthPerBlock, heightPerBlock) / 4;
+    
+    // 初始化位置列表
+    for (var i = 0; i < gridSize * gridSize; i++) {
+      positions.add(Vector2.zero());
+    }
+    
     for (var y = 0; y < gridSize; y++) {
       final tmpPieces = <PieceComponent>[];
-      pieces.add(tmpPieces);
       for (var x = 0; x < gridSize; x++) {
         PieceComponent player = getPiece(
           widthPerBlock,
@@ -58,8 +63,9 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
           y,
           image,
         );
-        pieces[y].add(player);
+        tmpPieces.add(player);
       }
+      pieces.add(tmpPieces);
     }
     positions.shuffle();
     for (var y = 0; y < pieces.length; y++) {
@@ -217,7 +223,7 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
       pieceY = pieceY - height;
     }
     // print(" pieceX:$pieceX pieceY:$pieceY");
-    positions.add(Vector2(pieceX, pieceY));
+    positions[positions.length-1] = Vector2(pieceX, pieceY);
   }
 
   // 添加重置游戏方法
@@ -226,7 +232,7 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     removeAll(children.toList()); // 修复：正确调用removeAll方法
     
     // 重置游戏状态
-    pieces = [[]];
+    pieces = [];
     positions = [];
     moves = 0;
     
