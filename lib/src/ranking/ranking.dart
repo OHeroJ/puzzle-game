@@ -1,19 +1,21 @@
 // 排行榜数据模型类
+import 'package:flutter/foundation.dart';
+
 class Ranking {
   final String id;
   final String userId;
   final String username;
   final int score;
-  final DateTime createdAt;
   final String? avatarUrl;
+  final DateTime createdAt;
 
   Ranking({
     required this.id,
     required this.userId,
     required this.username,
     required this.score,
-    required this.createdAt,
     this.avatarUrl,
+    required this.createdAt,
   });
 
   // 从JSON创建Ranking实例
@@ -35,8 +37,24 @@ class Ranking {
       'user_id': userId,
       'username': username,
       'score': score,
-      'created_at': createdAt.toIso8601String(),
       'avatar_url': avatarUrl,
+      'created_at': createdAt.toIso8601String(),
     };
+  }
+
+  /// 格式化创建时间显示
+  String formatCreatedAt() {
+    final now = DateTime.now();
+    final difference = now.difference(createdAt);
+    
+    if (difference.inDays > 0) {
+      return '${difference.inDays}天前';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}小时前';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}分钟前';
+    } else {
+      return '刚刚';
+    }
   }
 }

@@ -41,7 +41,7 @@ void main() {
     test('should register successfully', () async {
       userManager.initAuthProvider(mockAuthProvider);
       
-      final result = await userManager.register('newuser@example.com', 'password123');
+      final result = await userManager.register('newuser@example.com', 'password123', 'New User');
       
       expect(result, true);
       expect(userManager.currentUser, isNotNull);
@@ -58,6 +58,7 @@ void main() {
       
       // Then logout
       await userManager.logout();
+      
       expect(userManager.currentUser, null);
       expect(userManager.isSignedIn, false);
     });

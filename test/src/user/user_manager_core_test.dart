@@ -35,7 +35,7 @@ void main() {
       expect(userManager.isSignedIn, false);
       
       // 测试注册
-      final registerResult = await userManager.register('newuser@example.com', 'password123');
+      final registerResult = await userManager.register('newuser@example.com', 'password123', 'New User');
       expect(registerResult, true);
       expect(userManager.currentUser, isNotNull);
       expect(userManager.isSignedIn, true);

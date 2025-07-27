@@ -1,87 +1,124 @@
-import 'package:supabase/supabase.dart' as supabase hide User;
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+
+import '../config/supabase_config.dart';
 import 'auth_provider.dart';
-import 'user.dart' as local;
+import 'user.dart';
 
-// Supabase认证提供商实现
 class SupabaseAuthProvider implements AuthProvider {
-  final supabase.SupabaseClient _supabase;
-  
-  @override
-  AuthStateChangedCallback? onAuthStateChanged;
+  final supabase.SupabaseClient _supabaseClient;
+  AuthStateChangedCallback? _onAuthStateChanged;
 
-  SupabaseAuthProvider(supabase.SupabaseClient supabase) : _supabase = supabase {
+  SupabaseAuthProvider({required supabase.SupabaseClient supabaseClient})
+      : _supabaseClient = supabaseClient {
     // 监听认证状态变化
-    _supabase.auth.onAuthStateChange.listen((data) {
+    _supabaseClient.auth.onAuthStateChange.listen((data) {
       final session = data.session;
-      if (session != null) {
-        final user = _convertSupabaseUser(session.user!);
-        onAuthStateChanged?.call(user);
+      if (session == null) {
+        _onAuthStateChanged?.call(null);
       } else {
-        onAuthStateChanged?.call(null);
+        final user = User(
+          id: session.user.id,
+          email: session.user.email ?? '',
+          name: session.user.userMetadata?['name'] as String? ??
+              session.user.email ?? '',
+        );
+        _onAuthStateChanged?.call(user);
       }
     });
   }
 
-  local.User _convertSupabaseUser(dynamic supabaseUser) {
-    return local.User(
+  @override
+  User? getCurrentUser() {
+    final supabaseUser = _supabaseClient.auth.currentUser;
+    if (supabaseUser == null) {
+      return null;
+    }
+
+    return User(
       id: supabaseUser.id,
       email: supabaseUser.email ?? '',
-      name: supabaseUser.userMetadata?['name'] ?? supabaseUser.email ?? 'User',
-      avatarUrl: supabaseUser.userMetadata?['avatar_url'],
+      name: supabaseUser.userMetadata?['name'] as String? ??
+          supabaseUser.email ?? '',
     );
   }
 
   @override
-  local.User? getCurrentUser() {
-    final user = _supabase.auth.currentUser;
-    return user != null ? _convertSupabaseUser(user) : null;
-  }
-
-  @override
   bool isSignedIn() {
-    return _supabase.auth.currentSession != null;
+    return _supabaseClient.auth.currentSession != null;
   }
 
   @override
-  Future<local.User?> login(String email, String password) async {
+  Future<User?> login(String email, String password) async {
     try {
-      final response = await _supabase.auth.signInWithPassword(
+      final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
       );
-      
-      // 使用dynamic类型避免编译错误
+
       if (response.user != null) {
-        return _convertSupabaseUser(response.user!);
+        return User(
+          id: response.user!.id,
+          email: response.user!.email ?? '',
+          name: response.user!.userMetadata?['name'] as String? ??
+              response.user!.email ?? '',
+        );
       }
-    } on supabase.AuthApiException catch (e) {
+      return null;
+    } on supabase.AuthException catch (e) {
       // 处理认证异常
-      print('Login error: ${e.message}');
+      print('Login failed: ${e.message}');
+      return null;
+    } catch (e) {
+      // 处理其他异常
+      print('Login failed: $e');
+      return null;
     }
-    return null;
   }
 
   @override
-  Future<local.User?> register(String email, String password) async {
+  Future<User?> register(String email, String password, String name) async {
     try {
-      final response = await _supabase.auth.signUp(
+      final response = await _supabaseClient.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'name': name,
+        },
       );
-      
-      // 使用dynamic类型避免编译错误
+
       if (response.user != null) {
-        return _convertSupabaseUser(response.user!);
+        return User(
+          id: response.user!.id,
+          email: response.user!.email ?? '',
+          name: name,
+        );
       }
-    } on supabase.AuthApiException catch (e) {
+      return null;
+    } on supabase.AuthException catch (e) {
       // 处理认证异常
-      print('Register error: ${e.message}');
+      print('Registration failed: ${e.message}');
+      return null;
+    } catch (e) {
+      // 处理其他异常
+      print('Registration failed: $e');
+      return null;
     }
-    return null;
   }
 
   @override
   Future<void> logout() async {
-    await _supabase.auth.signOut();
+    try {
+      await _supabaseClient.auth.signOut();
+    } catch (e) {
+      print('Logout failed: $e');
+    }
   }
+
+  @override
+  set onAuthStateChanged(AuthStateChangedCallback? callback) {
+    _onAuthStateChanged = callback;
+  }
+
+  @override
+  AuthStateChangedCallback? get onAuthStateChanged => _onAuthStateChanged;
 }

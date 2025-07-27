@@ -7,6 +7,7 @@ class MockSettingsPersistence implements SettingsPersistence {
   bool soundsOn = true;
   bool muted = false;
   String playerName = 'Player';
+  AppTheme theme = AppTheme.light;
 
   @override
   Future<bool> getMusicOn() async => musicOn;
@@ -19,6 +20,9 @@ class MockSettingsPersistence implements SettingsPersistence {
 
   @override
   Future<String> getPlayerName() async => playerName;
+  
+  @override
+  Future<AppTheme> getTheme() async => theme;
 
   @override
   Future<void> saveMusicOn(bool value) async {
@@ -38,6 +42,11 @@ class MockSettingsPersistence implements SettingsPersistence {
   @override
   Future<void> savePlayerName(String value) async {
     playerName = value;
+  }
+  
+  @override
+  Future<void> saveTheme(AppTheme value) async {
+    theme = value;
   }
 }
 
@@ -63,6 +72,7 @@ void main() {
       expect(settingsController.soundsOn.value, true);
       expect(settingsController.muted.value, false);
       expect(settingsController.playerName.value, 'Player');
+      expect(settingsController.theme.value, AppTheme.light);
     });
 
     test('should update player name', () async {

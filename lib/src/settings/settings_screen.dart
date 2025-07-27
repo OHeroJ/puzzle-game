@@ -6,230 +6,310 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../style/palette.dart';
-import '../user/user_manager.dart' show UserManager;
+import '../user/user_manager.dart';
 import 'settings.dart';
-import '../ranking/ranking_manager.dart' show RankingManager;
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
-  static const _gap = SizedBox(height: 30);
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final TextEditingController _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // 初始化时设置用户名
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final settings = context.read<SettingsController>();
+      _nameController.text = settings.playerName.value;
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsController>();
     final palette = context.watch<Palette>();
+    final settings = context.watch<SettingsController>();
     final userManager = context.watch<UserManager>();
-    final rankingManager = context.watch<RankingManager>();
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            GoRouter.of(context).pop();
-          },
-          icon: const Icon(Icons.arrow_back_ios_new),
-        ),
-        centerTitle: true,
-        backgroundColor: palette.backgroundMain,
-        title: Text(
-          'Settings',
-          style: TextStyle(
-              fontSize: 28.sp,
-              color: palette.textColor,
-              fontWeight: FontWeight.bold),
-        ),
-      ),
       backgroundColor: palette.backgroundMain,
-      body: ListView(
-        children: [
-          SizedBox(height: 20),
-          // 用户信息区域
-          Container(
-            padding: EdgeInsets.all(20.w),
-            margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-            decoration: BoxDecoration(
-              color: palette.secondaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: userManager.isSignedIn
-                ? Row(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 返回按钮
+              IconButton(
+                icon: Icon(Icons.arrow_back, color: palette.textColor),
+                onPressed: () => context.pop(),
+              ),
+              SizedBox(height: 20.h),
+              
+              // 标题
+              Text(
+                '设置',
+                style: TextStyle(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                  color: palette.textColor,
+                ),
+              ),
+              SizedBox(height: 30.h),
+              
+              // 用户名设置
+              Text(
+                '用户名',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: palette.textColor,
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.w),
+                decoration: BoxDecoration(
+                  color: palette.backgroundMenu.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: TextField(
+                  controller: _nameController,
+                  style: TextStyle(color: palette.textColor),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: '请输入用户名',
+                    hintStyle: TextStyle(color: palette.textColor.withValues(alpha: 0.5)),
+                  ),
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      settings.setPlayerName(value.trim());
+                    }
+                  },
+                ),
+              ),
+              SizedBox(height: 20.h),
+              
+              // 音效设置
+              Text(
+                '音效设置',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: palette.textColor,
+                ),
+              ),
+              SizedBox(height: 15.h),
+              _buildSwitchSetting(
+                context,
+                '音乐',
+                settings.musicOn.value,
+                (value) => settings.toggleMusicOn(),
+              ),
+              SizedBox(height: 10.h),
+              _buildSwitchSetting(
+                context,
+                '音效',
+                settings.soundsOn.value,
+                (value) => settings.toggleSoundsOn(),
+              ),
+              SizedBox(height: 10.h),
+              _buildSwitchSetting(
+                context,
+                '静音',
+                settings.muted.value,
+                (value) => settings.toggleMuted(),
+              ),
+              SizedBox(height: 20.h),
+              
+              // 主题设置
+              Text(
+                '主题设置',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: palette.textColor,
+                ),
+              ),
+              SizedBox(height: 15.h),
+              _buildThemeSetting(context, settings),
+              SizedBox(height: 20.h),
+              
+              // 用户登录状态提示
+              if (!userManager.isSignedIn)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16.w),
+                  margin: EdgeInsets.only(bottom: 20.h),
+                  decoration: BoxDecoration(
+                    color: palette.backgroundMenu.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 25.r,
-                        backgroundColor: palette.primaryColor,
-                        child: Text(
-                          userManager.currentUser?.name.substring(0, 1) ?? 'U',
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 15.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              userManager.currentUser?.name ?? 'User',
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: palette.textColor,
-                              ),
-                            ),
-                            SizedBox(height: 5.h),
-                            Text(
-                              userManager.currentUser?.email ?? '',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: palette.textColor.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          userManager.logout();
-                        },
-                        child: Text(
-                          '登出',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: palette.primaryColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          GoRouter.of(context).push('/login');
-                        },
-                        child: Text(
-                          '登录',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: palette.primaryColor,
-                          ),
-                        ),
-                      ),
                       Text(
-                        '|',
+                        '提示',
                         style: TextStyle(
-                          color: palette.textColor.withOpacity(0.5),
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: palette.textColor,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          GoRouter.of(context).push('/register');
-                        },
-                        child: Text(
-                          '注册',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: palette.primaryColor,
-                          ),
+                      SizedBox(height: 10.h),
+                      Text(
+                        '登录后设置将保存到云端，可在不同设备间同步。\n点击右上角的个人头像登录。',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: palette.textColor,
                         ),
                       ),
                     ],
                   ),
-          ),
-          _gap,
-          // 排行榜入口
-          ListTile(
-            title: Text(
-              '排行榜',
-              style: TextStyle(
-                fontSize: 18.sp,
-                color: palette.textColor,
+                ),
+              SizedBox(height: 20.h),
+              
+              // 关于按钮
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.push('/settings/about');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: palette.primaryColor,
+                    padding: EdgeInsets.symmetric(vertical: 15.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    '关于',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: palette.backgroundMain,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            trailing: Icon(
-              Icons.arrow_forward_ios,
-              size: 16.sp,
-              color: palette.textColor.withOpacity(0.7),
-            ),
-            onTap: () {
-              GoRouter.of(context).push('/ranking');
-            },
+            ],
           ),
-          _gap,
-          SwitchListTile(
-            value: settings.soundsOn.value,
-            onChanged: (value) {
-              settings.soundsOn.value = value;
-            },
-            title: Text(
-              'Sound',
-              style: TextStyle(
-                fontSize: 18.sp,
-                color: palette.textColor,
-              ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwitchSetting(BuildContext context, String title, bool value, Function(bool) onChanged) {
+    final palette = context.watch<Palette>();
+    
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: palette.backgroundMenu.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16.sp,
+              color: palette.textColor,
             ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
             activeColor: palette.primaryColor,
-            inactiveThumbColor: palette.secondaryColor,
           ),
-          _SettingsLine(
-            'Policy',
-            Icon(Icons.policy, color: palette.textColor),
-            onSelected: () {
-              _launchInBrowser(
-                  Uri.parse("https://oldbird.run/puzzle-sec.html"));
-            },
-          ),
-          _SettingsLine(
-            'About',
-            Icon(Icons.info, color: palette.textColor),
-            onSelected: () {
-              GoRouter.of(context).push('/settings/about');
-            },
-          ),
-          SizedBox(height: 20),
         ],
       ),
     );
   }
-}
-
-Future<void> _launchInBrowser(Uri url) async {
-  if (!await launchUrl(
-    url,
-    mode: LaunchMode.externalApplication,
-  )) {
-    throw Exception('Could not launch $url');
-  }
-}
-
-class _SettingsLine extends StatelessWidget {
-  final String title;
-
-  final Widget trailing;
-
-  final VoidCallback? onSelected;
-
-  const _SettingsLine(this.title, this.trailing, {this.onSelected});
-
-  @override
-  Widget build(BuildContext context) {
+  
+  Widget _buildThemeSetting(BuildContext context, SettingsController settings) {
     final palette = context.watch<Palette>();
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(fontSize: 18.sp, color: palette.textColor),
+    
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: palette.backgroundMenu.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(12.r),
       ),
-      trailing: trailing,
-      onTap: onSelected,
-      contentPadding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 8.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '选择主题',
+            style: TextStyle(
+              fontSize: 16.sp,
+              color: palette.textColor,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            children: [
+              Expanded(
+                child: _buildThemeOption(
+                  context,
+                  '亮色',
+                  AppTheme.light,
+                  settings.theme.value == AppTheme.light,
+                  () => settings.setTheme(AppTheme.light),
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: _buildThemeOption(
+                  context,
+                  '暗色',
+                  AppTheme.dark,
+                  settings.theme.value == AppTheme.dark,
+                  () => settings.setTheme(AppTheme.dark),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildThemeOption(BuildContext context, String title, AppTheme theme, bool isSelected, VoidCallback onTap) {
+    final palette = context.watch<Palette>();
+    
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isSelected ? palette.primaryColor : palette.backgroundLevel3,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: isSelected ? palette.backgroundMain : palette.textColor,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -3,159 +3,82 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase/supabase.dart' as supabase;
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import 'firebase_options.dart';
 import 'src/app_lifecycle/app_lifecycle.dart';
+import 'src/audio/audio_controller.dart';
 import 'src/config/supabase_config.dart';
 import 'src/level_selection/level_selection_screen.dart';
-import 'src/level_selection/jigsaw_info.dart';
 import 'src/loading_selection/loading_selection_screen.dart';
 import 'src/main_menu/main_menu_screen.dart';
 import 'src/play_session/play_session_screen.dart';
 import 'src/ranking/ranking_manager.dart';
 import 'src/ranking/ranking_screen.dart';
-import 'src/settings/settings.dart';
+import 'src/settings/about_screen.dart';
 import 'src/settings/persistence/local_storage_settings_persistence.dart';
+import 'src/settings/persistence/supabase_settings_persistence.dart';
+import 'src/settings/settings.dart';
 import 'src/settings/settings_screen.dart';
 import 'src/style/palette.dart';
 import 'src/user/login_screen.dart';
 import 'src/user/register_screen.dart';
+import 'src/user/supabase_auth_provider.dart';
 import 'src/user/user_manager.dart';
+import 'src/user/user_progress_manager.dart';
 
 Future<void> main() async {
-  // A temporary workaround to avoid issues on web.
-  // See: https://github.com/firebase/firebase-dart/issues/746
-  if (!kIsWeb) {
+  // 初始化Flutter绑定
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 初始化日志记录
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    if (kDebugMode) {
+      print(
+          '${record.level.name}: ${record.time}: ${record.loggerName}: ${record.message}');
+    }
+  });
+
+  // 初始化Firebase
+  try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  }
-
-  // Disable print() in production.
-  if (kReleaseMode) {
-    debugPrint = (String? message, {int? wrapWidth}) {};
-  }
-
-  // Enable logging (release and debug) in the console.
-  Logger.root.level = kReleaseMode ? Level.WARNING : Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    if (kReleaseMode) {
-      // In release mode, only log warnings and errors.
-      if (record.level >= Level.WARNING) {
-        debugPrint('${record.level.name}: ${record.time}: '
-            '${record.loggerName}: '
-            '${record.message}');
-      }
-    } else {
-      // In debug mode, log everything.
-      debugPrint('${record.level.name}: ${record.time}: '
-          '${record.loggerName}: '
-          '${record.message}');
-    }
-  });
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    Logger('FlutterError')
-        .severe(details.exception, details.stack);
-  };
-
-  if (!kIsWeb) {
-    // Report uncaught errors.
-    PlatformDispatcher.instance.onError = (error, stack) {
-      Logger('PlatformDispatcher').severe('Uncaught error', error, stack);
-      if (!kReleaseMode) {
-        // In debug mode, print the error to the console.
-        debugPrint('PlatformDispatcher: $error\n$stack');
-      }
-      return true;
-    };
-  }
-
-  // Report errors to Crashlytics.
-  if (!kDebugMode && !kIsWeb) {
-    FlutterError.onError = (FlutterErrorDetails details) {
-      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
-    };
+    
+    // 传递未捕获的错误到Firebase Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
+  } catch (e) {
+    // Firebase初始化失败时的处理
+    if (kDebugMode) {
+      print('Firebase initialization failed: $e');
+    }
   }
 
-  // Set up routing.
-  final GoRouter router = GoRouter(
-    routes: <RouteBase>[
-      GoRoute(
-        path: '/',
-        builder: (BuildContext context, GoRouterState state) {
-          return const MainMenuScreen();
-        },
-        routes: <RouteBase>[
-          GoRoute(
-            path: 'play',
-            builder: (BuildContext context, GoRouterState state) {
-              // 创建一个默认的JigsawInfo对象
-              final level = JigsawInfo(
-                'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
-                'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
-                'Default Puzzle',
-                3,
-                'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
-              );
-              return LoadingSelectionScreen(level: level);
-            },
-          ),
-          GoRoute(
-            path: 'levelSelection',
-            builder: (BuildContext context, GoRouterState state) {
-              return const LevelSelectionScreen();
-            },
-          ),
-          GoRoute(
-            path: 'playSession/:levelId',
-            builder: (BuildContext context, GoRouterState state) {
-              final levelId = state.pathParameters['levelId']!;
-              final level = JigsawInfo.getJigsawInfo(levelId);
-              return PlaySessionScreen(level);
-            },
-          ),
-          GoRoute(
-            path: 'settings',
-            builder: (BuildContext context, GoRouterState state) {
-              return const SettingsScreen();
-            },
-          ),
-          GoRoute(
-            path: 'login',
-            builder: (BuildContext context, GoRouterState state) {
-              return const LoginScreen();
-            },
-          ),
-          GoRoute(
-            path: 'register',
-            builder: (BuildContext context, GoRouterState state) {
-              return const RegisterScreen();
-            },
-          ),
-          GoRoute(
-            path: 'ranking',
-            builder: (BuildContext context, GoRouterState state) {
-              return const RankingScreen();
-            },
-          ),
-        ],
-      ),
-    ],
-  );
+  // 初始化Supabase
+  try {
+    await supabase.Supabase.initialize(
+      url: SupabaseConfig.supabaseUrl,
+      anonKey: SupabaseConfig.supabaseAnonKey,
+    );
+  } catch (e) {
+    if (kDebugMode) {
+      print('Supabase initialization failed: $e');
+    }
+  }
 
   // Set up analytics.
   FirebaseAnalytics? analytics;
@@ -163,92 +86,207 @@ Future<void> main() async {
     analytics = FirebaseAnalytics.instance;
   }
 
-  // Run the app.
+  // 运行应用
   runApp(
     MyApp(
-      router: router,
       analytics: analytics,
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final GoRouter router;
   final FirebaseAnalytics? analytics;
 
   const MyApp({
-    required this.router,
     this.analytics,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppLifecycleObserver(
-      child: MultiProvider(
-        providers: [
-          Provider<GoRouter>.value(value: router),
-          Provider<FirebaseAnalytics?>.value(value: analytics),
-          ChangeNotifierProvider(
-            create: (context) => Palette(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => SettingsController(
-              persistence: LocalStorageSettingsPersistence(),
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+      ),
+    );
+
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MultiProvider(
+          providers: [
+            // 音频控制器
+            Provider<AudioController>(
+              create: (context) => AudioController()..initialize(),
             ),
-          ),
-          // 初始化Supabase客户端
-          Provider<supabase.SupabaseClient>(
-            create: (context) => supabase.SupabaseClient(
-              SupabaseConfig.supabaseUrl,
-              SupabaseConfig.supabaseAnonKey,
+            
+            // Supabase客户端
+            Provider<supabase.SupabaseClient>(
+              create: (context) => supabase.Supabase.instance.client,
             ),
-          ),
-          // 初始化用户管理器
-          ChangeNotifierProvider(
-            create: (context) => UserManager(),
-          ),
-          // 初始化排行榜管理器
-          ChangeNotifierProvider(
-            create: (context) {
-              final supabaseClient = context.read<supabase.SupabaseClient>();
-              final userManager = context.read<UserManager>();
-              return RankingManager(supabaseClient, userManager);
-            },
-          ),
-        ],
-        child: Consumer2<Palette, SettingsController>(
-          builder: (context, palette, settings, child) {
-            return ScreenUtilInit(
-              designSize: const Size(411, 839),
-              minTextAdapt: true,
-              splitScreenMode: true,
-              builder: (context, child) {
-                return MaterialApp.router(
-                  title: 'Puzzle',
-                  debugShowCheckedModeBanner: false,
+            
+            // 用户管理器
+            ChangeNotifierProvider<UserManager>(
+              create: (context) {
+                final userManager = UserManager();
+                // 初始化Supabase认证提供商
+                final supabaseClient = context.read<supabase.SupabaseClient>();
+                final authProvider = SupabaseAuthProvider(supabaseClient: supabaseClient);
+                userManager.initAuthProvider(authProvider);
+                return userManager;
+              },
+            ),
+            
+            // 设置控制器
+            ChangeNotifierProxyProvider<UserManager, SettingsController>(
+              create: (context) => SettingsController(
+                persistence: LocalStorageSettingsPersistence(),
+              ),
+              update: (context, userManager, previousSettingsController) {
+                if (userManager.isSignedIn && userManager.currentUser != null) {
+                  // 用户已登录，使用Supabase持久化
+                  final supabaseClient = context.read<supabase.SupabaseClient>();
+                  return SettingsController(
+                    persistence: SupabaseSettingsPersistence(
+                      supabaseClient: supabaseClient,
+                      userId: userManager.currentUser!.id,
+                    ),
+                  );
+                } else {
+                  // 用户未登录，使用本地存储
+                  return SettingsController(
+                    persistence: LocalStorageSettingsPersistence(),
+                  );
+                }
+              },
+            ),
+            
+            // 排行榜管理器
+            Provider<RankingManager>(
+              create: (context) {
+                final supabaseClient = context.read<supabase.SupabaseClient>();
+                return RankingManager(supabaseClient: supabaseClient);
+              },
+            ),
+            
+            // 用户进度管理器
+            Provider<UserProgressManager>(
+              create: (context) {
+                final supabaseClient = context.read<supabase.SupabaseClient>();
+                return UserProgressManager(supabaseClient: supabaseClient);
+              },
+            ),
+            
+            // 调色板（依赖于设置控制器）
+            ChangeNotifierProxyProvider<SettingsController, Palette>(
+              create: (context) => Palette(context.read<SettingsController>().theme.value),
+              update: (context, settings, previousPalette) {
+                final palette = Palette(settings.theme.value);
+                return palette;
+              },
+            ),
+          ],
+          child: Consumer3<Palette, UserManager, SettingsController>(
+            builder: (context, palette, userManager, settings, child) {
+              return AppLifecycleObserver(
+                child: MaterialApp.router(
+                  title: 'Puzzle Game',
                   theme: ThemeData(
                     useMaterial3: true,
                     colorScheme: ColorScheme.fromSeed(
-                      seedColor: palette.primaryColor,
-                      background: palette.backgroundMain,
+                      seedColor: palette.darkPen,
+                      brightness: settings.theme.value == AppTheme.dark ? Brightness.dark : Brightness.light,
                     ),
                     scaffoldBackgroundColor: palette.backgroundMain,
-                    textSelectionTheme: TextSelectionThemeData(
-                      cursorColor: palette.primaryColor,
-                      selectionColor: palette.primaryColor.withOpacity(0.3),
-                      selectionHandleColor: palette.primaryColor,
+                    textTheme: TextTheme(
+                      bodyMedium: TextStyle(color: palette.textColor),
+                    ),
+                    elevatedButtonTheme: ElevatedButtonThemeData(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: palette.primaryColor,
+                        foregroundColor: settings.theme.value == AppTheme.dark ? 
+                            const Color(0xFF212121) : const Color(0xFFFFFFFF),
+                      ),
                     ),
                   ),
-                  routeInformationProvider: router.routeInformationProvider,
-                  routeInformationParser: router.routeInformationParser,
-                  routerDelegate: router.routerDelegate,
-                );
-              },
-            );
-          },
-        ),
-      ),
+                  routerConfig: _router,
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
+
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const MainMenuScreen();
+      },
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'play',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LoadingSelectionScreen(level: 1);
+          },
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'level',
+              builder: (BuildContext context, GoRouterState state) {
+                return const LevelSelectionScreen();
+              },
+            ),
+            GoRoute(
+              path: 'level/:levelId',
+              builder: (BuildContext context, GoRouterState state) {
+                final levelId = state.pathParameters['levelId']!;
+                final level = int.tryParse(levelId) ?? 1;
+                return PlaySessionScreen(level: level);
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: 'settings',
+          builder: (BuildContext context, GoRouterState state) {
+            return const SettingsScreen();
+          },
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'about',
+              builder: (BuildContext context, GoRouterState state) {
+                return const AboutScreen();
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: 'login',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LoginScreen();
+          },
+        ),
+        GoRoute(
+          path: 'register',
+          builder: (BuildContext context, GoRouterState state) {
+            return const RegisterScreen();
+          },
+        ),
+        GoRoute(
+          path: 'ranking',
+          builder: (BuildContext context, GoRouterState state) {
+            return const RankingScreen();
+          },
+        ),
+      ],
+    ),
+  ],
+);

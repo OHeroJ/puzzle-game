@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import '../settings.dart';
+
 /// An interface of persistence stores for settings.
 ///
 /// Implementations can range from simple in-memory storage through
@@ -14,6 +16,8 @@ abstract class SettingsPersistence {
   Future<String> getPlayerName();
 
   Future<bool> getSoundsOn();
+  
+  Future<AppTheme> getTheme();
 
   Future<void> saveMusicOn(bool value);
 
@@ -22,4 +26,6 @@ abstract class SettingsPersistence {
   Future<void> savePlayerName(String value);
 
   Future<void> saveSoundsOn(bool value);
+  
+  Future<void> saveTheme(AppTheme theme);
 }

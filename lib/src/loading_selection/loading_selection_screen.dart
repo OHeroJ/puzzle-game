@@ -6,7 +6,7 @@ import '../level_selection/jigsaw_info.dart';
 import '../level_selection/piece_image.dart';
 
 class LoadingSelectionScreen extends StatefulWidget {
-  final JigsawInfo level;
+  final int level;
 
   const LoadingSelectionScreen({super.key, required this.level});
 
@@ -27,62 +27,113 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final jigsawInfo = JigsawInfo.getJigsawInfo(widget.level.toString());
+    
     return Scaffold(
       body: Container(
-        width: 1.sw,
-        height: 1.sh,
-        child: Stack(children: [
-          PieceImage(
-            pictureUrl: widget.level.smallimage,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/background/background.png"),
+            fit: BoxFit.cover,
           ),
-          PieceImage(
-            pictureUrl: widget.level.image,
-            progressIndicatorBuilder: (context, url, downloadProgress) {
-              return Container();
-            },
-            progress: () {
-              print("complete: $p");
-              int now = DateTime.now().microsecondsSinceEpoch;
-              print('now $now');
-              print('date $date');
-              print('diff ${now - date}');
-              print("complete: 22");
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Future.delayed(Duration(milliseconds: 1500), () async {
-                  GoRouter.of(context)
-                      .pushReplacement('/play/session/', extra: widget.level);
-                });
-              });
-            },
-          ),
-          // if (adsControllerAvailable) ...[
-          //   Container(
-          //     height: 80.h,
-          //     color: Colors.white,
-          //     child: Center(child: BannerAdWidget()),
-          //   )
-          // ],
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: EdgeInsets.only(bottom: 0.1.sh),
-              width: 0.9.sw,
-              child: Stack(alignment: Alignment.center, children: [
-                Container(
-                  height: 30.h,
-                  child: LinearProgressIndicator(
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation(Colors.blue),
-                  ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 300.w,
+                height: 300.w,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      child: PieceImage(
+                        pictureUrl: jigsawInfo.imageUrl,
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: PieceImage(
+                        pictureUrl: jigsawInfo.imageUrl,
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      bottom: 0,
+                      child: PieceImage(
+                        pictureUrl: jigsawInfo.imageUrl,
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: PieceImage(
+                        pictureUrl: jigsawInfo.imageUrl,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  "loading...",
-                )
-              ]),
-            ),
+              ),
+              SizedBox(height: 50.h),
+              Text(
+                'Loading...',
+                style: TextStyle(
+                  fontSize: 40.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 50.h),
+              SizedBox(
+                width: 300.w,
+                child: LinearProgressIndicator(
+                  value: p,
+                  backgroundColor: Colors.white,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                ),
+              ),
+            ],
           ),
-        ]),
+        ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (p == 0) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        setState(() {
+          p = 0.3;
+        });
+      });
+      Future.delayed(const Duration(milliseconds: 600), () {
+        setState(() {
+          p = 0.6;
+        });
+      });
+      Future.delayed(const Duration(milliseconds: 900), () {
+        setState(() {
+          p = 0.9;
+        });
+      });
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        setState(() {
+          p = 1.0;
+        });
+        int now = DateTime.now().microsecondsSinceEpoch;
+        if (now - date > 1500000) {
+          GoRouter.of(context).go('/play', extra: widget.level);
+        } else {
+          Future.delayed(const Duration(microseconds: 1500000), () {
+            GoRouter.of(context).go('/play', extra: widget.level);
+          });
+        }
+      });
+    }
   }
 }

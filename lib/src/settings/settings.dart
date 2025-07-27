@@ -6,6 +6,12 @@ import 'package:flutter/foundation.dart';
 
 import 'persistence/settings_persistence.dart';
 
+/// Enum representing the available themes
+enum AppTheme {
+  light,
+  dark,
+}
+
 /// An class that holds the settings of the game, and persists them
 /// to and from [SettingsPersistence].
 ///
@@ -29,18 +35,28 @@ import 'persistence/settings_persistence.dart';
 class SettingsController extends ChangeNotifier {
   final SettingsPersistence _persistence;
 
+  /// 默认设置值
+  static const bool defaultMusicOn = true;
+  static const bool defaultSoundsOn = true;
+  static const bool defaultMuted = false;
+  static const String defaultPlayerName = 'Player';
+  static const AppTheme defaultTheme = AppTheme.light;
+
   /// Controls whether music is played during a game.
-  final ValueNotifier<bool> musicOn = ValueNotifier(true);
+  final ValueNotifier<bool> musicOn = ValueNotifier(defaultMusicOn);
 
   /// Controls whether sound effects are played during a game.
-  final ValueNotifier<bool> soundsOn = ValueNotifier(true);
+  final ValueNotifier<bool> soundsOn = ValueNotifier(defaultSoundsOn);
   
   /// Whether or not the sound is on at all. This overrides both music
   /// and sound.
-  final ValueNotifier<bool> muted = ValueNotifier(false);
+  final ValueNotifier<bool> muted = ValueNotifier(defaultMuted);
 
   /// The player's name.
-  final ValueNotifier<String> playerName = ValueNotifier('Player');
+  final ValueNotifier<String> playerName = ValueNotifier(defaultPlayerName);
+
+  /// The app theme.
+  final ValueNotifier<AppTheme> theme = ValueNotifier(defaultTheme);
 
   SettingsController({required SettingsPersistence persistence})
       : _persistence = persistence {
@@ -58,6 +74,7 @@ class SettingsController extends ChangeNotifier {
       _persistence.getSoundsOn().then((value) => soundsOn.value = value),
       _persistence.getMusicOn().then((value) => musicOn.value = value),
       _persistence.getPlayerName().then((value) => playerName.value = value),
+      _persistence.getTheme().then((value) => theme.value = value),
     ]);
     
     notifyListeners();
@@ -69,6 +86,7 @@ class SettingsController extends ChangeNotifier {
     soundsOn.dispose();
     muted.dispose();
     playerName.dispose();
+    theme.dispose();
     super.dispose();
   }
 
@@ -93,6 +111,12 @@ class SettingsController extends ChangeNotifier {
   void toggleSoundsOn() {
     soundsOn.value = !soundsOn.value;
     _persistence.saveSoundsOn(soundsOn.value);
+    notifyListeners();
+  }
+  
+  void setTheme(AppTheme newTheme) {
+    theme.value = newTheme;
+    _persistence.saveTheme(newTheme);
     notifyListeners();
   }
 }

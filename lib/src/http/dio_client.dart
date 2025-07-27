@@ -17,19 +17,19 @@ class DioClient {
     _engine = DioEngine();
   }
 
-  Future get(String url, {Map<String, dynamic>? params}) async {
+  Future<dynamic> get(String url, {Map<String, dynamic>? params}) async {
     try {
-      Map<String, dynamic> map = await _engine.get(url, params: params);
-      return Future.value(map);
+      final response = await _engine.get(url);
+      return Future.value(response);
     } catch (e) {
       return Future.error(e);
     }
   }
 
-  Future post(String url, {Map<String, dynamic>? params}) async {
+  Future<dynamic> post(String url, {Map<String, dynamic>? params}) async {
     try {
-      Map<String, dynamic> map = await _engine.get(url, params: params);
-      return Future.error(map);
+      final response = await _engine.post(url, params);
+      return Future.value(response);
     } catch (e) {
       return Future.error(e);
     }

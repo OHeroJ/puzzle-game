@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
-import '../settings/settings.dart';
+import '../audio/audio_controller.dart';
+import '../audio/sounds.dart';
 import '../style/palette.dart';
-import '../style/responsive_screen.dart';
+import '../user/user_manager.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -19,142 +19,258 @@ class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    final settingsController = context.watch<SettingsController>();
+    final audioController = context.watch<AudioController>();
+    final userManager = context.watch<UserManager>();
 
     return Scaffold(
       backgroundColor: palette.backgroundMain,
-      body: ResponsiveScreen(
-        mainAreaProminence: 0.45,
-        squarishMainArea: Column(
-          children: [
-            Expanded(
-                child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Puzzle Game',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 60,
-                      height: 1,
-                      color: palette.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  InkWell(
-                    onTap: () {
-                      launchUrlString('https://www.pexels.com');
-                    },
-                    child: Text(
-                      'Photos provided by Pexels',
-                      style:
-                          TextStyle(color: palette.textColor.withOpacity(0.7)),
-                    ),
-                  ),
-                ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // 根据屏幕宽度调整整体布局
+          final isLargeScreen = constraints.maxWidth > 600;
+          
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isLargeScreen ? 80.w : 30.w,
               ),
-            )),
-            _buildBAH(),
-          ],
-        ),
-        rectangularMenuArea: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                GoRouter.of(context).push('/play');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: palette.primaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo
+                    Container(
+                      width: isLargeScreen ? 150.w : 120.w,
+                      height: isLargeScreen ? 150.h : 120.h,
+                      decoration: BoxDecoration(
+                        color: palette.primaryColor.withValues(alpha: 0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.extension,
+                        color: palette.textColor,
+                        size: isLargeScreen ? 80.w : 60.w,
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 50.h : 30.h),
+                    
+                    // 游戏标题
+                    Text(
+                      '拼图游戏',
+                      style: TextStyle(
+                        fontSize: isLargeScreen ? 36.sp : 28.sp,
+                        fontWeight: FontWeight.bold,
+                        color: palette.textColor,
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 60.h : 40.h),
+                    
+                    // 开始游戏按钮
+                    Container(
+                      width: isLargeScreen ? 200.w : 150.w,
+                      height: isLargeScreen ? 60.h : 45.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            palette.primaryColor,
+                            palette.secondaryColor,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(isLargeScreen ? 30.r : 22.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: palette.primaryColor.withValues(alpha: 0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          audioController.playSfx(SfxType.buttonTap);
+                          context.push('/play/level');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(isLargeScreen ? 30.r : 22.r),
+                          ),
+                        ),
+                        child: Text(
+                          '开始游戏',
+                          style: TextStyle(
+                            fontSize: isLargeScreen ? 20.sp : 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: palette.backgroundMain,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 30.h : 20.h),
+                    
+                    // 排行榜按钮
+                    Container(
+                      width: isLargeScreen ? 200.w : 150.w,
+                      height: isLargeScreen ? 50.h : 40.h,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: palette.primaryColor, width: 2.w),
+                        borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          audioController.playSfx(SfxType.buttonTap);
+                          context.push('/ranking');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                          ),
+                        ),
+                        child: Text(
+                          '排行榜',
+                          style: TextStyle(
+                            fontSize: isLargeScreen ? 18.sp : 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: palette.textColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 30.h : 20.h),
+                    
+                    // 设置按钮
+                    Container(
+                      width: isLargeScreen ? 200.w : 150.w,
+                      height: isLargeScreen ? 50.h : 40.h,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: palette.primaryColor, width: 2.w),
+                        borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          audioController.playSfx(SfxType.buttonTap);
+                          context.push('/settings');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                          ),
+                        ),
+                        child: Text(
+                          '设置',
+                          style: TextStyle(
+                            fontSize: isLargeScreen ? 18.sp : 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: palette.textColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isLargeScreen ? 30.h : 20.h),
+                    
+                    // 用户信息区域
+                    if (userManager.isSignedIn && userManager.currentUser != null)
+                      Container(
+                        width: isLargeScreen ? 200.w : 150.w,
+                        padding: EdgeInsets.all(isLargeScreen ? 15.w : 10.w),
+                        decoration: BoxDecoration(
+                          color: palette.backgroundMenu.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 15.r),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              userManager.currentUser!.name,
+                              style: TextStyle(
+                                fontSize: isLargeScreen ? 16.sp : 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: palette.textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Container(
+                        width: isLargeScreen ? 200.w : 150.w,
+                        padding: EdgeInsets.all(isLargeScreen ? 15.w : 10.w),
+                        decoration: BoxDecoration(
+                          color: palette.backgroundMenu.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 15.r),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              '未登录',
+                              style: TextStyle(
+                                fontSize: isLargeScreen ? 16.sp : 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: palette.textColor,
+                              ),
+                            ),
+                            SizedBox(height: 5.h),
+                            Text(
+                              '登录后可保存游戏记录',
+                              style: TextStyle(
+                                fontSize: isLargeScreen ? 12.sp : 10.sp,
+                                color: palette.textColor,
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            // 添加登录按钮
+                            Container(
+                              width: double.infinity,
+                              height: isLargeScreen ? 40.h : 35.h,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    palette.primaryColor,
+                                    palette.secondaryColor,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 17.r),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  audioController.playSfx(SfxType.buttonTap);
+                                  context.push('/login');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 17.r),
+                                  ),
+                                ),
+                                child: Text(
+                                  '立即登录',
+                                  style: TextStyle(
+                                    fontSize: isLargeScreen ? 14.sp : 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: palette.backgroundMain,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              child: const Text('Play', style: TextStyle(fontSize: 20)),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => GoRouter.of(context).push('/settings'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: palette.secondaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('Settings', style: TextStyle(fontSize: 20)),
-            ),
-            SizedBox(height: 30),
-            ValueListenableBuilder<bool>(
-              valueListenable: settingsController.muted,
-              builder: (context, muted, child) {
-                return IconButton(
-                  onPressed: () => settingsController.toggleSoundsOn(),
-                  icon: Icon(muted ? Icons.volume_off : Icons.volume_up,
-                      size: 30, color: palette.textColor),
-                );
-              },
-            ),
-            SizedBox(height: 20),
-          ],
-        ),
+          );
+        },
       ),
     );
-  }
-
-  Widget _buildBAH() {
-    if (kIsWeb)
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            height: 30.h,
-          ),
-          GestureDetector(
-            onTap: () {
-              launchUrlString('https://beian.miit.gov.cn');
-            },
-            child: Text(
-              '赣ICP备2021010021号-1',
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          GestureDetector(
-            onTap: () {
-              launchUrlString(
-                  'https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=36011102000528');
-            },
-            child: Row(
-              children: [
-                Image.asset(
-                  "assets/images/beanh.png",
-                  width: 12,
-                  height: 12,
-                ),
-                Text(
-                  '赣公网安备 36011102000528号',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey,
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-      );
-    else
-      return SizedBox();
   }
 }

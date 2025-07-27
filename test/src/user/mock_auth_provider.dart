@@ -32,11 +32,11 @@ class MockAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<User?> register(String email, String password) async {
+  Future<User?> register(String email, String password, String name) async {
     _currentUser = User(
       id: '124',
       email: email,
-      name: 'New User',
+      name: name,
     );
     _isSignedIn = true;
     onAuthStateChanged?.call(_currentUser);

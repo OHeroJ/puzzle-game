@@ -1,75 +1,86 @@
-import 'package:flutter/foundation.dart';
-import 'package:supabase/supabase.dart' as supabase;
+import 'dart:math';
 
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+
+import '../user/user.dart';
 import '../user/user_manager.dart';
 import 'ranking.dart';
+import 'score_calculator.dart';
 
-// 排行榜管理器
-class RankingManager with ChangeNotifier {
-  final supabase.SupabaseClient _supabaseClient;
-  final UserManager _userManager;
-
-  List<Ranking> _rankings = [];
+class RankingManager {
+  final supabase.SupabaseClient supabaseClient;
   bool _isLoading = false;
+  List<Ranking> _rankings = [];
 
-  RankingManager(this._supabaseClient, this._userManager);
+  RankingManager({required this.supabaseClient});
 
-  // 获取排行榜数据
-  Future<List<Ranking>> fetchRankings({int limit = 50}) async {
-    _isLoading = true;
-    notifyListeners();
+  bool get isLoading => _isLoading;
+  List<Ranking> get rankings => _rankings;
 
+  /// 获取排行榜
+  Future<List<Ranking>> getRankings({int limit = 50}) async {
     try {
-      final response = await _supabaseClient
+      _isLoading = true;
+      
+      final response = await supabaseClient
           .from('rankings')
           .select()
           .order('score', ascending: false)
           .limit(limit);
+
       _rankings = response.map((data) => Ranking.fromJson(data)).toList();
+      return _rankings;
+    } on supabase.PostgrestException catch (e) {
+      // 处理数据库异常
+      if (e.code == '42P01') {
+        // 表不存在
+        print('Database table "rankings" does not exist: ${e.message}');
+      } else {
+        print('Failed to fetch rankings: ${e.message}');
+      }
+      return [];
     } catch (e) {
-      debugPrint('Failed to fetch rankings: $e');
-      _rankings = [];
+      // 处理其他异常
+      print('Failed to fetch rankings: $e');
+      return [];
     } finally {
       _isLoading = false;
-      notifyListeners();
     }
-
-    return _rankings;
   }
 
-  // 提交用户分数
-  Future<bool> submitScore(int score) async {
-    if (!_userManager.isSignedIn || _userManager.currentUser == null) {
-      return false;
-    }
-
+  /// 提交分数
+  Future<bool> submitScore(int score, UserManager userManager) async {
     try {
-      final userId = _userManager.currentUser!.id;
-      final username = _userManager.currentUser!.name;
-      final avatarUrl = _userManager.currentUser!.avatarUrl;
+      // 检查用户是否已登录
+      if (!userManager.isSignedIn || userManager.currentUser == null) {
+        return false;
+      }
 
-      await _supabaseClient.from('rankings').insert([
-        {
-          'user_id': userId,
-          'username': username,
-          'score': score,
-          'avatar_url': avatarUrl,
-          'created_at': DateTime.now().toIso8601String(),
-        }
-      ]);
+      final user = userManager.currentUser!;
+      
+      // 保存分数到排行榜
+      await supabaseClient.from('rankings').insert({
+        'user_id': user.id,
+        'username': user.name,
+        'score': score,
+        'avatar_url': '', // 可以根据需要添加头像URL
+        'created_at': DateTime.now().toIso8601String(),
+      });
 
-      // 重新获取排行榜数据
-      await fetchRankings();
       return true;
+    } on supabase.PostgrestException catch (e) {
+      // 处理数据库异常
+      if (e.code == '42P01') {
+        // 表不存在
+        print('Database table "rankings" does not exist: ${e.message}');
+      } else {
+        print('Failed to submit score: ${e.message}');
+      }
+      return false;
     } catch (e) {
-      debugPrint('Failed to submit score: $e');
+      // 处理其他异常
+      print('Failed to submit score: $e');
       return false;
     }
   }
-
-  // 获取当前排行榜数据
-  List<Ranking> get rankings => _rankings;
-
-  // 检查是否正在加载数据
-  bool get isLoading => _isLoading;
 }

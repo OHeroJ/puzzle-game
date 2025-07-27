@@ -30,4 +30,24 @@ class Score {
         .padLeft(2, '0'));
     return buf.toString();
   }
+
+  static String formatTime(Duration duration) {
+    final buf = StringBuffer();
+    if (duration.inHours > 0) {
+      buf.write('${duration.inHours}');
+      buf.write(':');
+    }
+    final minutes = duration.inMinutes % Duration.minutesPerHour;
+    if (minutes > 9) {
+      buf.write('$minutes');
+    } else {
+      buf.write('0');
+      buf.write('$minutes');
+    }
+    buf.write(':');
+    buf.write((duration.inSeconds % Duration.secondsPerMinute)
+        .toString()
+        .padLeft(2, '0'));
+    return buf.toString();
+  }
 }

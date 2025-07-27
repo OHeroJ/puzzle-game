@@ -4,6 +4,7 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../settings.dart';
 import 'settings_persistence.dart';
 
 /// An implementation of [SettingsPersistence] that uses
@@ -35,6 +36,13 @@ class LocalStorageSettingsPersistence extends SettingsPersistence {
     final prefs = await instanceFuture;
     return prefs.getBool('soundsOn') ?? true;
   }
+  
+  @override
+  Future<AppTheme> getTheme() async {
+    final prefs = await instanceFuture;
+    final themeString = prefs.getString('theme') ?? 'light';
+    return themeString == 'dark' ? AppTheme.dark : AppTheme.light;
+  }
 
   @override
   Future<void> saveMusicOn(bool value) async {
@@ -58,5 +66,11 @@ class LocalStorageSettingsPersistence extends SettingsPersistence {
   Future<void> saveSoundsOn(bool value) async {
     final prefs = await instanceFuture;
     await prefs.setBool('soundsOn', value);
+  }
+  
+  @override
+  Future<void> saveTheme(AppTheme theme) async {
+    final prefs = await instanceFuture;
+    await prefs.setString('theme', theme == AppTheme.dark ? 'dark' : 'light');
   }
 }

@@ -1,6 +1,6 @@
-import 'package:supabase/supabase.dart' as supabase;
+import 'package:mockito/mockito.dart';
 
-class MockSupabaseClient {
+class MockSupabaseClient extends Mock {
   MockSupabaseClient();
 
   MockFrom from(String table) {

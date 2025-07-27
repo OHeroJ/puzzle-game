@@ -1,91 +1,173 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+// Copyright 2022, the Flutter project authors. Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 
-import 'http_exception.dart';
+import '../utils/sp_util.dart';
 
-typedef HttpProgressBack = void Function(double progress);
+class HttpEngine {
+  static final HttpEngine _instance = HttpEngine._internal();
 
-abstract class HttpEngine {
-  Map<String, CancelToken> _cancelToken = {};
+  factory HttpEngine() => _instance;
 
-  dynamic getEngine();
+  HttpEngine._internal();
 
-  void setProxy(String proxy);
+  final Map<String, String> _urlTokens = <String, String>{};
 
-  Future get(String url, {Map<String, dynamic>? params});
+  final Dio _dio = Dio();
 
-  Future post(String url, {Map<String, dynamic>? params});
+  static HttpEngine get instance => _instance;
 
-  Future download(
-    String url,
-    String filePath,
-    HttpProgressBack progressBack,
-  );
+  Future<http.Response> get(String url) async {
+    final String token = _urlTokens[url] ?? '';
+    final Uri uri = Uri.parse(url);
 
-  getFileName(String filePath) {
-    return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length);
-  }
-
-  Future checkRequest(String url) async {
-    if (url.isEmpty) {
-      throw HttpException(HttpExceptionType.noNetWork);
-    }
-    bool available = await isNetworkConnect();
-    if (!available) {
-      throw HttpException(HttpExceptionType.noNetWork);
-    }
-  }
-
-  static Future<bool> isNetworkConnect() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    return connectivityResult != ConnectivityResult.none;
-  }
-
-  void cancelRequest(String url) {
-    if (_cancelToken.containsKey(url)) {
-      _cancelToken[url]?.cancel('cancel');
+    try {
+      final http.Response response = await http.get(
+        uri,
+        headers: <String, String>{
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+      );
+      return response;
+    } on SocketException {
+      return http.Response('No internet connection', 500);
+    } on HttpException {
+      return http.Response('HTTP error occurred', 500);
+    } on FormatException {
+      return http.Response('Invalid response format', 500);
+    } catch (e) {
+      return http.Response('Unknown error: $e', 500);
     }
   }
 
-  void catchError(error) {
-    if (error is DioException) {
-      switch (error.type) {
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout:
-        case DioExceptionType.connectionError:
-          throw HttpException(HttpExceptionType.timeout,
-              message: error.message);
-        case DioExceptionType.badCertificate:
-        case DioExceptionType.badResponse:
-          if (error.response?.statusCode == 401) {
-            throw HttpException(HttpExceptionType.unauthorized,
-                message: error.message);
-          } else {
-            throw HttpException(HttpExceptionType.netWorkCode,
-                message: error.message);
-          }
-        case DioExceptionType.cancel:
-          throw HttpException(HttpExceptionType.cancel, message: error.message);
-        case DioExceptionType.unknown:
-          throw HttpException(HttpExceptionType.other, message: error.message);
-          break;
+  Future<http.Response> post(String url, dynamic data) async {
+    final String token = _urlTokens[url] ?? '';
+    final Uri uri = Uri.parse(url);
+
+    try {
+      final http.Response response = await http.post(
+        uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+        body: data,
+      );
+      return response;
+    } on SocketException {
+      return http.Response('No internet connection', 500);
+    } on HttpException {
+      return http.Response('HTTP error occurred', 500);
+    } on FormatException {
+      return http.Response('Invalid response format', 500);
+    } catch (e) {
+      return http.Response('Unknown error: $e', 500);
+    }
+  }
+
+  Future<http.Response> put(String url, dynamic data) async {
+    final String token = _urlTokens[url] ?? '';
+    final Uri uri = Uri.parse(url);
+
+    try {
+      final http.Response response = await http.put(
+        uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+        body: data,
+      );
+      return response;
+    } on SocketException {
+      return http.Response('No internet connection', 500);
+    } on HttpException {
+      return http.Response('HTTP error occurred', 500);
+    } on FormatException {
+      return http.Response('Invalid response format', 500);
+    } catch (e) {
+      return http.Response('Unknown error: $e', 500);
+    }
+  }
+
+  Future<http.Response> delete(String url) async {
+    final String token = _urlTokens[url] ?? '';
+    final Uri uri = Uri.parse(url);
+
+    try {
+      final http.Response response = await http.delete(
+        uri,
+        headers: <String, String>{
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+      );
+      return response;
+    } on SocketException {
+      return http.Response('No internet connection', 500);
+    } on HttpException {
+      return http.Response('HTTP error occurred', 500);
+    } on FormatException {
+      return http.Response('Invalid response format', 500);
+    } catch (e) {
+      return http.Response('Unknown error: $e', 500);
+    }
+  }
+
+  Future<String> uploadFile(String url, File file) async {
+    try {
+      final String fileName = p.basename(file.path);
+      final FormData formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(file.path, filename: fileName),
+      });
+
+      final Response response = await _dio.post(
+        url,
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data.toString();
+      } else {
+        throw HttpException('Failed to upload file: ${response.statusMessage}');
       }
-    } else {
-      throw HttpException(HttpExceptionType.responseError,
-          message: error.message);
+    } catch (e) {
+      throw HttpException('Failed to upload file: $e');
     }
   }
 
-  CancelToken addUrlToken(String url) {
-    CancelToken token = CancelToken();
-    _cancelToken[url] = token;
-    return token;
+  String getFileName(String url) {
+    try {
+      final Uri uri = Uri.parse(url);
+      final String path = uri.path;
+      return p.basename(path);
+    } catch (e) {
+      debugPrint('Error parsing URL: $e');
+      return '';
+    }
+  }
+
+  void addUrlToken(String url, String token) {
+    _urlTokens[url] = token;
   }
 
   void removeUrlToken(String url) {
-    if (_cancelToken.containsKey(url)) {
-      _cancelToken.remove(url);
-    }
+    _urlTokens.remove(url);
+  }
+
+  Future<void> cancelRequest(String url) async {
+    // Cancel all requests by creating a new Dio instance
+    _dio.close(force: true);
   }
 }

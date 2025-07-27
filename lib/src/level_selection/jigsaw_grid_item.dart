@@ -1,63 +1,92 @@
+// Copyright 2022, the Flutter project authors. Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:puzzle/src/level_selection/jigsaw_info.dart';
-import 'package:puzzle/src/level_selection/piece_image.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../style/palette.dart';
+import 'jigsaw_info.dart';
 
 class JigsawGridItem extends StatelessWidget {
-  const JigsawGridItem({required this.info, Key? key, this.onTap})
-    : super(key: key);
-  final JigsawInfo info;
-  final GestureTapCallback? onTap;
+  final JigsawInfo jigsaw;
+
+  const JigsawGridItem({required this.jigsaw, super.key});
 
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 3), // changes position of shadow
+
+    return GestureDetector(
+      onTap: () {
+        // 使用jigsaw的gridSize作为ID传递
+        context.push('/play/level/${jigsaw.gridSize}');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: palette.backgroundMenu.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: palette.primaryColor,
+            width: 2.w,
           ),
-        ],
-      ),
-      child: GestureDetector(
-        onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            children: [
-              Positioned.fill(child: PieceImage(pictureUrl: info.smallimage)),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 4.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    '@${info.photographer}',
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 显示网格大小
+            Text(
+              '${jigsaw.gridSize}x${jigsaw.gridSize}',
+              style: TextStyle(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+                color: palette.textColor,
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 10.h),
+            // 显示难度级别
+            Text(
+              '难度: ${jigsaw.difficulty}',
+              style: TextStyle(
+                fontSize: 16.sp,
+                color: palette.textColor,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            // 显示图片预览
+            Container(
+              width: 60.w,
+              height: 60.h,
+              decoration: BoxDecoration(
+                color: palette.primaryColor.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(
+                Icons.image,
+                color: palette.textColor,
+                size: 30.w,
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Color _getDifficultyColor(int difficulty) {
+    switch (difficulty) {
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.orange;
+      case 3:
+        return Colors.red;
+      default:
+        return Colors.blue;
+    }
   }
 }

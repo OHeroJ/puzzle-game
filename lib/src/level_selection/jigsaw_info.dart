@@ -14,6 +14,14 @@ class JigsawInfo {
   late String url; // 添加url属性
   late int difficultyLevel; // 添加difficultyLevel属性
 
+  // 添加缺失的getter方法
+  String get imageUrl => image;
+  String get name => title;
+  int get difficulty => difficultyLevel;
+  int get rows => gridSize;
+  int get columns => gridSize;
+  String get levelId => '$gridSize'; // 添加levelId getter，使用gridSize作为ID
+
   JigsawInfo(
     this.image,
     this.smallimage,
@@ -22,6 +30,7 @@ class JigsawInfo {
     this.url, // 添加url参数
   ) {
     difficultyLevel = gridSize; // 初始化difficultyLevel为gridSize
+    id = gridSize; // 初始化id为gridSize
   }
 
   JigsawInfo.fromJson(dynamic json, int gridSize) {
@@ -37,13 +46,13 @@ class JigsawInfo {
   
   // 添加一个静态方法来根据ID获取拼图信息
   static JigsawInfo getJigsawInfo(String levelId) {
-    // 这里应该根据levelId返回对应的JigsawInfo对象
-    // 为了简化，我们返回一个默认的JigsawInfo对象
+    // 根据levelId返回对应的JigsawInfo对象
+    int gridSize = int.tryParse(levelId) ?? 3; // 默认3x3网格
     return JigsawInfo(
       'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
       'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg',
       'Default Puzzle',
-      3, // 默认3x3网格
+      gridSize,
       'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg', // url参数
     );
   }

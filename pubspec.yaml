@@ -18,7 +18,7 @@ dependencies:
   firebase_crashlytics: ^4.3.9
 
   # Supabase
-  supabase: ^2.6.0
+  supabase_flutter: ^2.5.0
 
   # State management
   provider: ^6.1.2
@@ -29,6 +29,8 @@ dependencies:
   awesome_dialog: ^3.2.1
   lottie: ^3.3.1
   google_fonts: ^6.2.1
+  cherry_toast: ^1.13.0
+  package_info_plus: ^8.1.1
 
   # Networking
   dio: ^5.4.3+1
@@ -67,4 +69,3 @@ flutter:
   assets:
     - assets/lottie/
     - assets/music/
-

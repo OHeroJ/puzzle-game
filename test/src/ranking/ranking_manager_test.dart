@@ -1,51 +1,34 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:puzzle/src/ranking/ranking_manager.dart';
-import 'package:puzzle/src/user/user.dart' as local_user;
-import 'package:puzzle/src/user/user_manager.dart';
 import 'package:puzzle/src/ranking/ranking.dart';
-import 'package:supabase/supabase.dart' as supabase;
+import 'package:puzzle/src/ranking/ranking_manager.dart';
+import 'package:puzzle/src/user/user.dart';
+import 'package:puzzle/src/user/user_manager.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
-class MockUserManager extends UserManager {
-  local_user.User? _currentUser;
-  bool _isSignedIn = false;
-
-  @override
-  local_user.User? get currentUser => _currentUser;
-
-  @override
-  bool get isSignedIn => _isSignedIn;
-
-  void setCurrentUser(local_user.User user) {
-    _currentUser = user;
-    _isSignedIn = true;
-  }
-
-  void clearUser() {
-    _currentUser = null;
-    _isSignedIn = false;
-  }
-}
-
-// 创建一个简单的测试用SupabaseClient模拟
 class MockSupabaseClient extends supabase.SupabaseClient {
   MockSupabaseClient() : super('https://test.supabase.co', 'test-key');
+}
 
+class MockUserManager implements UserManager {
   @override
-  supabase.SupabaseQueryBuilder from(String table) {
-    throw UnimplementedError();
-  }
+  bool get isSignedIn => _isSignedIn;
+  bool _isSignedIn = false;
+  
+  @override
+  User? get currentUser => _currentUser;
+  User? _currentUser;
+  
+  // 实现其他必需的方法和属性
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 // 创建一个简单的测试用RankingManager子类
 class TestRankingManager extends RankingManager {
-  final MockUserManager _mockUserManager;
+  TestRankingManager() : super(supabaseClient: MockSupabaseClient());
   
-  TestRankingManager(MockUserManager userManager) 
-    : _mockUserManager = userManager,
-      super(MockSupabaseClient(), userManager);
-
   @override
-  Future<List<Ranking>> fetchRankings({int limit = 50}) async {
+  Future<List<Ranking>> getRankings({int limit = 50}) async {
     // 模拟返回一些排行榜数据
     return [
       Ranking(
@@ -59,23 +42,16 @@ class TestRankingManager extends RankingManager {
         id: '2',
         userId: 'user2',
         username: 'Player Two',
-        score: 1500,
+        score: 1800,
         createdAt: DateTime(2023, 1, 2),
-      ),
-      Ranking(
-        id: '3',
-        userId: 'user3',
-        username: 'Player Three',
-        score: 1000,
-        createdAt: DateTime(2023, 1, 3),
       ),
     ];
   }
 
   @override
-  Future<bool> submitScore(int score) async {
+  Future<bool> submitScore(int score, UserManager userManager) async {
     // 模拟提交分数
-    if (_mockUserManager.currentUser == null) {
+    if (!userManager.isSignedIn || userManager.currentUser == null) {
       return false;
     }
     return true;
@@ -89,42 +65,38 @@ void main() {
 
     setUp(() {
       mockUserManager = MockUserManager();
-      rankingManager = TestRankingManager(mockUserManager);
+      rankingManager = TestRankingManager();
     });
 
     test('should fetch rankings successfully', () async {
-      final rankings = await rankingManager.fetchRankings();
-
+      final rankings = await rankingManager.getRankings();
+      
       expect(rankings, isNotEmpty);
-      expect(rankings.length, 3);
+      expect(rankings.length, 2);
       expect(rankings[0].username, 'Player One');
       expect(rankings[0].score, 2000);
       expect(rankings[1].username, 'Player Two');
-      expect(rankings[1].score, 1500);
-      expect(rankings[2].username, 'Player Three');
-      expect(rankings[2].score, 1000);
+      expect(rankings[1].score, 1800);
     });
 
     test('should submit score successfully when user is signed in', () async {
-      // 设置当前用户
-      final user = local_user.User(
-        id: 'user123',
-        email: 'test@example.com',
-        name: 'Test User',
-      );
-      mockUserManager.setCurrentUser(user);
-
-      final result = await rankingManager.submitScore(2500);
-
-      expect(result, isTrue);
+      // 模拟用户已登录
+      mockUserManager._isSignedIn = true;
+      mockUserManager._currentUser = User(id: 'test', email: 'test@example.com', name: 'Test User');
+      
+      final result = await rankingManager.submitScore(1500, mockUserManager);
+      
+      expect(result, true);
     });
 
     test('should not submit score when user is not signed in', () async {
-      mockUserManager.clearUser();
-
-      final result = await rankingManager.submitScore(2500);
-
-      expect(result, isFalse);
+      // 模拟用户未登录
+      mockUserManager._isSignedIn = false;
+      mockUserManager._currentUser = null;
+      
+      final result = await rankingManager.submitScore(1500, mockUserManager);
+      
+      expect(result, false);
     });
   });
 }

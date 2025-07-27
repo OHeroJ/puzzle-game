@@ -5,8 +5,13 @@
 List<String> soundTypeToFilename(SfxType type) {
   switch (type) {
     case SfxType.click:
+    case SfxType.buttonTap:
       return const [
         'click.wav',
+      ];
+    case SfxType.victory:
+      return const [
+        'victory.mp3',
       ];
   }
 }
@@ -15,10 +20,15 @@ List<String> soundTypeToFilename(SfxType type) {
 double soundTypeToVolume(SfxType type) {
   switch (type) {
     case SfxType.click:
+    case SfxType.buttonTap:
+      return 1.0;
+    case SfxType.victory:
       return 1.0;
   }
 }
 
 enum SfxType {
   click,
+  buttonTap,
+  victory,
 }
