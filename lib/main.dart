@@ -3,8 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:io';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +16,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-import 'firebase_options.dart';
 import 'src/app_lifecycle/app_lifecycle.dart';
 import 'src/audio/audio_controller.dart';
 import 'src/level_selection/jigsaw_info.dart';
@@ -47,7 +44,6 @@ Future<void> main() async {
   });
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
@@ -148,9 +144,6 @@ class MyApp extends StatelessWidget {
               ),
               ProxyProvider2<SettingsController,
                   ValueNotifier<AppLifecycleState>, AudioController>(
-                // Ensures that the AudioController is created on startup,
-                // and not "only when it's needed", as is default behavior.
-                // This way, music starts immediately.
                 lazy: false,
                 create: (context) => AudioController()..initialize(),
                 update: (context, settings, lifecycleNotifier, audio) {
