@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../style/palette.dart';
-import 'custom_name_dialog.dart';
 import 'settings.dart';
 
 class AboutScreen extends StatefulWidget {

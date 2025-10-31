@@ -36,6 +36,7 @@ dependencies:
   connectivity_plus: ^6.0.3
 
 
+  file: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -2,10 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:math';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle/src/http/api.dart';
 import 'package:puzzle/src/http/dio_client.dart';

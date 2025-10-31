@@ -13,7 +13,6 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart' hide Level;
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import '../games_services/score.dart';
 import '../settings/settings.dart';
