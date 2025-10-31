@@ -34,6 +34,7 @@ import 'src/user/login_screen.dart';
 import 'src/user/register_screen.dart';
 import 'src/user/supabase_auth_provider.dart';
 import 'src/user/user_manager.dart';
+import 'src/debug/database_debug_screen.dart';
 import 'src/user/user_progress_manager.dart';
 
 Future<void> main() async {
@@ -245,11 +246,11 @@ final GoRouter _router = GoRouter(
               },
             ),
             GoRoute(
-              path: 'level/:levelId',
+              path: 'level/:jigsawId',
               builder: (BuildContext context, GoRouterState state) {
-                final levelId = state.pathParameters['levelId']!;
-                final level = int.tryParse(levelId) ?? 1;
-                return PlaySessionScreen(level: level);
+                final jigsawIdParam = state.pathParameters['jigsawId']!;
+                final jigsawId = int.tryParse(jigsawIdParam) ?? 1;
+                return PlaySessionScreen(jigsawId: jigsawId);
               },
             ),
           ],
@@ -284,6 +285,12 @@ final GoRouter _router = GoRouter(
           path: 'ranking',
           builder: (BuildContext context, GoRouterState state) {
             return const RankingScreen();
+          },
+        ),
+        GoRoute(
+          path: 'debug/database',
+          builder: (BuildContext context, GoRouterState state) {
+            return const DatabaseDebugScreen();
           },
         ),
       ],

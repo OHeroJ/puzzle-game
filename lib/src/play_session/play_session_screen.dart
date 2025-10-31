@@ -3,10 +3,9 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:developer' as developer;
 
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flame/game.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -17,14 +16,13 @@ import '../audio/sounds.dart';
 import '../games_services/score.dart';
 import '../level_selection/jigsaw_info.dart';
 import '../level_selection/jigsaw_service.dart';
-import '../settings/settings.dart';
 import '../style/palette.dart';
 import 'jigsaw/jigsaw_game.dart';
 
 class PlaySessionScreen extends StatefulWidget {
-  final int level;
+  final int jigsawId;
 
-  const PlaySessionScreen({required this.level, super.key});
+  const PlaySessionScreen({required this.jigsawId, super.key});
 
   @override
   State<PlaySessionScreen> createState() => _PlaySessionScreenState();
@@ -44,45 +42,39 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
   Future<void> _loadJigsawInfo() async {
     try {
+      developer.log('Starting to load jigsaw info for jigsaw ID ${widget.jigsawId}');
+      
       // 获取Supabase客户端
       final supabaseClient = supabase.Supabase.instance.client;
+      developer.log('Supabase client initialized');
       
       // 创建拼图服务实例
       final jigsawService = JigsawService(supabaseClient);
+      developer.log('JigsawService created');
       
-      // 从Supabase获取拼图数据
-      final jigsaws = await jigsawService.getJigsawInfos();
+      // 直接通过ID从Supabase获取拼图数据
+      final jigsawInfo = await jigsawService.getJigsawInfoById(widget.jigsawId);
+      developer.log('Loaded jigsaw puzzle with ID ${widget.jigsawId} from service');
       
-      // 查找匹配的拼图
-      JigsawInfo? jigsawInfo;
-      try {
-        jigsawInfo = jigsaws.firstWhere(
-          (jigsaw) => jigsaw.gridSize == widget.level,
-        );
-      } catch (e) {
-        // 如果没有找到完全匹配的，使用第一个
-        jigsawInfo = jigsaws.isNotEmpty ? jigsaws.first : null;
-      }
-
       if (jigsawInfo != null) {
         setState(() {
           _jigsawInfo = jigsawInfo;
           _isLoading = false;
-          if (jigsawInfo != null) {
-            _game = JigsawGame(
-              jigsawInfo!,
-              true, // 默认开启音乐
-              _onGameEnd, // 传递游戏结束回调
-            );
-          }
+          _game = JigsawGame(
+            jigsawInfo,
+            true, // 默认开启音乐
+            _onGameEnd, // 传递游戏结束回调
+          );
         });
       } else {
+        developer.log('No jigsaw found with ID ${widget.jigsawId}');
         setState(() {
           _isLoading = false;
-          _errorMessage = '未找到对应的拼图数据';
+          _errorMessage = '未找到ID为${widget.jigsawId}的拼图数据';
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      developer.log('Error loading jigsaw info', error: e, stackTrace: stackTrace);
       setState(() {
         _isLoading = false;
         _errorMessage = '加载拼图数据失败: $e';
@@ -92,7 +84,6 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
   void _onGameEnd(dynamic score) {
     final audioController = context.read<AudioController>();
-    final settings = context.read<SettingsController>();
     final palette = context.read<Palette>();
 
     audioController.playSfx(SfxType.victory);
@@ -105,8 +96,6 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
   }
 
   Widget _buildGameEndDialog(Score score, Palette palette) {
-    final jigsawInfo = JigsawInfo.getJigsawInfo(widget.level.toString());
-    
     return AlertDialog(
       backgroundColor: palette.backgroundMain,
       title: Text(
@@ -121,13 +110,15 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
         TextButton(
           onPressed: () {
             GoRouter.of(context).pop(); // 关闭对话框
+            _loadJigsawInfo(); // 重新加载拼图信息
             setState(() {
-              final jigsawInfo = JigsawInfo.getJigsawInfo(widget.level.toString());
-              _game = JigsawGame(
-                jigsawInfo,
-                true, // 默认开启音乐
-                _onGameEnd, // 传递游戏结束回调
-              );
+              if (_jigsawInfo != null) {
+                _game = JigsawGame(
+                  _jigsawInfo!,
+                  true, // 默认开启音乐
+                  _onGameEnd, // 传递游戏结束回调
+                );
+              }
             });
           },
           child: Text('再来一次', style: TextStyle(color: palette.primaryColor)),

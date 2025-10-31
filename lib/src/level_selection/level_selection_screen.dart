@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import 'dart:developer' as developer;
 
 import '../style/palette.dart';
 import 'jigsaw_grid.dart';
@@ -33,21 +34,40 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
 
   Future<void> _loadJigsaws() async {
     try {
+      developer.log('Starting to load jigsaw puzzles');
+      
       // 获取Supabase客户端
-      final supabaseClient = supabase.Supabase.instance.client;
+      final supabaseInstance = supabase.Supabase.instance;
+      if (supabaseInstance == null) {
+        throw Exception('Supabase instance not initialized');
+      }
+      
+      final supabaseClient = supabaseInstance.client;
+      if (supabaseClient == null) {
+        throw Exception('Supabase client not available');
+      }
+      
+      developer.log('Supabase client initialized');
       
       // 创建拼图服务实例
       final jigsawService = JigsawService(supabaseClient);
       
       // 从Supabase获取拼图数据
       final loadedJigsaws = await jigsawService.getJigsawInfos();
+      developer.log('Loaded ${loadedJigsaws.length} jigsaw puzzles');
 
       setState(() {
         jigsaws = loadedJigsaws;
         _isLoading = false;
         _errorMessage = '';
       });
-    } catch (e) {
+      
+      // 打印加载的拼图信息
+      for (var jigsaw in loadedJigsaws) {
+        developer.log('Loaded puzzle: id=${jigsaw.id}, title=${jigsaw.title}, gridSize=${jigsaw.gridSize}');
+      }
+    } catch (e, stackTrace) {
+      developer.log('Error loading jigsaw puzzles', error: e, stackTrace: stackTrace);
       setState(() {
         _isLoading = false;
         _errorMessage = '加载拼图数据失败: $e';
@@ -100,6 +120,18 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                     color: palette.textColor.withValues(alpha: 0.7),
                   ),
                 ),
+                // 显示调试信息
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.h),
+                    child: Text(
+                      '错误: $_errorMessage',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -172,6 +204,17 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                                   style: TextStyle(
                                     fontSize: 16.sp,
                                     color: palette.textColor,
+                                  ),
+                                ),
+                                SizedBox(height: 16.h),
+                                ElevatedButton(
+                                  onPressed: _loadJigsaws,
+                                  child: Text(
+                                    '重新加载',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      color: palette.backgroundMain,
+                                    ),
                                   ),
                                 ),
                               ],

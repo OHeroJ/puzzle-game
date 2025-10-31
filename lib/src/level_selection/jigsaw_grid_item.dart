@@ -23,7 +23,7 @@ class JigsawGridItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // 使用jigsaw的gridSize作为ID传递
-        context.push('/play/level/${jigsaw.gridSize}');
+        context.push('/play/level/${jigsaw.id}');
       },
       child: Container(
         decoration: BoxDecoration(
@@ -80,13 +80,17 @@ class JigsawGridItem extends StatelessWidget {
   Color _getDifficultyColor(int difficulty) {
     switch (difficulty) {
       case 1:
-        return Colors.green;
       case 2:
-        return Colors.orange;
       case 3:
+        return Colors.green;
+      case 4:
+      case 5:
+        return Colors.orange;
+      case 6:
+      case 7:
         return Colors.red;
       default:
-        return Colors.blue;
+        return Colors.purple;
     }
   }
 }
