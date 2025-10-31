@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   connectivity_plus
   firebase_core
-  rive_common
+  rive_native
   url_launcher_windows
 )
 

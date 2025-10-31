@@ -7,7 +7,7 @@ import '../style/palette.dart';
 
 class JigsawGridItem extends StatelessWidget {
   const JigsawGridItem({required this.info, Key? key, this.onTap})
-    : super(key: key);
+      : super(key: key);
   final JigsawInfo info;
   final GestureTapCallback? onTap;
 

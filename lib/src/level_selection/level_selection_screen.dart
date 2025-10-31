@@ -270,9 +270,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         margin: EdgeInsets.only(left: 10.w, right: 10.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: gridSizeValue == num
-              ? palette.primaryColor
-              : palette.lightGray,
+          color:
+              gridSizeValue == num ? palette.primaryColor : palette.lightGray,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

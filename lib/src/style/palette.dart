@@ -28,5 +28,6 @@ class Palette {
   Color get primaryColor => const Color(0xFF4CAF50); // Vibrant green
   Color get secondaryColor => const Color(0xFF2196F3); // Complementary blue
   Color get accentColor => const Color(0xFFFFC107); // Accent amber
-  Color get lightGray => const Color(0xFFE0E0E0); // Light gray for subtle elements
+  Color get lightGray =>
+      const Color(0xFFE0E0E0); // Light gray for subtle elements
 }

@@ -132,12 +132,10 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     //相对于扩大后图片的起点
     xAxis -= shape.leftTab != 0 ? pieceSize : 0;
     yAxis -= shape.topTab != 0 ? pieceSize : 0;
-    final double widthPerBlockTemp =
-        widthPerBlock +
+    final double widthPerBlockTemp = widthPerBlock +
         (shape.leftTab != 0 ? pieceSize : 0) +
         (shape.rightTab != 0 ? pieceSize : 0);
-    final double heightPerBlockTemp =
-        heightPerBlock +
+    final double heightPerBlockTemp = heightPerBlock +
         (shape.topTab != 0 ? pieceSize : 0) +
         (shape.bottomTab != 0 ? pieceSize : 0);
 

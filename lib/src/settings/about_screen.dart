@@ -58,7 +58,10 @@ class _AboutScreenState extends State<AboutScreen> {
         backgroundColor: palette.backgroundMain,
         title: Text(
           'About',
-          style: TextStyle(fontSize: 28.sp, color: palette.textColor, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 28.sp,
+              color: palette.textColor,
+              fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: palette.backgroundMain,
@@ -74,12 +77,16 @@ class _AboutScreenState extends State<AboutScreen> {
             SizedBox(height: 20.h),
             Text(
               "${_packageInfo.appName}",
-              style: TextStyle(fontSize: 24.sp, color: palette.textColor, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 24.sp,
+                  color: palette.textColor,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10.h),
             Text(
               "Version: ${_packageInfo.version}",
-              style: TextStyle(fontSize: 18.sp, color: palette.textColor.withOpacity(0.7)),
+              style: TextStyle(
+                  fontSize: 18.sp, color: palette.textColor.withOpacity(0.7)),
             ),
           ],
         ),

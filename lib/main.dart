@@ -146,11 +146,8 @@ class MyApp extends StatelessWidget {
                     SettingsController(persistence: settingsPersistence)
                       ..loadStateFromPersistence(),
               ),
-              ProxyProvider2<
-                SettingsController,
-                ValueNotifier<AppLifecycleState>,
-                AudioController
-              >(
+              ProxyProvider2<SettingsController,
+                  ValueNotifier<AppLifecycleState>, AudioController>(
                 // Ensures that the AudioController is created on startup,
                 // and not "only when it's needed", as is default behavior.
                 // This way, music starts immediately.
@@ -174,13 +171,12 @@ class MyApp extends StatelessWidget {
                   builder: EasyLoading.init(),
                   title: 'Puzzle',
                   theme: ThemeData(
-                    textTheme:
-                        GoogleFonts.poppinsTextTheme(
-                          Theme.of(context).textTheme,
-                        ).apply(
-                          bodyColor: palette.textColor,
-                          displayColor: palette.textColor,
-                        ),
+                    textTheme: GoogleFonts.poppinsTextTheme(
+                      Theme.of(context).textTheme,
+                    ).apply(
+                      bodyColor: palette.textColor,
+                      displayColor: palette.textColor,
+                    ),
                     colorScheme: ColorScheme.fromSeed(
                       seedColor: palette.primaryColor,
                       background: palette.backgroundMain,
