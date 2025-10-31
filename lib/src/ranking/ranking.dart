@@ -46,7 +46,7 @@ class Ranking {
   String formatCreatedAt() {
     final now = DateTime.now();
     final difference = now.difference(createdAt);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}天前';
     } else if (difference.inHours > 0) {

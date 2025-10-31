@@ -42,20 +42,22 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
   Future<void> _loadJigsawInfo() async {
     try {
-      developer.log('Starting to load jigsaw info for jigsaw ID ${widget.jigsawId}');
-      
+      developer
+          .log('Starting to load jigsaw info for jigsaw ID ${widget.jigsawId}');
+
       // 获取Supabase客户端
       final supabaseClient = supabase.Supabase.instance.client;
       developer.log('Supabase client initialized');
-      
+
       // 创建拼图服务实例
       final jigsawService = JigsawService(supabaseClient);
       developer.log('JigsawService created');
-      
+
       // 直接通过ID从Supabase获取拼图数据
       final jigsawInfo = await jigsawService.getJigsawInfoById(widget.jigsawId);
-      developer.log('Loaded jigsaw puzzle with ID ${widget.jigsawId} from service');
-      
+      developer
+          .log('Loaded jigsaw puzzle with ID ${widget.jigsawId} from service');
+
       if (jigsawInfo != null) {
         setState(() {
           _jigsawInfo = jigsawInfo;
@@ -74,7 +76,8 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
         });
       }
     } catch (e, stackTrace) {
-      developer.log('Error loading jigsaw info', error: e, stackTrace: stackTrace);
+      developer.log('Error loading jigsaw info',
+          error: e, stackTrace: stackTrace);
       setState(() {
         _isLoading = false;
         _errorMessage = '加载拼图数据失败: $e';

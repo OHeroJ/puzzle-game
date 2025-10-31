@@ -16,7 +16,7 @@ abstract class SettingsPersistence {
   Future<String> getPlayerName();
 
   Future<bool> getSoundsOn();
-  
+
   Future<AppTheme> getTheme();
 
   Future<void> saveMusicOn(bool value);
@@ -26,6 +26,6 @@ abstract class SettingsPersistence {
   Future<void> savePlayerName(String value);
 
   Future<void> saveSoundsOn(bool value);
-  
+
   Future<void> saveTheme(AppTheme theme);
 }

@@ -36,7 +36,7 @@ class LocalStorageSettingsPersistence extends SettingsPersistence {
     final prefs = await instanceFuture;
     return prefs.getBool('soundsOn') ?? true;
   }
-  
+
   @override
   Future<AppTheme> getTheme() async {
     final prefs = await instanceFuture;
@@ -67,7 +67,7 @@ class LocalStorageSettingsPersistence extends SettingsPersistence {
     final prefs = await instanceFuture;
     await prefs.setBool('soundsOn', value);
   }
-  
+
   @override
   Future<void> saveTheme(AppTheme theme) async {
     final prefs = await instanceFuture;

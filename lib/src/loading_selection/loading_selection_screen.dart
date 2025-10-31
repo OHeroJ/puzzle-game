@@ -28,7 +28,7 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final jigsawInfo = JigsawInfo.getJigsawInfo(widget.level.toString());
-    
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(

@@ -20,7 +20,8 @@ class SupabaseAuthProvider implements AuthProvider {
           id: session.user.id,
           email: session.user.email ?? '',
           name: session.user.userMetadata?['name'] as String? ??
-              session.user.email ?? '',
+              session.user.email ??
+              '',
         );
         _onAuthStateChanged?.call(user);
       }
@@ -38,7 +39,8 @@ class SupabaseAuthProvider implements AuthProvider {
       id: supabaseUser.id,
       email: supabaseUser.email ?? '',
       name: supabaseUser.userMetadata?['name'] as String? ??
-          supabaseUser.email ?? '',
+          supabaseUser.email ??
+          '',
     );
   }
 
@@ -60,7 +62,8 @@ class SupabaseAuthProvider implements AuthProvider {
           id: response.user!.id,
           email: response.user!.email ?? '',
           name: response.user!.userMetadata?['name'] as String? ??
-              response.user!.email ?? '',
+              response.user!.email ??
+              '',
         );
       }
       return null;

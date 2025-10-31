@@ -15,10 +15,10 @@ class JigsawService {
     if (_supabaseClient == null) {
       return getDefaultJigsaws();
     }
-    
+
     try {
       developer.log('Attempting to fetch jigsaw puzzles from Supabase');
-      
+
       // 从Supabase获取拼图数据
       final response = await _supabaseClient!
           .from('jigsaw_puzzles') // 假设表名为jigsaw_puzzles
@@ -31,16 +31,16 @@ class JigsawService {
       // 将响应数据转换为JigsawInfo对象列表
       final List<JigsawInfo> jigsaws = response.map((data) {
         developer.log('Processing data record: $data');
-        
+
         // 检查必要的字段是否存在
         if (data['image_url'] == null) {
           developer.log('Warning: image_url is null for record: $data');
         }
-        
+
         if (data['title'] == null) {
           developer.log('Warning: title is null for record: $data');
         }
-        
+
         if (data['grid_size'] == null) {
           developer.log('Warning: grid_size is null for record: $data');
         }
@@ -54,8 +54,9 @@ class JigsawService {
         )
           ..setId = data['id'] ?? 0 // 设置ID
           ..setPhotographer = data['photographer'] ?? '' // 摄影师
-          ..setDifficultyLevel = data['difficulty_level'] ?? (data['grid_size'] ?? 3); // 难度等级
-          
+          ..setDifficultyLevel =
+              data['difficulty_level'] ?? (data['grid_size'] ?? 3); // 难度等级
+
         return jigsaw;
       }).toList();
 
@@ -63,10 +64,12 @@ class JigsawService {
       return jigsaws;
     } on supabase.PostgrestException catch (e) {
       // 处理数据库异常
-      developer.log('PostgrestException while fetching jigsaw puzzles', error: e);
+      developer.log('PostgrestException while fetching jigsaw puzzles',
+          error: e);
       if (e.code == '42P01') {
         // 表不存在
-        developer.log('Database table "jigsaw_puzzles" does not exist: ${e.message}');
+        developer.log(
+            'Database table "jigsaw_puzzles" does not exist: ${e.message}');
         print('Database table "jigsaw_puzzles" does not exist: ${e.message}');
       } else {
         developer.log('Failed to fetch jigsaw puzzles: ${e.message}');
@@ -76,23 +79,25 @@ class JigsawService {
       return getDefaultJigsaws();
     } catch (e, stackTrace) {
       // 处理其他异常
-      developer.log('Unexpected error while fetching jigsaw puzzles', error: e, stackTrace: stackTrace);
+      developer.log('Unexpected error while fetching jigsaw puzzles',
+          error: e, stackTrace: stackTrace);
       print('Failed to fetch jigsaw puzzles: $e');
       // 返回默认数据作为后备
       return getDefaultJigsaws();
     }
   }
-  
+
   /// 根据ID从Supabase获取单个拼图数据
   Future<JigsawInfo?> getJigsawInfoById(int id) async {
     // 如果没有提供客户端，则返回null
     if (_supabaseClient == null) {
       return null;
     }
-    
+
     try {
-      developer.log('Attempting to fetch jigsaw puzzle with ID: $id from Supabase');
-      
+      developer
+          .log('Attempting to fetch jigsaw puzzle with ID: $id from Supabase');
+
       // 从Supabase获取指定ID的拼图数据
       final response = await _supabaseClient!
           .from('jigsaw_puzzles')
@@ -100,22 +105,22 @@ class JigsawService {
           .eq('id', id)
           .limit(1)
           .single();
-      
+
       developer.log('Raw response for jigsaw puzzle with ID $id: $response');
-      
+
       // 检查必要的字段是否存在
       if (response['image_url'] == null) {
         developer.log('Warning: image_url is null for record: $response');
       }
-      
+
       if (response['title'] == null) {
         developer.log('Warning: title is null for record: $response');
       }
-      
+
       if (response['grid_size'] == null) {
         developer.log('Warning: grid_size is null for record: $response');
       }
-      
+
       final jigsaw = JigsawInfo(
         response['image_url'] ?? '', // 大图URL
         response['small_image_url'] ?? response['image_url'] ?? '', // 小图URL
@@ -125,29 +130,39 @@ class JigsawService {
       )
         ..setId = response['id'] ?? 0 // 设置ID
         ..setPhotographer = response['photographer'] ?? '' // 摄影师
-        ..setDifficultyLevel = response['difficulty_level'] ?? (response['grid_size'] ?? 3); // 难度等级
-        
-      developer.log('Successfully converted jigsaw puzzle with ID: ${jigsaw.id}');
+        ..setDifficultyLevel = response['difficulty_level'] ??
+            (response['grid_size'] ?? 3); // 难度等级
+
+      developer
+          .log('Successfully converted jigsaw puzzle with ID: ${jigsaw.id}');
       return jigsaw;
     } on supabase.PostgrestException catch (e) {
       // 处理数据库异常
-      developer.log('PostgrestException while fetching jigsaw puzzle with ID: $id', error: e);
+      developer.log(
+          'PostgrestException while fetching jigsaw puzzle with ID: $id',
+          error: e);
       if (e.code == '42P01') {
         // 表不存在
-        developer.log('Database table "jigsaw_puzzles" does not exist: ${e.message}');
+        developer.log(
+            'Database table "jigsaw_puzzles" does not exist: ${e.message}');
         print('Database table "jigsaw_puzzles" does not exist: ${e.message}');
       } else if (e.code == 'PGRST116') {
         // 未找到记录
         developer.log('Jigsaw puzzle with ID: $id not found');
         print('Jigsaw puzzle with ID: $id not found');
       } else {
-        developer.log('Failed to fetch jigsaw puzzle with ID: $id, error: ${e.message}');
-        print('Failed to fetch jigsaw puzzle with ID: $id, error: ${e.message}');
+        developer.log(
+            'Failed to fetch jigsaw puzzle with ID: $id, error: ${e.message}');
+        print(
+            'Failed to fetch jigsaw puzzle with ID: $id, error: ${e.message}');
       }
       return null;
     } catch (e, stackTrace) {
       // 处理其他异常
-      developer.log('Unexpected error while fetching jigsaw puzzle with ID: $id', error: e, stackTrace: stackTrace);
+      developer.log(
+          'Unexpected error while fetching jigsaw puzzle with ID: $id',
+          error: e,
+          stackTrace: stackTrace);
       print('Failed to fetch jigsaw puzzle with ID: $id, error: $e');
       return null;
     }

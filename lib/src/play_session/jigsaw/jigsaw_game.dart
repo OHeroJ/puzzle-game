@@ -47,12 +47,12 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     final double widthPerBlock = image.width / gridSize;
     final double heightPerBlock = image.height / gridSize;
     pieceSize = min(widthPerBlock, heightPerBlock) / 4;
-    
+
     // 初始化位置列表
     for (var i = 0; i < gridSize * gridSize; i++) {
       positions.add(Vector2.zero());
     }
-    
+
     for (var y = 0; y < gridSize; y++) {
       final tmpPieces = <PieceComponent>[];
       for (var x = 0; x < gridSize; x++) {
@@ -140,12 +140,10 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     //相对于扩大后图片的起点
     xAxis -= shape.leftTab != 0 ? pieceSize : 0;
     yAxis -= shape.topTab != 0 ? pieceSize : 0;
-    final double widthPerBlockTemp =
-        widthPerBlock +
+    final double widthPerBlockTemp = widthPerBlock +
         (shape.leftTab != 0 ? pieceSize : 0) +
         (shape.rightTab != 0 ? pieceSize : 0);
-    final double heightPerBlockTemp =
-        heightPerBlock +
+    final double heightPerBlockTemp = heightPerBlock +
         (shape.topTab != 0 ? pieceSize : 0) +
         (shape.bottomTab != 0 ? pieceSize : 0);
 
@@ -223,23 +221,23 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
       pieceY = pieceY - height;
     }
     // print(" pieceX:$pieceX pieceY:$pieceY");
-    positions[positions.length-1] = Vector2(pieceX, pieceY);
+    positions[positions.length - 1] = Vector2(pieceX, pieceY);
   }
 
   // 添加重置游戏方法
   void resetGame() {
     // 移除所有组件
     removeAll(children.toList()); // 修复：正确调用removeAll方法
-    
+
     // 重置游戏状态
     pieces = [];
     positions = [];
     moves = 0;
-    
+
     // 重新加载游戏
     onLoad();
   }
-  
+
   // 添加切换音乐方法
   void toggleMusic() {
     isMusicOn = !isMusicOn;

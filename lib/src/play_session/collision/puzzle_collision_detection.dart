@@ -13,7 +13,7 @@ import 'package:puzzle/src/play_session/shape_type.dart';
 class PuzzleCollisionDetection<B extends Broadphase<ShapeHitbox>>
     extends CollisionDetection<ShapeHitbox, B> {
   PuzzleCollisionDetection({B? broadphase})
-    : super(broadphase: broadphase ?? Sweep<ShapeHitbox>() as B);
+      : super(broadphase: broadphase ?? Sweep<ShapeHitbox>() as B);
 
   /// Check what the intersection points of two collidables are,
   /// returns an empty list if there are no intersections.
@@ -164,9 +164,8 @@ class PuzzleCollisionDetection<B extends Broadphase<ShapeHitbox>>
     var currentRay = ray;
     for (var i = 0; i < maxDepth; i++) {
       final hasResultObject = (out?.length ?? 0) > i;
-      final storeResult = hasResultObject
-          ? out![i]
-          : RaycastResult<ShapeHitbox>();
+      final storeResult =
+          hasResultObject ? out![i] : RaycastResult<ShapeHitbox>();
       final currentResult = raycast(
         currentRay,
         ignoreHitboxes: ignoreHitboxes,

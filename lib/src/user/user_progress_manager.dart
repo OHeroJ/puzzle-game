@@ -11,7 +11,8 @@ class UserProgressManager extends ChangeNotifier {
       : _supabaseClient = supabaseClient;
 
   /// 保存用户游戏进度
-  Future<bool> saveProgress(int level, Score score, UserManager userManager) async {
+  Future<bool> saveProgress(
+      int level, Score score, UserManager userManager) async {
     try {
       // 检查用户是否已登录
       if (!userManager.isSignedIn || userManager.currentUser == null) {
@@ -19,7 +20,7 @@ class UserProgressManager extends ChangeNotifier {
       }
 
       final user = userManager.currentUser!;
-      
+
       // 保存关卡进度
       await _supabaseClient.from('level_progress').upsert({
         'user_id': user.id,
@@ -56,7 +57,7 @@ class UserProgressManager extends ChangeNotifier {
       }
 
       final user = userManager.currentUser!;
-      
+
       // 获取关卡进度
       final response = await _supabaseClient
           .from('level_progress')
@@ -64,7 +65,7 @@ class UserProgressManager extends ChangeNotifier {
           .eq('user_id', user.id)
           .eq('level', level)
           .single();
-          
+
       // 创建Score对象
       return Score(
         Duration(seconds: response['time'] as int),
@@ -86,7 +87,8 @@ class UserProgressManager extends ChangeNotifier {
   }
 
   /// 获取用户所有关卡的进度
-  Future<List<Map<String, dynamic>>> getAllProgress(UserManager userManager) async {
+  Future<List<Map<String, dynamic>>> getAllProgress(
+      UserManager userManager) async {
     try {
       // 检查用户是否已登录
       if (!userManager.isSignedIn || userManager.currentUser == null) {
@@ -94,13 +96,13 @@ class UserProgressManager extends ChangeNotifier {
       }
 
       final user = userManager.currentUser!;
-      
+
       // 获取所有关卡进度
       final response = await _supabaseClient
           .from('level_progress')
           .select()
           .eq('user_id', user.id);
-          
+
       return response;
     } on supabase.PostgrestException catch (e) {
       // 处理数据库异常

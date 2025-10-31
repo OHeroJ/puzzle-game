@@ -47,7 +47,7 @@ class SettingsController extends ChangeNotifier {
 
   /// Controls whether sound effects are played during a game.
   final ValueNotifier<bool> soundsOn = ValueNotifier(defaultSoundsOn);
-  
+
   /// Whether or not the sound is on at all. This overrides both music
   /// and sound.
   final ValueNotifier<bool> muted = ValueNotifier(defaultMuted);
@@ -76,7 +76,7 @@ class SettingsController extends ChangeNotifier {
       _persistence.getPlayerName().then((value) => playerName.value = value),
       _persistence.getTheme().then((value) => theme.value = value),
     ]);
-    
+
     notifyListeners();
   }
 
@@ -113,7 +113,7 @@ class SettingsController extends ChangeNotifier {
     _persistence.saveSoundsOn(soundsOn.value);
     notifyListeners();
   }
-  
+
   void setTheme(AppTheme newTheme) {
     theme.value = newTheme;
     _persistence.saveTheme(newTheme);

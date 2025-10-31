@@ -21,7 +21,7 @@ class RankingManager {
   Future<List<Ranking>> getRankings({int limit = 50}) async {
     try {
       _isLoading = true;
-      
+
       final response = await supabaseClient
           .from('rankings')
           .select()
@@ -57,7 +57,7 @@ class RankingManager {
       }
 
       final user = userManager.currentUser!;
-      
+
       // 保存分数到排行榜
       await supabaseClient.from('rankings').insert({
         'user_id': user.id,

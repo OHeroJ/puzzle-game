@@ -57,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: () => context.pop(),
               ),
               SizedBox(height: 20.h),
-              
+
               // 标题
               Text(
                 '设置',
@@ -68,7 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               SizedBox(height: 30.h),
-              
+
               // 用户名设置
               Text(
                 '用户名',
@@ -91,7 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: '请输入用户名',
-                    hintStyle: TextStyle(color: palette.textColor.withValues(alpha: 0.5)),
+                    hintStyle: TextStyle(
+                        color: palette.textColor.withValues(alpha: 0.5)),
                   ),
                   onSubmitted: (value) {
                     if (value.trim().isNotEmpty) {
@@ -101,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               SizedBox(height: 20.h),
-              
+
               // 音效设置
               Text(
                 '音效设置',
@@ -133,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 (value) => settings.toggleMuted(),
               ),
               SizedBox(height: 20.h),
-              
+
               // 主题设置
               Text(
                 '主题设置',
@@ -146,7 +147,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SizedBox(height: 15.h),
               _buildThemeSetting(context, settings),
               SizedBox(height: 20.h),
-              
+
               // 用户登录状态提示
               if (!userManager.isSignedIn)
                 Container(
@@ -180,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               SizedBox(height: 20.h),
-              
+
               // 关于按钮
               SizedBox(
                 width: double.infinity,
@@ -211,9 +212,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSwitchSetting(BuildContext context, String title, bool value, Function(bool) onChanged) {
+  Widget _buildSwitchSetting(BuildContext context, String title, bool value,
+      Function(bool) onChanged) {
     final palette = context.watch<Palette>();
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
       decoration: BoxDecoration(
@@ -239,10 +241,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildThemeSetting(BuildContext context, SettingsController settings) {
     final palette = context.watch<Palette>();
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
       decoration: BoxDecoration(
@@ -287,10 +289,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
-  Widget _buildThemeOption(BuildContext context, String title, AppTheme theme, bool isSelected, VoidCallback onTap) {
+
+  Widget _buildThemeOption(BuildContext context, String title, AppTheme theme,
+      bool isSelected, VoidCallback onTap) {
     final palette = context.watch<Palette>();
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(

@@ -31,7 +31,7 @@ class Palette extends ChangeNotifier {
   static const darkBackgroundMainColor = Color(0xFF303030);
   static const darkBackgroundMenuColor = Color(0xFF424242);
   static const darkTextColor = Color(0xFFFFFFFF);
-  
+
   // 亮色主题颜色
   static const lightPrimary = Color(0xFF673AB7);
   static const lightSecondary = Color(0xFFE91E63);
@@ -39,7 +39,7 @@ class Palette extends ChangeNotifier {
   static const lightBackgroundMainColor = Color(0xFFF5F5F5);
   static const lightBackgroundMenuColor = Color(0xFFE0E0E0);
   static const lightTextColor = Color(0xFF212121);
-  
+
   // 当前主题颜色（默认为亮色主题）
   late Color backgroundMain;
   late Color backgroundLevel1;
@@ -50,16 +50,16 @@ class Palette extends ChangeNotifier {
   late Color primaryColor;
   late Color secondaryColor;
   late Color backgroundMenu;
-  
+
   Palette(AppTheme theme) {
     _updateColors(theme);
   }
-  
+
   void setTheme(AppTheme theme) {
     _updateColors(theme);
     notifyListeners();
   }
-  
+
   void _updateColors(AppTheme theme) {
     if (theme == AppTheme.dark) {
       // 暗色主题

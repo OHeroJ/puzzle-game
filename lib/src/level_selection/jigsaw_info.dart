@@ -43,7 +43,7 @@ class JigsawInfo {
     this.gridSize = gridSize; // 设置gridSize属性
     difficultyLevel = gridSize; // 初始化difficultyLevel为gridSize
   }
-  
+
   // 添加一个静态方法来根据ID获取拼图信息
   static JigsawInfo getJigsawInfo(String levelId) {
     // 根据levelId返回对应的JigsawInfo对象
@@ -56,16 +56,16 @@ class JigsawInfo {
       'https://images.pexels.com/photos/1366957/pexels-photo-1366957.jpeg', // url参数
     );
   }
-  
+
   // 修复setter方法
   set setId(int value) {
     id = value;
   }
-  
+
   set setPhotographer(String value) {
     photographer = value;
   }
-  
+
   set setDifficultyLevel(int value) {
     difficultyLevel = value;
   }

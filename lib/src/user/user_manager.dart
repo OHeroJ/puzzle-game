@@ -14,7 +14,7 @@ class UserManager extends ChangeNotifier {
   void initAuthProvider(AuthProvider authProvider) {
     _authProvider = authProvider;
     _authProvider!.onAuthStateChanged = _handleAuthStateChange;
-    
+
     // 初始化当前用户
     _currentUser = _authProvider!.getCurrentUser();
     _isInitialized = true;

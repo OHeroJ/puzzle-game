@@ -51,26 +51,22 @@ class PieceComponent extends PositionComponent
     bottomRight = Offset(size.x, size.y);
     bottomLeft = Offset(0, size.y);
 
-    topLeft =
-        Offset(
+    topLeft = Offset(
           shape.leftTab != 0 ? _pieceSize : 0,
           (shape.topTab != 0) ? _pieceSize : 0,
         ) +
         topLeft;
-    topRight =
-        Offset(
+    topRight = Offset(
           shape.rightTab != 0 ? -_pieceSize : 0,
           (shape.topTab != 0) ? _pieceSize : 0,
         ) +
         topRight;
-    bottomRight =
-        Offset(
+    bottomRight = Offset(
           shape.rightTab != 0 ? -_pieceSize : 0,
           (shape.bottomTab != 0) ? -_pieceSize : 0,
         ) +
         bottomRight;
-    bottomLeft =
-        Offset(
+    bottomLeft = Offset(
           shape.leftTab != 0 ? _pieceSize : 0,
           (shape.bottomTab != 0) ? -_pieceSize : 0,
         ) +
@@ -251,20 +247,19 @@ class PieceComponent extends PositionComponent
       final double topMiddleY = shape.topTab == 0
           ? end.dy
           : (shape.topTab > 0
-                ? end.dy - _pieceSize / 5 * 4
-                : end.dy + _pieceSize / 5 * 4);
+              ? end.dy - _pieceSize / 5 * 4
+              : end.dy + _pieceSize / 5 * 4);
       var centerX =
           (end.dx - start.dx) / 2 + (shape.leftTab != 0 ? _pieceSize : 0);
-      topHitbox =
-          PuzzleHitbox(
-              ShapeType.top,
-              shape.topTab,
-              position: Vector2(centerX, end.dy),
-              size: Vector2(_pieceSize, _pieceSize / 2),
-              anchor: Anchor.center,
-            )
-            ..renderShape = isDebug
-            ..paint.color = Colors.red;
+      topHitbox = PuzzleHitbox(
+        ShapeType.top,
+        shape.topTab,
+        position: Vector2(centerX, end.dy),
+        size: Vector2(_pieceSize, _pieceSize / 2),
+        anchor: Anchor.center,
+      )
+        ..renderShape = isDebug
+        ..paint.color = Colors.red;
       add(topHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
@@ -285,18 +280,17 @@ class PieceComponent extends PositionComponent
       final double bottomMiddleY = shape.bottomTab == 0
           ? end.dy
           : (shape.bottomTab > 0
-                ? end.dy + _pieceSize / 5 * 4
-                : end.dy - _pieceSize / 5 * 4);
-      bottomHitbox =
-          PuzzleHitbox(
-              ShapeType.bottom,
-              shape.bottomTab,
-              position: Vector2(centerX, end.dy),
-              size: Vector2(_pieceSize, _pieceSize / 2),
-              anchor: Anchor.center,
-            )
-            ..renderShape = isDebug
-            ..paint.color = Colors.red;
+              ? end.dy + _pieceSize / 5 * 4
+              : end.dy - _pieceSize / 5 * 4);
+      bottomHitbox = PuzzleHitbox(
+        ShapeType.bottom,
+        shape.bottomTab,
+        position: Vector2(centerX, end.dy),
+        size: Vector2(_pieceSize, _pieceSize / 2),
+        anchor: Anchor.center,
+      )
+        ..renderShape = isDebug
+        ..paint.color = Colors.red;
       add(bottomHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
@@ -315,20 +309,19 @@ class PieceComponent extends PositionComponent
       final double rightMiddleX = shape.rightTab == 0
           ? start.dx
           : (shape.rightTab > 0
-                ? start.dx + _pieceSize / 5 * 4
-                : start.dx - _pieceSize / 5 * 4);
+              ? start.dx + _pieceSize / 5 * 4
+              : start.dx - _pieceSize / 5 * 4);
       var centerY =
           (end.dy - start.dy) / 2 + (shape.topTab != 0 ? _pieceSize : 0);
-      rightHitbox =
-          PuzzleHitbox(
-              ShapeType.right,
-              shape.rightTab,
-              position: Vector2(end.dx, centerY),
-              size: Vector2(_pieceSize / 2, _pieceSize),
-              anchor: Anchor.center,
-            )
-            ..renderShape = isDebug
-            ..paint.color = Colors.red;
+      rightHitbox = PuzzleHitbox(
+        ShapeType.right,
+        shape.rightTab,
+        position: Vector2(end.dx, centerY),
+        size: Vector2(_pieceSize / 2, _pieceSize),
+        anchor: Anchor.center,
+      )
+        ..renderShape = isDebug
+        ..paint.color = Colors.red;
       add(rightHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);
@@ -349,18 +342,17 @@ class PieceComponent extends PositionComponent
       final double leftMiddleX = shape.leftTab == 0
           ? start.dx
           : (shape.leftTab > 0
-                ? start.dx - _pieceSize / 5 * 4
-                : start.dx + _pieceSize / 5 * 4);
-      leftHitbox =
-          PuzzleHitbox(
-              ShapeType.left,
-              shape.leftTab,
-              position: Vector2(end.dx, centerY),
-              size: Vector2(_pieceSize / 2, _pieceSize),
-              anchor: Anchor.center,
-            )
-            ..renderShape = isDebug
-            ..paint.color = Colors.red;
+              ? start.dx - _pieceSize / 5 * 4
+              : start.dx + _pieceSize / 5 * 4);
+      leftHitbox = PuzzleHitbox(
+        ShapeType.left,
+        shape.leftTab,
+        position: Vector2(end.dx, centerY),
+        size: Vector2(_pieceSize / 2, _pieceSize),
+        anchor: Anchor.center,
+      )
+        ..renderShape = isDebug
+        ..paint.color = Colors.red;
       add(leftHitbox!);
       path.moveTo(start.dx, start.dy);
       list.add(start);

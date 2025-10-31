@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     final audioController = context.read<AudioController>();
     final userManager = context.read<UserManager>();
-    
+
     setState(() {
       _isLoading = true;
       _errorMessage = '';
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () => context.pop(),
               ),
               SizedBox(height: 20.h),
-              
+
               // 标题
               Text(
                 '用户登录',
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 30.h),
-              
+
               // 登录表单
               Expanded(
                 child: Column(
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 密码输入
                     Container(
                       width: double.infinity,
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 错误信息显示
                     if (_errorMessage.isNotEmpty)
                       Container(
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     SizedBox(height: 20.h),
-                    
+
                     // 登录按钮
                     SizedBox(
                       width: double.infinity,
@@ -194,7 +194,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: _isLoading
                             ? CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(palette.backgroundMain),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    palette.backgroundMain),
                               )
                             : Text(
                                 '登录',
@@ -207,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 注册提示
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

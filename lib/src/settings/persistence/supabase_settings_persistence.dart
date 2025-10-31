@@ -7,7 +7,8 @@ class SupabaseSettingsPersistence implements SettingsPersistence {
   final supabase.SupabaseClient _supabaseClient;
   final String userId;
 
-  SupabaseSettingsPersistence({required supabase.SupabaseClient supabaseClient, required this.userId})
+  SupabaseSettingsPersistence(
+      {required supabase.SupabaseClient supabaseClient, required this.userId})
       : _supabaseClient = supabaseClient;
 
   @override
@@ -45,7 +46,8 @@ class SupabaseSettingsPersistence implements SettingsPersistence {
           .eq('user_id', userId)
           .single();
 
-      return response['sounds_on'] as bool? ?? SettingsController.defaultSoundsOn;
+      return response['sounds_on'] as bool? ??
+          SettingsController.defaultSoundsOn;
     } on supabase.PostgrestException catch (e) {
       // 处理数据库异常
       if (e.code == '42P01') {
@@ -97,7 +99,8 @@ class SupabaseSettingsPersistence implements SettingsPersistence {
           .eq('user_id', userId)
           .single();
 
-      return response['player_name'] as String? ?? SettingsController.defaultPlayerName;
+      return response['player_name'] as String? ??
+          SettingsController.defaultPlayerName;
     } on supabase.PostgrestException catch (e) {
       // 处理数据库异常
       if (e.code == '42P01') {
@@ -113,7 +116,7 @@ class SupabaseSettingsPersistence implements SettingsPersistence {
       return SettingsController.defaultPlayerName;
     }
   }
-  
+
   @override
   Future<AppTheme> getTheme() async {
     try {
@@ -228,7 +231,7 @@ class SupabaseSettingsPersistence implements SettingsPersistence {
       print('Failed to save player name setting: $e');
     }
   }
-  
+
   @override
   Future<void> saveTheme(AppTheme theme) async {
     try {

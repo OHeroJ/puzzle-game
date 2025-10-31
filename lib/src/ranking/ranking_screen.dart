@@ -39,7 +39,8 @@ class _RankingScreenState extends State<RankingScreen> {
     );
   }
 
-  Widget _buildBody(Palette palette, RankingManager rankingManager, bool isDesktop) {
+  Widget _buildBody(
+      Palette palette, RankingManager rankingManager, bool isDesktop) {
     return Scaffold(
       backgroundColor: palette.backgroundMain,
       appBar: AppBar(
@@ -143,6 +144,4 @@ class _RankingScreenState extends State<RankingScreen> {
       ),
     );
   }
-
-
 }

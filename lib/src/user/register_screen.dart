@@ -18,7 +18,8 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   bool _isLoading = false;
   String _errorMessage = '';
@@ -35,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _handleRegister() async {
     final audioController = context.read<AudioController>();
     final userManager = context.read<UserManager>();
-    
+
     setState(() {
       _isLoading = true;
       _errorMessage = '';
@@ -105,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 onPressed: () => context.pop(),
               ),
               SizedBox(height: 20.h),
-              
+
               // 标题
               Text(
                 '用户注册',
@@ -124,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               SizedBox(height: 30.h),
-              
+
               // 注册表单
               Expanded(
                 child: Column(
@@ -154,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 邮箱输入
                     Container(
                       width: double.infinity,
@@ -181,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 密码输入
                     Container(
                       width: double.infinity,
@@ -208,7 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 确认密码输入
                     Container(
                       width: double.infinity,
@@ -235,7 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 错误信息显示
                     if (_errorMessage.isNotEmpty)
                       Container(
@@ -254,7 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     SizedBox(height: 20.h),
-                    
+
                     // 注册按钮
                     SizedBox(
                       width: double.infinity,
@@ -269,7 +270,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: _isLoading
                             ? CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(palette.backgroundMain),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    palette.backgroundMain),
                               )
                             : Text(
                                 '注册',
@@ -282,7 +284,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    
+
                     // 登录提示
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

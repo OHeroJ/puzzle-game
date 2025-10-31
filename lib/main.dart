@@ -55,7 +55,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    
+
     // 传递未捕获的错误到Firebase Crashlytics
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
@@ -124,24 +124,25 @@ class MyApp extends StatelessWidget {
             Provider<AudioController>(
               create: (context) => AudioController()..initialize(),
             ),
-            
+
             // Supabase客户端
             Provider<supabase.SupabaseClient>(
               create: (context) => supabase.Supabase.instance.client,
             ),
-            
+
             // 用户管理器
             ChangeNotifierProvider<UserManager>(
               create: (context) {
                 final userManager = UserManager();
                 // 初始化Supabase认证提供商
                 final supabaseClient = context.read<supabase.SupabaseClient>();
-                final authProvider = SupabaseAuthProvider(supabaseClient: supabaseClient);
+                final authProvider =
+                    SupabaseAuthProvider(supabaseClient: supabaseClient);
                 userManager.initAuthProvider(authProvider);
                 return userManager;
               },
             ),
-            
+
             // 设置控制器
             ChangeNotifierProxyProvider<UserManager, SettingsController>(
               create: (context) => SettingsController(
@@ -150,7 +151,8 @@ class MyApp extends StatelessWidget {
               update: (context, userManager, previousSettingsController) {
                 if (userManager.isSignedIn && userManager.currentUser != null) {
                   // 用户已登录，使用Supabase持久化
-                  final supabaseClient = context.read<supabase.SupabaseClient>();
+                  final supabaseClient =
+                      context.read<supabase.SupabaseClient>();
                   return SettingsController(
                     persistence: SupabaseSettingsPersistence(
                       supabaseClient: supabaseClient,
@@ -165,7 +167,7 @@ class MyApp extends StatelessWidget {
                 }
               },
             ),
-            
+
             // 排行榜管理器
             Provider<RankingManager>(
               create: (context) {
@@ -173,7 +175,7 @@ class MyApp extends StatelessWidget {
                 return RankingManager(supabaseClient: supabaseClient);
               },
             ),
-            
+
             // 用户进度管理器
             Provider<UserProgressManager>(
               create: (context) {
@@ -181,10 +183,11 @@ class MyApp extends StatelessWidget {
                 return UserProgressManager(supabaseClient: supabaseClient);
               },
             ),
-            
+
             // 调色板（依赖于设置控制器）
             ChangeNotifierProxyProvider<SettingsController, Palette>(
-              create: (context) => Palette(context.read<SettingsController>().theme.value),
+              create: (context) =>
+                  Palette(context.read<SettingsController>().theme.value),
               update: (context, settings, previousPalette) {
                 final palette = Palette(settings.theme.value);
                 return palette;
@@ -200,7 +203,9 @@ class MyApp extends StatelessWidget {
                     useMaterial3: true,
                     colorScheme: ColorScheme.fromSeed(
                       seedColor: palette.darkPen,
-                      brightness: settings.theme.value == AppTheme.dark ? Brightness.dark : Brightness.light,
+                      brightness: settings.theme.value == AppTheme.dark
+                          ? Brightness.dark
+                          : Brightness.light,
                     ),
                     scaffoldBackgroundColor: palette.backgroundMain,
                     textTheme: TextTheme(
@@ -209,8 +214,9 @@ class MyApp extends StatelessWidget {
                     elevatedButtonTheme: ElevatedButtonThemeData(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: palette.primaryColor,
-                        foregroundColor: settings.theme.value == AppTheme.dark ? 
-                            const Color(0xFF212121) : const Color(0xFFFFFFFF),
+                        foregroundColor: settings.theme.value == AppTheme.dark
+                            ? const Color(0xFF212121)
+                            : const Color(0xFFFFFFFF),
                       ),
                     ),
                   ),

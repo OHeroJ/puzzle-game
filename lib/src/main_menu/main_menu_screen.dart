@@ -28,7 +28,7 @@ class MainMenuScreen extends StatelessWidget {
         builder: (context, constraints) {
           // 根据屏幕宽度调整整体布局
           final isLargeScreen = constraints.maxWidth > 600;
-          
+
           return Center(
             child: Padding(
               padding: EdgeInsets.symmetric(
@@ -53,7 +53,7 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 50.h : 30.h),
-                    
+
                     // 游戏标题
                     Text(
                       '拼图游戏',
@@ -64,7 +64,7 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 60.h : 40.h),
-                    
+
                     // 开始游戏按钮
                     Container(
                       width: isLargeScreen ? 200.w : 150.w,
@@ -76,7 +76,8 @@ class MainMenuScreen extends StatelessWidget {
                             palette.secondaryColor,
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(isLargeScreen ? 30.r : 22.r),
+                        borderRadius:
+                            BorderRadius.circular(isLargeScreen ? 30.r : 22.r),
                         boxShadow: [
                           BoxShadow(
                             color: palette.primaryColor.withValues(alpha: 0.3),
@@ -95,7 +96,8 @@ class MainMenuScreen extends StatelessWidget {
                           shadowColor: Colors.transparent,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(isLargeScreen ? 30.r : 22.r),
+                            borderRadius: BorderRadius.circular(
+                                isLargeScreen ? 30.r : 22.r),
                           ),
                         ),
                         child: Text(
@@ -109,14 +111,16 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 30.h : 20.h),
-                    
+
                     // 排行榜按钮
                     Container(
                       width: isLargeScreen ? 200.w : 150.w,
                       height: isLargeScreen ? 50.h : 40.h,
                       decoration: BoxDecoration(
-                        border: Border.all(color: palette.primaryColor, width: 2.w),
-                        borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                        border:
+                            Border.all(color: palette.primaryColor, width: 2.w),
+                        borderRadius:
+                            BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
                       ),
                       child: ElevatedButton(
                         onPressed: () {
@@ -128,7 +132,8 @@ class MainMenuScreen extends StatelessWidget {
                           shadowColor: Colors.transparent,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                            borderRadius: BorderRadius.circular(
+                                isLargeScreen ? 25.r : 20.r),
                           ),
                         ),
                         child: Text(
@@ -142,14 +147,16 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 30.h : 20.h),
-                    
+
                     // 设置按钮
                     Container(
                       width: isLargeScreen ? 200.w : 150.w,
                       height: isLargeScreen ? 50.h : 40.h,
                       decoration: BoxDecoration(
-                        border: Border.all(color: palette.primaryColor, width: 2.w),
-                        borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                        border:
+                            Border.all(color: palette.primaryColor, width: 2.w),
+                        borderRadius:
+                            BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
                       ),
                       child: ElevatedButton(
                         onPressed: () {
@@ -161,7 +168,8 @@ class MainMenuScreen extends StatelessWidget {
                           shadowColor: Colors.transparent,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(isLargeScreen ? 25.r : 20.r),
+                            borderRadius: BorderRadius.circular(
+                                isLargeScreen ? 25.r : 20.r),
                           ),
                         ),
                         child: Text(
@@ -175,15 +183,17 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: isLargeScreen ? 30.h : 20.h),
-                    
+
                     // 用户信息区域
-                    if (userManager.isSignedIn && userManager.currentUser != null)
+                    if (userManager.isSignedIn &&
+                        userManager.currentUser != null)
                       Container(
                         width: isLargeScreen ? 200.w : 150.w,
                         padding: EdgeInsets.all(isLargeScreen ? 15.w : 10.w),
                         decoration: BoxDecoration(
                           color: palette.backgroundMenu.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 15.r),
+                          borderRadius: BorderRadius.circular(
+                              isLargeScreen ? 20.r : 15.r),
                         ),
                         child: Column(
                           children: [
@@ -204,7 +214,8 @@ class MainMenuScreen extends StatelessWidget {
                         padding: EdgeInsets.all(isLargeScreen ? 15.w : 10.w),
                         decoration: BoxDecoration(
                           color: palette.backgroundMenu.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 15.r),
+                          borderRadius: BorderRadius.circular(
+                              isLargeScreen ? 20.r : 15.r),
                         ),
                         child: Column(
                           children: [
@@ -236,7 +247,8 @@ class MainMenuScreen extends StatelessWidget {
                                     palette.secondaryColor,
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 17.r),
+                                borderRadius: BorderRadius.circular(
+                                    isLargeScreen ? 20.r : 17.r),
                               ),
                               child: ElevatedButton(
                                 onPressed: () {
@@ -248,7 +260,8 @@ class MainMenuScreen extends StatelessWidget {
                                   shadowColor: Colors.transparent,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(isLargeScreen ? 20.r : 17.r),
+                                    borderRadius: BorderRadius.circular(
+                                        isLargeScreen ? 20.r : 17.r),
                                   ),
                                 ),
                                 child: Text(

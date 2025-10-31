@@ -6,8 +6,7 @@ import '../config/supabase_config.dart';
 class SupabaseInitializer {
   final supabase.SupabaseClient _supabaseClient;
 
-  SupabaseInitializer()
-      : _supabaseClient = supabase.Supabase.instance.client;
+  SupabaseInitializer() : _supabaseClient = supabase.Supabase.instance.client;
 
   /// 初始化Supabase客户端
   Future<void> initialize() async {

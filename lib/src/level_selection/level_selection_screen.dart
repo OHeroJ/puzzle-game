@@ -35,23 +35,23 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   Future<void> _loadJigsaws() async {
     try {
       developer.log('Starting to load jigsaw puzzles');
-      
+
       // 获取Supabase客户端
       final supabaseInstance = supabase.Supabase.instance;
       if (supabaseInstance == null) {
         throw Exception('Supabase instance not initialized');
       }
-      
+
       final supabaseClient = supabaseInstance.client;
       if (supabaseClient == null) {
         throw Exception('Supabase client not available');
       }
-      
+
       developer.log('Supabase client initialized');
-      
+
       // 创建拼图服务实例
       final jigsawService = JigsawService(supabaseClient);
-      
+
       // 从Supabase获取拼图数据
       final loadedJigsaws = await jigsawService.getJigsawInfos();
       developer.log('Loaded ${loadedJigsaws.length} jigsaw puzzles');
@@ -61,13 +61,15 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         _isLoading = false;
         _errorMessage = '';
       });
-      
+
       // 打印加载的拼图信息
       for (var jigsaw in loadedJigsaws) {
-        developer.log('Loaded puzzle: id=${jigsaw.id}, title=${jigsaw.title}, gridSize=${jigsaw.gridSize}');
+        developer.log(
+            'Loaded puzzle: id=${jigsaw.id}, title=${jigsaw.title}, gridSize=${jigsaw.gridSize}');
       }
     } catch (e, stackTrace) {
-      developer.log('Error loading jigsaw puzzles', error: e, stackTrace: stackTrace);
+      developer.log('Error loading jigsaw puzzles',
+          error: e, stackTrace: stackTrace);
       setState(() {
         _isLoading = false;
         _errorMessage = '加载拼图数据失败: $e';
