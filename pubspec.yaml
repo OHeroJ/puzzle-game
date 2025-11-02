@@ -33,7 +33,7 @@ dependencies:
   package_info_plus: ^8.0.0
   file: any
   crypto: ^3.0.3
-  http: ^1.2.0
+  http: any
   image: ^4.1.3
   file_selector: any
   path_provider: ^2.1.5
@@ -58,11 +58,17 @@ dependency_overrides:
       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
       path: "packages/file_selector/file_selector"
 # 跑android 的时候，这个需要关闭
-  # audioplayers:
-  #   git:
-  #     url: "https://gitcode.com/openharmony-sig/flutter_audioplayers.git"
-  #     path: "packages/audioplayers"
-  #     ref: "br_v6.5.0_ohos"
+  audioplayers:
+    git:
+      url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
+      path: packages/audioplayers
+      ref: br_v6.5.0_ohos
+
+  audioplayers_platform_interface: 
+    git: 
+      url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
+      path: packages/audioplayers_platform_interface
+      ref: br_v6.5.0_ohos
 
   shared_preferences:
     git:
