@@ -21,11 +21,12 @@ class LoadingSelectionScreen extends StatefulWidget {
 class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
   double p = 0;
   int date = 0;
-  bool _unlocked = false; // 是否已通关（用于决定是否显示蒙版）
+  bool _unlocked = true; // 是否已通关（用于决定是否显示蒙版）
 
   @override
   void initState() {
     super.initState();
+    _unlocked = widget.level.unlocked;
     date = DateTime.now().microsecondsSinceEpoch;
   }
 
@@ -39,9 +40,11 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
         child: Stack(children: [
           PieceImage(
             pictureUrl: widget.level.smallimage,
+            unlocked: _unlocked,
           ),
           
           PieceImage(
+            unlocked: _unlocked,
             pictureUrl: widget.level.image,
             progressIndicatorBuilder: (context, url, downloadProgress) {
               return Container();

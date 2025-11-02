@@ -15,8 +15,10 @@ class PieceImage extends StatelessWidget {
     required this.pictureUrl,
     this.progress,
     this.progressIndicatorBuilder,
+    this.unlocked = true,
   });
 
+  final bool unlocked;
   final String pictureUrl;
   final Function? progress;
   final ProgressIndicatorBuilder? progressIndicatorBuilder;
@@ -102,6 +104,9 @@ class PieceImage extends StatelessWidget {
   }
 
   Widget _buildResult(Widget result) {
+    if (unlocked) {
+      return result;
+    }
     return Stack(
       children: [
         result,

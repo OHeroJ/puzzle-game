@@ -33,6 +33,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   late final LocalImageService _localService;
   late final UploadsStore _uploadsStore;
   Set<int> _completedIds = <int>{};
+  VoidCallback? _historyListener;
 
   @override
   void initState() {
@@ -52,6 +53,12 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
     _loadUploadsAndMerge();
 
     _loadCompletedIds();
+
+    // 监听历史完成事件，主动刷新解锁状态
+    _historyListener = () {
+      _loadCompletedIds();
+    };
+    PuzzleHistoryStore.changes.addListener(_historyListener!);
 
     super.initState();
   }
@@ -97,6 +104,10 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
 
   @override
   void dispose() {
+    if (_historyListener != null) {
+      PuzzleHistoryStore.changes.removeListener(_historyListener!);
+      _historyListener = null;
+    }
     super.dispose();
   }
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 import 'package:puzzle/src/utils/sp_util.dart';
@@ -60,6 +61,8 @@ class PuzzleHistoryEntry {
 /// 历史存储：使用 SharedPreferences(JSON) 持久化
 class PuzzleHistoryStore {
   static const String _spKey = 'puzzle_history';
+  // 用于通知外部：历史数据发生变化（例如完成拼图）
+  static final ValueNotifier<int> changes = ValueNotifier<int>(0);
 
   Future<List<PuzzleHistoryEntry>> load() async {
     final raw = SpUtil().getJSON(_spKey);
@@ -120,6 +123,8 @@ class PuzzleHistoryStore {
         success: true,
       );
       await _save(items);
+      // 触发变更通知（用于刷新关卡列表的解锁状态）
+      changes.value = changes.value + 1;
     }
   }
 

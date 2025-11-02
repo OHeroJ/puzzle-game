@@ -47,17 +47,12 @@ class JigsawGridItem extends StatelessWidget {
                 child: locked
                     ? ImageFiltered(
                         imageFilter:
-                            ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                         child: PieceImage(pictureUrl: info.smallimage),
                       )
                     : PieceImage(pictureUrl: info.smallimage),
               ),
-              if (locked) ...[
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withOpacity(0.85),
-                  ),
-                ),
+              if (locked) ...[                
                 Positioned.fill(
                   child: IgnorePointer(
                     ignoring: true,
