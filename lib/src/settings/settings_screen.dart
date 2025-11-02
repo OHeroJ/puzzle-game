@@ -53,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
                 onChanged: (bool value) {
                   settings.toggleSoundsOn();
                 },
-                activeThumbColor: palette.primaryColor,
+                activeColor: palette.primaryColor,
               ), // Icon(soundsOn ? Icons.volume_up : Icons.volume_off),
               onSelected: () => settings.toggleSoundsOn(),
             ),
