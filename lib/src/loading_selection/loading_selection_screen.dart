@@ -76,7 +76,7 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
                   ),
                 ),
                 Text(
-                  "loading...",
+                  "加载中...",
                 )
               ]),
             ),

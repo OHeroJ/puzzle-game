@@ -35,7 +35,7 @@ class _CustomNameDialogState extends State<CustomNameDialog> {
         curve: Curves.easeOutCubic,
       ),
       child: SimpleDialog(
-        title: const Text('Change name'),
+        title: const Text('修改昵称'),
         children: [
           TextField(
             controller: _controller,
@@ -55,7 +55,7 @@ class _CustomNameDialogState extends State<CustomNameDialog> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('关闭'),
           ),
         ],
       ),

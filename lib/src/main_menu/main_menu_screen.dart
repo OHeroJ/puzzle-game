@@ -28,7 +28,7 @@ class MainMenuScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Puzzle Game',
+                '拼图游戏',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 60,
@@ -43,7 +43,7 @@ class MainMenuScreen extends StatelessWidget {
                   launchUrlString('https://www.pexels.com');
                 },
                 child: Text(
-                  'Photos provided by Pexels',
+                  '图片由 Pexels 提供',
                   style: TextStyle(color: palette.textColor.withOpacity(0.7)),
                 ),
               ),
@@ -65,7 +65,20 @@ class MainMenuScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('Play', style: TextStyle(fontSize: 20)),
+              child: const Text('开始游戏', style: TextStyle(fontSize: 20)),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => GoRouter.of(context).push('/history'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: palette.secondaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('历史记录', style: TextStyle(fontSize: 20)),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -78,7 +91,7 @@ class MainMenuScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('Settings', style: TextStyle(fontSize: 20)),
+              child: const Text('设置', style: TextStyle(fontSize: 20)),
             ),
             SizedBox(height: 30),
             ValueListenableBuilder<bool>(

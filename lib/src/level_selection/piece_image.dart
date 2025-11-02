@@ -21,6 +21,21 @@ class PieceImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
+    // 如果是本地资源路径，使用 AssetImage 加载
+    if (pictureUrl.startsWith('assets/')) {
+      progress?.call();
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          image: DecorationImage(
+            image: AssetImage(pictureUrl),
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+
+    // 默认使用网络图片加载
     return CachedNetworkImage(
       imageUrl: pictureUrl,
       imageBuilder: (context, imageProvider) {

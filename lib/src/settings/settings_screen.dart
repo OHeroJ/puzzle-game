@@ -33,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
-          'Settings',
+          '设置',
           style: TextStyle(
               fontSize: 28.sp,
               color: palette.textColor,
@@ -47,7 +47,7 @@ class SettingsScreen extends StatelessWidget {
           ValueListenableBuilder<bool>(
             valueListenable: settings.soundsOn,
             builder: (context, soundsOn, child) => _SettingsLine(
-              'Voice',
+              '音效',
               Switch(
                 value: soundsOn,
                 onChanged: (bool value) {
@@ -59,7 +59,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           _SettingsLine(
-            'Policy',
+            '隐私政策',
             Icon(Icons.policy, color: palette.textColor),
             onSelected: () {
               _launchInBrowser(
@@ -67,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           _SettingsLine(
-            'About',
+            '关于',
             Icon(Icons.info, color: palette.textColor),
             onSelected: () {
               GoRouter.of(context).push('/settings/about');
@@ -85,7 +85,7 @@ Future<void> _launchInBrowser(Uri url) async {
     url,
     mode: LaunchMode.externalApplication,
   )) {
-    throw Exception('Could not launch $url');
+    throw Exception('无法打开 $url');
   }
 }
 

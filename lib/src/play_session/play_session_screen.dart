@@ -15,6 +15,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../games_services/score.dart';
+import '../history/puzzle_history.dart';
 import '../settings/settings.dart';
 import '../style/palette.dart';
 import 'jigsaw/jigsaw_game.dart';
@@ -55,9 +56,9 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
             },
           ),
           centerTitle: true,
-          backgroundColor: palette.backgroundMain,
-          title: Text(
-            'Puzzle',
+        backgroundColor: palette.backgroundMain,
+        title: Text(
+            '拼图',
             style: TextStyle(
               fontSize: 28.sp,
               color: palette.textColor,
@@ -120,6 +121,13 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
     _startOfPlay = DateTime.now();
 
+    // 记录开始一局拼图到历史
+    PuzzleHistoryStore().startPuzzle(
+      widget.level,
+      gridSize: widget.level.gridSize,
+      startedAt: _startOfPlay,
+    );
+
     // Preload ad for the win screen.
     // final adsRemoved =
     //     context.read<InAppPurchaseController?>()?.adRemoval.active ?? false;
@@ -138,9 +146,9 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       animType: AnimType.scale,
       dialogType: DialogType.info,
       headerAnimationLoop: false,
-      title: 'Reset pieces?',
-      btnOkText: 'Reset',
-      btnCancelText: 'Cancel',
+      title: '重置拼图？',
+      btnOkText: '重置',
+      btnCancelText: '取消',
       btnCancelOnPress: () {},
       btnOkOnPress: () {
         setState(() {});
@@ -194,7 +202,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
               child: Center(child: Lottie.asset('assets/lottie/win.json')),
             ),
             Text(
-              'Time: ${score.formattedTime}',
+              '用时：${score.formattedTime}',
               style: TextStyle(
                 fontSize: 16.sp,
                 color: Palette().textColor,
@@ -206,11 +214,18 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       ),
       dialogBackgroundColor: Palette().backgroundMain,
       btnOkColor: Palette().primaryColor,
-      btnOkText: "Continue",
+      btnOkText: "继续",
       btnOkOnPress: () {
         GoRouter.of(context).pop();
       },
     ).show();
+
+    // 持久化通关历史（用时等）
+    final elapsedMs = DateTime.now().difference(_startOfPlay).inMilliseconds;
+    await PuzzleHistoryStore().completePuzzle(
+      widget.level.id,
+      elapsedMs: elapsedMs,
+    );
 
     // GoRouter.of(context).go('/play/won', extra: {'score': score});
   }

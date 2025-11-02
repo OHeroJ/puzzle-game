@@ -21,12 +21,12 @@ class AboutScreen extends StatefulWidget {
 class _AboutScreenState extends State<AboutScreen> {
   var _gap = SizedBox(height: 20.h);
   PackageInfo _packageInfo = PackageInfo(
-    appName: 'Unknown',
-    packageName: 'Unknown',
-    version: 'Unknown',
-    buildNumber: 'Unknown',
-    buildSignature: 'Unknown',
-    installerStore: 'Unknown',
+    appName: '未知',
+    packageName: '未知',
+    version: '未知',
+    buildNumber: '未知',
+    buildSignature: '未知',
+    installerStore: '未知',
   );
 
   @override
@@ -56,7 +56,7 @@ class _AboutScreenState extends State<AboutScreen> {
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
-          'About',
+          '关于',
           style: TextStyle(
               fontSize: 28.sp,
               color: palette.textColor,
@@ -83,7 +83,7 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
             SizedBox(height: 10.h),
             Text(
-              "Version: ${_packageInfo.version}",
+              "版本：${_packageInfo.version}",
               style: TextStyle(
                   fontSize: 18.sp, color: palette.textColor.withOpacity(0.7)),
             ),

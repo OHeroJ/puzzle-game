@@ -22,6 +22,7 @@ import 'src/level_selection/jigsaw_info.dart';
 import 'src/level_selection/level_selection_screen.dart';
 import 'src/main_menu/main_menu_screen.dart';
 import 'src/play_session/play_session_screen.dart';
+import 'src/history/history_screen.dart';
 import 'src/settings/persistence/local_storage_settings_persistence.dart';
 import 'src/settings/persistence/settings_persistence.dart';
 import 'src/settings/settings.dart';
@@ -110,6 +111,10 @@ class MyApp extends StatelessWidget {
         },
       ),
       GoRoute(
+        path: '/history',
+        builder: (context, state) => const HistoryScreen(key: Key('history')),
+      ),
+      GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(key: Key('settings')),
         routes: [
@@ -162,7 +167,7 @@ class MyApp extends StatelessWidget {
 
                 return MaterialApp.router(
                   builder: EasyLoading.init(),
-                  title: 'Puzzle',
+                  title: '拼图',
                   theme: ThemeData(
                     textTheme: GoogleFonts.poppinsTextTheme(
                       Theme.of(context).textTheme,

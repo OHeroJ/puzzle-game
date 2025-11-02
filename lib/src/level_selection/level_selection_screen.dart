@@ -5,8 +5,8 @@
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:puzzle/src/http/api.dart';
-import 'package:puzzle/src/http/dio_client.dart';
+// 改为使用本地图片，不再依赖网络
+import 'package:puzzle/src/level_selection/local_image_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +26,10 @@ class LevelSelectionScreen extends StatefulWidget {
 
 class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   late final PagingController<int, JigsawInfo> _pagingController;
+  late String _selectedCategory;
+  late List<String> _categories;
+  late List<JigsawInfo> _localItems;
+  late final LocalImageService _localService;
 
   @override
   void initState() {
@@ -36,23 +40,28 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       },
     );
 
+    _localService = LocalImageService();
+    _categories = _localService.categories;
+    _selectedCategory = '全部';
+    _localItems = _localService.allJigsaws();
+
     super.initState();
   }
 
   Future<List<JigsawInfo>> _fetchPage(int pageId) async {
-    try {
-      final response = await DioClient.getInstance().get(
-        Api.image,
-        params: {"page": pageId, "per_page": 15},
-      );
-      final List<JigsawInfo> newLists = (response["photos"] as List)
-          .map((ele) => JigsawInfo.fromJson(ele))
-          .toList();
-      return newLists;
-    } catch (error) {
-      _pagingController.value = _pagingController.value.copyWith(error: error);
-      return [];
+    // 本地分页：每页 15 个
+    const int pageSize = 15;
+    final int start = (pageId - 1) * pageSize;
+    if (start >= _localItems.length) return [];
+    final end = (start + pageSize).clamp(0, _localItems.length);
+    return _localItems.sublist(start, end);
+  }
+
+  List<JigsawInfo> _buildItemsForCategory(String category) {
+    if (category == '全部') {
+      return _localService.allJigsaws();
     }
+    return _localService.jigsawsForCategory(category);
   }
 
   @override
@@ -74,7 +83,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
-          'Puzzles',
+          '拼图',
           style: TextStyle(
             fontSize: 28.sp,
             color: palette.textColor,
@@ -99,16 +108,42 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             ),
             slivers: [
               SliverToBoxAdapter(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                      'Photos provided by Pexels',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: palette.textColor.withOpacity(0.7),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '分类：',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: palette.textColor.withOpacity(0.8),
+                        ),
                       ),
-                    ),
+                      SizedBox(width: 8.w),
+                      DropdownButton<String>(
+                        value: _selectedCategory.isNotEmpty ? _selectedCategory : null,
+                        dropdownColor: palette.backgroundMain,
+                        items: ['全部', ..._categories]
+                            .map((c) => DropdownMenuItem<String>(
+                                  value: c,
+                                  child: Text(
+                                    c,
+                                    style: TextStyle(color: palette.textColor),
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            _selectedCategory = value;
+                            _localItems = _buildItemsForCategory(_selectedCategory);
+                            // 通过刷新分页重新加载本地数据
+                            _pagingController.refresh();
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -167,7 +202,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             child: Column(
               children: [
                 Text(
-                  'Pieces',
+                  '拼图块数',
                   style: TextStyle(
                     fontStyle: FontStyle.italic,
                     color: palette.textColor,
@@ -245,7 +280,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text("Start"),
+            child: const Text("开始"),
           ),
         ),
       ),

@@ -10,6 +10,7 @@ import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 
 import '../collision/puzzle_collision_detection.dart';
@@ -33,8 +34,13 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
   Future<void> onLoad() async {
     collisionDetection = PuzzleCollisionDetection();
     // add(FpsTextComponent(position: Vector2(0, 50)));
-    var file = await DefaultCacheManager().getSingleFile(jigsawInfo.image);
-    Image image = await getFileImage(file);
+    Image image;
+    if (jigsawInfo.image.startsWith('assets/')) {
+      image = await getAssetImage(jigsawInfo.image);
+    } else {
+      var file = await DefaultCacheManager().getSingleFile(jigsawInfo.image);
+      image = await getFileImage(file);
+    }
     _scale = ImageUtils.calculateScale(
       size.x / 3.0 * 2.0,
       size.y / 3.0 * 2.0,
@@ -108,6 +114,15 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(filePath.readAsBytesSync(), (ui.Image img) {
       print("image width:${img.width} image height:${img.height}:");
+      return completer.complete(img);
+    });
+    return completer.future;
+  }
+
+  Future<Image> getAssetImage(String assetPath) async {
+    final Completer<ui.Image> completer = Completer();
+    final data = await rootBundle.load(assetPath);
+    ui.decodeImageFromList(data.buffer.asUint8List(), (ui.Image img) {
       return completer.complete(img);
     });
     return completer.future;
