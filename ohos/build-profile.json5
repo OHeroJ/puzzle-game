@@ -1,13 +1,47 @@
-
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "debug",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/laijihua/.ohos/config/debug_ohos_6n-mGEdIkVPIeQ1xfRu6cPsdvkmlgO-dtrIjf_3Xc2s=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A5B407F74FFAC0284615AE7CF764437247134CCD5973A2C7A9045CC3A7EE241DD77ADCF57FFF4",
+          "profile": "/Users/laijihua/.ohos/config/debug_ohos_6n-mGEdIkVPIeQ1xfRu6cPsdvkmlgO-dtrIjf_3Xc2s=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/laijihua/.ohos/config/debug_ohos_6n-mGEdIkVPIeQ1xfRu6cPsdvkmlgO-dtrIjf_3Xc2s=.p12",
+          "storePassword": "0000001A49FB86BDEDA21634DDA88C3FBA45B15838F39589F3744D6201DA742F3EE0DE0A2FD0400DD6F8"
+        }
+      },
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "/Users/laijihua/HongmengCers/hm_flutter.p12",
+          "storePassword": "0000001DFE4B9CFF30B6B2C81388ECF0E86C8A54DC5A3D248CAA8E7C76D02DA0C367D5887F9BD89820F0413D03",
+          "keyAlias": "hm_flutter",
+          "keyPassword": "0000001D8BCD537FF402687E48CEBAA39BB894598764D5F4E5033E38AF7A843E020ECEC3606017EB3B7F860EE2",
+          "signAlg": "SHA256withECDSA",
+          "profile": "/Users/laijihua/HongmengCers/puzzleRelease.p7b",
+          "certpath": "/Users/laijihua/HongmengCers/hm_flutter.cer"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
-        "signingConfig": "default",
-        "compatibleSdkVersion": "5.1.0(18)",
+        "signingConfig": "debug",
+        "compatibleSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.0.0(20)"
+      },
+      {
+        "name": "release",
+        "signingConfig": "release",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.0.0(20)"
       }
     ],
     "buildModeSet": [
@@ -30,7 +64,8 @@
         {
           "name": "default",
           "applyToProducts": [
-            "default"
+            "default",
+            "release"
           ]
         }
       ]

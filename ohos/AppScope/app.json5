@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "run.oldbird.puzzle.puzzle",
+    "bundleName": "run.oldbird.puzzle",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",
