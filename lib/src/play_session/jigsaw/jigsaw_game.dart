@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:math' as math;
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -37,6 +39,18 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     Image image;
     if (jigsawInfo.image.startsWith('assets/')) {
       image = await getAssetImage(jigsawInfo.image);
+    } else if (jigsawInfo.image.startsWith('data:image/')) {
+      // data URI
+      final base64Part = jigsawInfo.image.split(',').last;
+      final bytes = base64Decode(base64Part);
+      image = await getBytesImage(bytes);
+    } else if (jigsawInfo.image.startsWith('file://') || jigsawInfo.image.startsWith('/')) {
+      // local file path
+      final path = jigsawInfo.image.startsWith('file://')
+          ? jigsawInfo.image.replaceFirst('file://', '')
+          : jigsawInfo.image;
+      final file = File(path);
+      image = await getFileImage(file);
     } else {
       var file = await DefaultCacheManager().getSingleFile(jigsawInfo.image);
       image = await getFileImage(file);
@@ -123,6 +137,14 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
     final Completer<ui.Image> completer = Completer();
     final data = await rootBundle.load(assetPath);
     ui.decodeImageFromList(data.buffer.asUint8List(), (ui.Image img) {
+      return completer.complete(img);
+    });
+    return completer.future;
+  }
+
+  Future<Image> getBytesImage(Uint8List bytes) async {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(bytes, (ui.Image img) {
       return completer.complete(img);
     });
     return completer.future;

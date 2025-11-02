@@ -116,12 +116,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       separatorBuilder: (_, __) => SizedBox(height: 8.h),
                       itemBuilder: (context, index) {
                         final e = filtered[index];
-                        return _HistoryTile(entry: e, onStart: () {
+                        return _HistoryTile(
+                            entry: e,
+                            onStart: () async {
                           final info = e.source == 'asset'
-                              ? JigsawInfo.fromAsset(e.image,
-                                  title: e.title, photographer: e.photographer)
-                              : JigsawInfo(e.image, e.image, e.title);
+                                  ? JigsawInfo.fromAsset(
+                                      e.image,
+                                      title: e.title,
+                                      photographer: e.photographer,
+                                    )
+                                  : () {
+                                      final i =
+                                          JigsawInfo(e.image, e.image, e.title);
+                                      i.photographer = e.photographer;
+                                      i.id =
+                                          JigsawInfo.stableIdFromPath(e.image);
+                                      return i;
+                                    }();
                           info.gridSize = e.gridSize;
+
+                              final entries = await PuzzleHistoryStore().load();
+                              final unlocked = entries
+                                  .any((e) => e.id == info.id && e.success);
+                              info.unlocked = unlocked;   
+                          
                           GoRouter.of(context).push('/play/loading', extra: info);
                         });
                       },

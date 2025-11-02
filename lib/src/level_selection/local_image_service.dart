@@ -40,13 +40,31 @@ class LocalImageService {
 
   List<JigsawInfo> jigsawsForCategory(String category) {
     return itemsForCategory(category)
-        .map((e) => JigsawInfo.fromAsset(e.path, title: e.title, photographer: e.category))
+        .map((e) {
+          if (e.path.startsWith('assets/')) {
+            return JigsawInfo.fromAsset(e.path, title: e.title, photographer: e.category);
+          }
+          final info = JigsawInfo(e.path, e.path, e.title);
+          info.photographer = e.category;
+          info.id = JigsawInfo.stableIdFromPath(e.path);
+          info.gridSize = 4;
+          return info;
+        })
         .toList(growable: false);
   }
 
   List<JigsawInfo> allJigsaws() {
     return allItems()
-        .map((e) => JigsawInfo.fromAsset(e.path, title: e.title, photographer: e.category))
+        .map((e) {
+          if (e.path.startsWith('assets/')) {
+            return JigsawInfo.fromAsset(e.path, title: e.title, photographer: e.category);
+          }
+          final info = JigsawInfo(e.path, e.path, e.title);
+          info.photographer = e.category;
+          info.id = JigsawInfo.stableIdFromPath(e.path);
+          info.gridSize = 4;
+          return info;
+        })
         .toList(growable: false);
   }
 

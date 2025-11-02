@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import '../level_selection/piece_image.dart';
 
 class LoadingSelectionScreen extends StatefulWidget {
   final JigsawInfo level;
+
 
   const LoadingSelectionScreen({super.key, required this.level});
 
@@ -18,12 +21,14 @@ class LoadingSelectionScreen extends StatefulWidget {
 class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
   double p = 0;
   int date = 0;
+  bool _unlocked = false; // 是否已通关（用于决定是否显示蒙版）
 
   @override
   void initState() {
     super.initState();
     date = DateTime.now().microsecondsSinceEpoch;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +40,7 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
           PieceImage(
             pictureUrl: widget.level.smallimage,
           ),
+          
           PieceImage(
             pictureUrl: widget.level.image,
             progressIndicatorBuilder: (context, url, downloadProgress) {

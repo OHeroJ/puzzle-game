@@ -36,6 +36,10 @@ dependencies:
   connectivity_plus: ^6.0.3
   file: any
   crypto: ^3.0.3
+  http: ^1.2.0
+  image: ^4.1.3
+  file_picker: ^10.3.3
+  path_provider: ^2.1.5
 
 dependency_overrides: 
 
@@ -49,6 +53,12 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/animals/
+    - assets/images/landscape/
+    - assets/images/people/
+    - assets/images/cars/
+    - assets/images/beauty/
+    - assets/images/architecture/
     - assets/music/
     - assets/sfx/
     - assets/lottie/

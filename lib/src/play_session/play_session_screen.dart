@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:ui' as ui;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:file/file.dart';
 import 'package:flame/game.dart';
@@ -38,6 +39,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
   bool _duringCelebration = false;
   bool isLoading = true;
+  bool _sessionCompleted = false;
 
   late DateTime _startOfPlay;
 
@@ -158,6 +160,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
 
   void showImage() async {
     File file = await DefaultCacheManager().getSingleFile(widget.level.image);
+    final locked = !_sessionCompleted;
     AwesomeDialog(
       width: 400.h,
       context: context,
@@ -171,7 +174,30 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           padding: EdgeInsets.all(20.h),
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.r)),
-          child: Image.file(file, fit: BoxFit.contain),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: locked
+                    ? ImageFiltered(
+                        imageFilter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                        child: Image.file(file, fit: BoxFit.contain),
+                      )
+                    : Image.file(file, fit: BoxFit.contain),
+              ),
+              if (locked)
+                Positioned.fill(
+                  child: Container(color: Colors.black.withOpacity(0.85)),
+                ),
+              if (locked)
+                Center(
+                  child: Icon(
+                    Icons.lock,
+                    size: 64.sp,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     ).show();
@@ -219,6 +245,11 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
         GoRouter.of(context).pop();
       },
     ).show();
+
+    // 标记本次会话完成，用于去掉原图蒙层
+    setState(() {
+      _sessionCompleted = true;
+    });
 
     // 持久化通关历史（用时等）
     final elapsedMs = DateTime.now().difference(_startOfPlay).inMilliseconds;

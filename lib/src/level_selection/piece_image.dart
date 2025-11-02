@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io' show File;
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +27,7 @@ class PieceImage extends StatelessWidget {
     // 如果是本地资源路径，使用 AssetImage 加载
     if (pictureUrl.startsWith('assets/')) {
       progress?.call();
-      return Container(
+      return _buildResult(Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           image: DecorationImage(
@@ -32,11 +35,49 @@ class PieceImage extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-      );
+      ));
+    }
+
+    // data URI (base64)
+    if (pictureUrl.startsWith('data:image/')) {
+      try {
+        final base64Part = pictureUrl.split(',').last;
+        final bytes = base64Decode(base64Part);
+        progress?.call();
+        return _buildResult(Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            image:
+                DecorationImage(image: MemoryImage(bytes), fit: BoxFit.cover),
+          ),
+        ));
+      } catch (_) {
+        return _buildResult(Icon(Icons.error));
+      }
+    }
+
+    // 本地文件路径（绝对路径或 file://）
+    if (pictureUrl.startsWith('file://') || pictureUrl.startsWith('/')) {
+      final path = pictureUrl.startsWith('file://')
+          ? pictureUrl.replaceFirst('file://', '')
+          : pictureUrl;
+      final file = File(path);
+      if (file.existsSync()) {
+        progress?.call();
+        return _buildResult(Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            image: DecorationImage(image: FileImage(file), fit: BoxFit.cover),
+          ),
+        ));
+      } else {
+        return _buildResult(Icon(Icons.error));
+      }
     }
 
     // 默认使用网络图片加载
-    return CachedNetworkImage(
+    return _buildResult(
+      CachedNetworkImage(
       imageUrl: pictureUrl,
       imageBuilder: (context, imageProvider) {
         progress?.call();
@@ -56,6 +97,27 @@ class PieceImage extends StatelessWidget {
             ));
           },
       errorWidget: (context, url, error) => Icon(Icons.error),
+      ),
+    );
+  }
+
+  Widget _buildResult(Widget result) {
+    return Stack(
+      children: [
+        result,
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), // 模糊程度（值越大越模糊）
+            child: Container(
+              color: Colors.black12, // 可选：增加蒙版颜色叠加
+            ),
+          ),
+        )
+      ],
     );
   }
 }

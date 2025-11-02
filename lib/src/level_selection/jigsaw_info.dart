@@ -14,10 +14,15 @@ class JigsawInfo {
   late String title;
   late String photographer;
 
+  late bool unlocked;
+
   JigsawInfo(
     this.image,
     this.smallimage,
     this.title,
+    {
+    this.unlocked = false,
+  }
   );
 
   JigsawInfo.fromJson(dynamic json) {
@@ -26,6 +31,7 @@ class JigsawInfo {
     smallimage = json['src']['medium'];
     title = json['alt'];
     photographer = json['photographer'];
+    unlocked = json['unlocked'] ?? false;
   }
 
   /// 使用本地资源构造一个拼图信息。
@@ -42,6 +48,7 @@ class JigsawInfo {
     this.title = title;
     this.photographer = photographer;
     gridSize = 4; // 默认值，实际由弹窗选择覆盖
+    unlocked = false;
   }
 
   static int stableIdFromPath(String path) {

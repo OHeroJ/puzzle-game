@@ -37,16 +37,6 @@ class MainMenuScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20),
-              InkWell(
-                onTap: () {
-                  launchUrlString('https://www.pexels.com');
-                },
-                child: Text(
-                  '图片由 Pexels 提供',
-                  style: TextStyle(color: palette.textColor.withOpacity(0.7)),
-                ),
-              ),
             ],
           ),
         ),
