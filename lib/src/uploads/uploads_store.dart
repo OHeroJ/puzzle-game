@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io' show File, Directory;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 import 'package:puzzle/src/uploads/uploads_entry.dart';
@@ -26,14 +26,13 @@ class UploadsStore {
 
   /// 选择图片并持久化到本地（桌面/移动），Web 使用 base64 存储
   Future<UploadEntry?> pickAndSave({String category = '我的上传'}) async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-      withData: true, // Web 返回 bytes
+    final typeGroup = const XTypeGroup(
+      label: 'images',
+      extensions: ['jpg', 'jpeg', 'png', 'gif'],
     );
-    if (result == null || result.files.isEmpty) return null;
-    final f = result.files.first;
-    final title = f.name;
+    final xfile = await openFile(acceptedTypeGroups: [typeGroup]);
+    if (xfile == null) return null;
+    final title = xfile.name;
     final createdAt = DateTime.now().toIso8601String();
 
     String storageType;
@@ -41,8 +40,9 @@ class UploadsStore {
 
     if (kIsWeb) {
       // Web: 以 data URI 存储（必须有 bytes）
-      if (f.bytes == null) return null;
-      final base64 = base64Encode(f.bytes!);
+      final bytes = await xfile.readAsBytes();
+      if (bytes.isEmpty) return null;
+      final base64 = base64Encode(bytes);
       final mime = _mimeFromName(title);
       storageType = 'base64';
       pathOrData = 'data:$mime;base64,$base64';
@@ -55,14 +55,14 @@ class UploadsStore {
       }
       final sanitized = title.replaceAll(RegExp('[^a-zA-Z0-9._-]'), '_');
       final targetPath = '${uploadsDir.path}/$sanitized';
-      if (f.path != null) {
-        final file = File(f.path!);
+      if (xfile.path.isNotEmpty) {
+        final file = File(xfile.path);
         await file.copy(targetPath);
-      } else if (f.bytes != null) {
-        final file = File(targetPath);
-        await file.writeAsBytes(f.bytes!);
       } else {
-        return null;
+        final bytes = await xfile.readAsBytes();
+        if (bytes.isEmpty) return null;
+        final file = File(targetPath);
+        await file.writeAsBytes(bytes);
       }
       storageType = 'file';
       pathOrData = targetPath;

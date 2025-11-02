@@ -10,7 +10,6 @@ import 'package:puzzle/src/level_selection/local_image_service.dart';
 import 'package:puzzle/src/uploads/uploads_store.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 // 移除分页依赖，改为一次性渲染 SliverGrid
 import 'package:provider/provider.dart';
 
@@ -399,11 +398,12 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
           children: [
             Text(
               "${num * num}",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
                 fontSize: 28.sp,
-                color: gridSizeValue == num ? Colors.white : palette.textColor,
-              ),
+                  color:
+                      gridSizeValue == num ? Colors.white : palette.textColor,
+                )
             ),
           ],
         ),

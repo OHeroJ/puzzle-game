@@ -12,7 +12,6 @@ import 'package:puzzle/src/settings/about_screen.dart';
 import 'package:puzzle/src/utils/sp_util.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -169,12 +168,6 @@ class MyApp extends StatelessWidget {
                   builder: EasyLoading.init(),
                   title: '拼图',
                   theme: ThemeData(
-                    textTheme: GoogleFonts.poppinsTextTheme(
-                      Theme.of(context).textTheme,
-                    ).apply(
-                      bodyColor: palette.textColor,
-                      displayColor: palette.textColor,
-                    ),
                     colorScheme: ColorScheme.fromSeed(
                       seedColor: palette.primaryColor,
                       background: palette.backgroundMain,
