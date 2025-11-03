@@ -57,18 +57,18 @@ dependency_overrides:
     git: 
       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
       path: "packages/file_selector/file_selector"
-  # Android 平台时可启用 OHOS 分支；为确保 Web 构建兼容，这里关闭 audioplayers 的 git 覆盖
-  # audioplayers:
-  #   git:
-  #     url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
-  #     path: packages/audioplayers
-  #     ref: br_v6.5.0_ohos
+# 跑android 的时候，这个需要关闭
+  audioplayers:
+    git:
+      url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
+      path: packages/audioplayers
+      ref: br_v6.5.0_ohos
 
-  # audioplayers_platform_interface: 
-  #   git: 
-  #     url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
-  #     path: packages/audioplayers_platform_interface
-  #     ref: br_v6.5.0_ohos
+  audioplayers_platform_interface: 
+    git: 
+      url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
+      path: packages/audioplayers_platform_interface
+      ref: br_v6.5.0_ohos
 
   shared_preferences:
     git:

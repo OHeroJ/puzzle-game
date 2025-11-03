@@ -42,6 +42,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       backgroundColor: palette.backgroundMain,
       body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 30.w),
         children: [
           SizedBox(height: 20),
           ValueListenableBuilder<bool>(

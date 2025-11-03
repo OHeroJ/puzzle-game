@@ -26,6 +26,7 @@ import 'src/settings/persistence/local_storage_settings_persistence.dart';
 import 'src/settings/persistence/settings_persistence.dart';
 import 'src/settings/settings.dart';
 import 'src/settings/settings_screen.dart';
+import 'src/settings/privacy_consent_screen.dart';
 import 'src/style/my_transition.dart';
 import 'src/style/palette.dart';
 import 'src/style/snack_bar.dart';
@@ -70,11 +71,27 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   static final _router = GoRouter(
+    redirect: (context, state) {
+      final accepted = SpUtil().getBool('privacyAccepted') ?? false;
+      final currentLocation = state.uri.toString();
+      final onPrivacy = currentLocation == '/privacy';
+      if (!accepted && !onPrivacy) {
+        return '/privacy';
+      }
+      if (accepted && onPrivacy) {
+        return '/';
+      }
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/',
         builder: (context, state) =>
             const MainMenuScreen(key: Key('main menu')),
+      ),
+      GoRoute(
+        path: '/privacy',
+        builder: (context, state) => const PrivacyConsentScreen(),
       ),
       GoRoute(
         path: '/play',
