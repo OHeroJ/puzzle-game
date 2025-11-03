@@ -258,6 +258,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         onPressed: _triggerUpload,
         label: const Text('上传图片'),
         icon: const Icon(Icons.upload),

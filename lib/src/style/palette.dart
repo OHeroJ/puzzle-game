@@ -25,7 +25,7 @@ import 'package:flutter/material.dart';
 class Palette {
   Color get backgroundMain => const Color(0xFFF0F2F5); // Light background
   Color get textColor => const Color(0xFF333333); // Dark text
-  Color get primaryColor => const Color(0xFF4CAF50); // Vibrant green
+  Color get primaryColor => Colors.black; // Vibrant green
   Color get secondaryColor => const Color(0xFF2196F3); // Complementary blue
   Color get accentColor => const Color(0xFFFFC107); // Accent amber
   Color get lightGray =>

@@ -165,8 +165,9 @@ class MyApp extends StatelessWidget {
                 final palette = context.watch<Palette>();
 
                 return MaterialApp.router(
+                  debugShowCheckedModeBanner: false,
                   builder: EasyLoading.init(),
-                  title: '拼图',
+                  title: '有趣拼图',
                   theme: ThemeData(
                     colorScheme: ColorScheme.fromSeed(
                       seedColor: palette.primaryColor,

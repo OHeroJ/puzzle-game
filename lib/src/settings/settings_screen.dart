@@ -63,7 +63,7 @@ class SettingsScreen extends StatelessWidget {
             Icon(Icons.policy, color: palette.textColor),
             onSelected: () {
               _launchInBrowser(
-                  Uri.parse("https://oldbird.run/puzzle-sec.html"));
+                  Uri.parse("https://oldbird.run/puzzle-sec-hw.html"));
             },
           ),
           _SettingsLine(

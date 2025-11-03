@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import '../settings/settings.dart';
 import '../style/palette.dart';
@@ -22,13 +21,13 @@ class MainMenuScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: palette.backgroundMain,
       body: ResponsiveScreen(
-        mainAreaProminence: 0.45,
+        mainAreaProminence: 0.55,
         squarishMainArea: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '拼图游戏',
+                '有趣拼图',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 60,
@@ -37,52 +36,36 @@ class MainMenuScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  GoRouter.of(context).push('/play');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: palette.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('开始拼图', style: TextStyle(fontSize: 20)),
+              ),
             ],
           ),
         ),
         rectangularMenuArea: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                GoRouter.of(context).push('/play');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: palette.primaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('开始游戏', style: TextStyle(fontSize: 20)),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
+            IconButton(
               onPressed: () => GoRouter.of(context).push('/history'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: palette.secondaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('历史记录', style: TextStyle(fontSize: 20)),
+              icon: const Icon(Icons.history, size: 24),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => GoRouter.of(context).push('/settings'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: palette.secondaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('设置', style: TextStyle(fontSize: 20)),
-            ),
+            IconButton(
+                onPressed: () => GoRouter.of(context).push('/settings'),
+                icon: const Icon(Icons.settings, size: 24)),
             SizedBox(height: 30),
             ValueListenableBuilder<bool>(
               valueListenable: settingsController.muted,
