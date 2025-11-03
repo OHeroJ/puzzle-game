@@ -38,49 +38,50 @@ dependencies:
   file_selector: any
   path_provider: ^2.1.5
 
-dependency_overrides: 
-  path_provider: 
-    git:
-      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
-      path: "packages/path_provider/path_provider"
-  device_info_plus:
-    git:
-      url: "https://gitcode.com/openharmony-sig/flutter_plus_plugins.git"
-      path: "packages/device_info_plus/device_info_plus"
+# 
+# dependency_overrides: 
+#   path_provider: 
+#     git:
+#       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
+#       path: "packages/path_provider/path_provider"
+#   device_info_plus:
+#     git:
+#       url: "https://gitcode.com/openharmony-sig/flutter_plus_plugins.git"
+#       path: "packages/device_info_plus/device_info_plus"
 
-  url_launcher:
-    git:
-      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
-      path: "packages/url_launcher/url_launcher"
+#   url_launcher:
+#     git:
+#       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
+#       path: "packages/url_launcher/url_launcher"
 
-  file_selector:
-    git: 
-      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
-      path: "packages/file_selector/file_selector"
-# 跑android 的时候，这个需要关闭
-  audioplayers:
-    git:
-      url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
-      path: packages/audioplayers
-      ref: br_v6.5.0_ohos
+#   file_selector:
+#     git: 
+#       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
+#       path: "packages/file_selector/file_selector"
+# # 跑android 的时候，这个需要关闭
+#   audioplayers:
+#     git:
+#       url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
+#       path: packages/audioplayers
+#       ref: br_v6.5.0_ohos
 
-  audioplayers_platform_interface: 
-    git: 
-      url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
-      path: packages/audioplayers_platform_interface
-      ref: br_v6.5.0_ohos
+#   audioplayers_platform_interface: 
+#     git: 
+#       url: https://gitcode.com/openharmony-sig/flutter_audioplayers.git
+#       path: packages/audioplayers_platform_interface
+#       ref: br_v6.5.0_ohos
 
-  shared_preferences:
-    git:
-      url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
-      path: "packages/shared_preferences/shared_preferences"
-      ref: "br_shared_preferences-v2.5.3_ohos"
+#   shared_preferences:
+#     git:
+#       url: "https://gitcode.com/openharmony-tpc/flutter_packages.git"
+#       path: "packages/shared_preferences/shared_preferences"
+#       ref: "br_shared_preferences-v2.5.3_ohos"
 
-  package_info_plus:
-    git:
-      url: "https://gitcode.com/openharmony-sig/flutter_plus_plugins.git"
-      path: "packages/package_info_plus/package_info_plus"
-      ref: "br_package_info_plus_v8.3.0_ohos"
+#   package_info_plus:
+#     git:
+#       url: "https://gitcode.com/openharmony-sig/flutter_plus_plugins.git"
+#       path: "packages/package_info_plus/package_info_plus"
+#       ref: "br_package_info_plus_v8.3.0_ohos"
 
 dev_dependencies:
   flutter_test:

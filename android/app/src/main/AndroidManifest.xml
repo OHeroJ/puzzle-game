@@ -9,7 +9,7 @@
         </intent>
     </queries>
     <application
-        android:label="Puzzle"
+        android:label="有趣拼图"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
