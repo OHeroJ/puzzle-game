@@ -36,8 +36,10 @@ class MainMenuScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
+              SizedBox(height: 25),
+              ElevatedButton.icon(
+                icon:
+                    const Icon(Icons.play_arrow, color: Colors.white, size: 24),
                 onPressed: () {
                   GoRouter.of(context).push('/play');
                 },
@@ -49,7 +51,7 @@ class MainMenuScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('开始拼图', style: TextStyle(fontSize: 20)),
+                label: const Text('开始', style: TextStyle(fontSize: 20)),
               ),
             ],
           ),
