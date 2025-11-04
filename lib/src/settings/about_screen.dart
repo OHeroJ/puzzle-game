@@ -85,7 +85,7 @@ class _AboutScreenState extends State<AboutScreen> {
             Text(
               "版本：${_packageInfo.version}",
               style: TextStyle(
-                  fontSize: 18.sp, color: palette.textColor.withOpacity(0.7)),
+                  fontSize: 18.sp, color: palette.textColor.withValues(alpha: 0.7)),
             ),
           ],
         ),

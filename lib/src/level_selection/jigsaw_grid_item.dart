@@ -30,7 +30,7 @@ class JigsawGridItem extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 1,
             blurRadius: 5,
             offset: Offset(0, 3), // changes position of shadow
@@ -59,7 +59,7 @@ class JigsawGridItem extends StatelessWidget {
                     child: Center(
                       child: Icon(
                         Icons.lock,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         size: 36,
                       ),
                     ),
@@ -77,7 +77,7 @@ class JigsawGridItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         padding: const EdgeInsets.all(4),
@@ -96,7 +96,7 @@ class JigsawGridItem extends StatelessWidget {
                     vertical: 4.0,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
                   child: Text(
                     '@${info.photographer}',

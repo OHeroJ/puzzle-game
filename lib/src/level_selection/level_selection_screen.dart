@@ -113,90 +113,54 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => GoRouter.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new),
-        ),
-        centerTitle: true,
-        backgroundColor: palette.backgroundMain,
-        title: Text(
-          '拼图',
-          style: TextStyle(
-            fontSize: 28.sp,
-            color: palette.textColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              GoRouter.of(context).push('/settings');
-            },
-            icon: Icon(Icons.settings, color: palette.textColor),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Container(
-          width: 0.9.sw,
-          child: CustomScrollView(
-            scrollBehavior: MaterialScrollBehavior().copyWith(
-              scrollbars: false,
+    final tabs = ['全部', ..._categories];
+    final initialIndex = tabs.indexOf(_selectedCategory);
+    return DefaultTabController(
+      initialIndex: initialIndex < 0 ? 0 : initialIndex,
+      length: tabs.length,
+      child: Scaffold(
+        appBar: AppBar(   
+          centerTitle: true,
+          backgroundColor: palette.backgroundMain,
+          title: Text(
+            '拼图',
+            style: TextStyle(
+              color: palette.textColor,
+              fontWeight: FontWeight.bold,
             ),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '分类：',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: palette.textColor.withOpacity(0.8),
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      DropdownButton<String>(
-                        value: _selectedCategory.isNotEmpty ? _selectedCategory : null,
-                        dropdownColor: palette.backgroundMain,
-                        items: ['全部', ..._categories]
-                            .map((c) => DropdownMenuItem<String>(
-                                  value: c,
-                                  child: Text(
-                                    c,
-                                    style: TextStyle(color: palette.textColor),
-                                  ),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          if (value == null) return;
-                          setState(() {
-                            _selectedCategory = value;
-                            if (_selectedCategory == '我的上传') {
-                              // 异步加载上传列表
-                              _localItems = [];
-                              _loadUploadsAndMerge();
-                            } else if (_selectedCategory == '全部') {
-                              _localItems =
-                                  _buildItemsForCategory(_selectedCategory);
-                              _loadUploadsAndMerge();
-                            } else {
-                              _localItems =
-                                  _buildItemsForCategory(_selectedCategory);
-                            }
-                            // 通过刷新分页重新加载本地数据
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+          ),
+          bottom: TabBar(
+            isScrollable: true,
+            indicatorColor: palette.primaryColor,
+            labelColor: palette.textColor,
+            unselectedLabelColor: palette.textColor.withValues(alpha: 0.6),
+            tabs: tabs.map((c) => Tab(text: c)).toList(),
+            onTap: (index) {
+              final value = tabs[index];
+              setState(() {
+                _selectedCategory = value;
+                if (_selectedCategory == '我的上传') {
+                  _localItems = [];
+                  _loadUploadsAndMerge();
+                } else if (_selectedCategory == '全部') {
+                  _localItems = _buildItemsForCategory(_selectedCategory);
+                  _loadUploadsAndMerge();
+                } else {
+                  _localItems = _buildItemsForCategory(_selectedCategory);
+                }
+              });
+            },
+          ),
+        ),
+        body: Center(
+          child: Container(
+            width: 0.9.sw,
+            child: CustomScrollView(
+              scrollBehavior: MaterialScrollBehavior().copyWith(
+                scrollbars: false,
                 ),
-              ),
+              slivers: [
+                // TabBar 已移动至 AppBar.bottom，实现吸顶
               if (_selectedCategory == '我的上传' && _localItems.isEmpty)
                 SliverToBoxAdapter(
                   child: Center(
@@ -206,7 +170,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                         '正在加载“我的上传”...',
                         style: TextStyle(
                           fontSize: 16.sp,
-                          color: palette.textColor.withOpacity(0.8),
+                            color: palette.textColor.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -221,7 +185,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                         '暂无图片',
                         style: TextStyle(
                           fontSize: 16.sp,
-                          color: palette.textColor.withOpacity(0.8),
+                            color: palette.textColor.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -263,6 +227,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         onPressed: _triggerUpload,
         label: const Text('上传图片'),
         icon: const Icon(Icons.upload),
+      ),
       ),
     );
   }

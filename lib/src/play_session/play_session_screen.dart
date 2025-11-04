@@ -7,6 +7,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:file/file.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -120,6 +121,12 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
   @override
   void initState() {
     super.initState();
+    // 游戏页进入时隐藏状态栏与导航栏，沉浸式体验
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
 
     _startOfPlay = DateTime.now();
 
@@ -137,6 +144,19 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
     //   final adsController = context.read<AdsController?>();
     //   adsController?.preloadAd();
     // }
+  }
+
+  @override
+  void dispose() {
+    // 退出游戏页时恢复显示状态栏与导航栏
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+    );
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    super.dispose();
   }
 
   void showReset() async {
@@ -186,14 +206,14 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
               ),
               if (locked)
                 Positioned.fill(
-                  child: Container(color: Colors.black.withOpacity(0.85)),
+                  child: Container(color: Colors.black.withValues(alpha: 0.85)),
                 ),
               if (locked)
                 Center(
                   child: Icon(
                     Icons.lock,
                     size: 64.sp,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
             ],

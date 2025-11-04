@@ -52,16 +52,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        leading: IconButton(
-          onPressed: () => GoRouter.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new),
-        ),
+        
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
           '历史记录',
           style: TextStyle(
-            fontSize: 28.sp,
             color: palette.textColor,
             fontWeight: FontWeight.bold,
           ),
@@ -108,7 +104,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ? Center(
                       child: Text(
                         '暂无历史记录',
-                        style: TextStyle(color: palette.textColor.withOpacity(0.7)),
+                        style: TextStyle(
+                            color: palette.textColor.withValues(alpha: 0.7)),
                       ),
                     )
                   : ListView.separated(
@@ -160,7 +157,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(color: palette.textColor.withOpacity(0.8)),
+          style: TextStyle(color: palette.textColor.withValues(alpha: 0.8)),
         ),
         SizedBox(width: 8.w),
         DropdownButton<String>(
@@ -193,7 +190,7 @@ class _HistoryTile extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -224,10 +221,12 @@ class _HistoryTile extends StatelessWidget {
                     ),
                     SizedBox(height: 4.w),
                     Text('分类：${entry.photographer.isNotEmpty ? entry.photographer : '未知'}',
-                        style: TextStyle(color: palette.textColor.withOpacity(0.8))),
+                        style: TextStyle(
+                            color: palette.textColor.withValues(alpha: 0.8))),
                     SizedBox(height: 4.w),
                     Text('块数：${entry.gridSize} x ${entry.gridSize}',
-                        style: TextStyle(color: palette.textColor.withOpacity(0.8))),
+                        style: TextStyle(
+                            color: palette.textColor.withValues(alpha: 0.8))),
                     SizedBox(height: 4.w),
                     Text(
                       entry.success

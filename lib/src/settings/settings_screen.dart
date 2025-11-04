@@ -24,18 +24,13 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            GoRouter.of(context).pop();
-          },
-          icon: const Icon(Icons.arrow_back_ios_new),
-        ),
+        
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
           '设置',
           style: TextStyle(
-              fontSize: 28.sp,
+            
               color: palette.textColor,
               fontWeight: FontWeight.bold),
         ),
@@ -105,7 +100,7 @@ class _SettingsLine extends StatelessWidget {
     return ListTile(
       title: Text(
         title,
-        style: TextStyle(fontSize: 18.sp, color: palette.textColor),
+        style: TextStyle(color: palette.textColor),
       ),
       trailing: trailing,
       onTap: onSelected,

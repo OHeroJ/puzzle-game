@@ -19,7 +19,8 @@ import 'src/app_lifecycle/app_lifecycle.dart';
 import 'src/audio/audio_controller.dart';
 import 'src/level_selection/jigsaw_info.dart';
 import 'src/level_selection/level_selection_screen.dart';
-import 'src/main_menu/main_menu_screen.dart';
+// import 'src/main_menu/main_menu_screen.dart';
+import 'src/home_tabs/home_tabs_scaffold.dart';
 import 'src/play_session/play_session_screen.dart';
 import 'src/history/history_screen.dart';
 import 'src/settings/persistence/local_storage_settings_persistence.dart';
@@ -44,11 +45,6 @@ Future<void> main() async {
     );
   });
   WidgetsFlutterBinding.ensureInitialized();
-
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -57,7 +53,12 @@ Future<void> main() async {
       systemNavigationBarDividerColor: Colors.transparent,
     ),
   );
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  // 默认显示状态栏与导航栏（除游戏页外不隐藏）
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+  );
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
     /// Prepare the google_mobile_ads plugin so that the first ad loads
@@ -71,6 +72,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   static final _router = GoRouter(
+    initialLocation: '/play',
     redirect: (context, state) {
       final accepted = SpUtil().getBool('privacyAccepted') ?? false;
       final currentLocation = state.uri.toString();
@@ -79,29 +81,40 @@ class MyApp extends StatelessWidget {
         return '/privacy';
       }
       if (accepted && onPrivacy) {
-        return '/';
+        return '/play';
       }
       return null;
     },
     routes: [
       GoRoute(
-        path: '/',
-        builder: (context, state) =>
-            const MainMenuScreen(key: Key('main menu')),
-      ),
-      GoRoute(
         path: '/privacy',
         builder: (context, state) => const PrivacyConsentScreen(),
       ),
-      GoRoute(
-        path: '/play',
-        builder: (context, state) {
-          return const LevelSelectionScreen(key: Key('level selection'));
-        },
-        // pageBuilder: (context, state) => buildMyTransition<void>(
-        //   child: const LevelSelectionScreen(key: Key('level selection')),
-        //   color: context.watch<Palette>().backgroundMain,
-        // ),
+      ShellRoute(
+        builder: (context, state, child) => HomeTabsScaffold(child: child),
+        routes: [
+          GoRoute(
+            path: '/play',
+            builder: (context, state) =>
+                const LevelSelectionScreen(key: Key('level selection')),
+          ),
+          GoRoute(
+            path: '/history',
+            builder: (context, state) =>
+                const HistoryScreen(key: Key('history')),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) =>
+                const SettingsScreen(key: Key('settings')),
+            routes: [
+              GoRoute(
+                path: 'about',
+                builder: (context, state) => const AboutScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '/play/loading',
@@ -125,20 +138,6 @@ class MyApp extends StatelessWidget {
             color: context.watch<Palette>().backgroundMain,
           );
         },
-      ),
-      GoRoute(
-        path: '/history',
-        builder: (context, state) => const HistoryScreen(key: Key('history')),
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(key: Key('settings')),
-        routes: [
-          GoRoute(
-            path: 'about',
-            builder: (context, state) => const AboutScreen(),
-          ),
-        ],
       ),
     ],
   );
