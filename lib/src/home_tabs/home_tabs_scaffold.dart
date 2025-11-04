@@ -10,9 +10,10 @@ class HomeTabsScaffold extends StatelessWidget {
   const HomeTabsScaffold({super.key, required this.child});
 
   int _indexForLocation(String location) {
-    if (location.startsWith('/settings')) return 2;
-    if (location.startsWith('/history')) return 1;
-    // 默认拼图列表
+    if (location.startsWith('/settings')) return 3;
+    if (location.startsWith('/history')) return 2;
+    if (location.startsWith('/uploads')) return 1;
+    // 默认拼图列表（/play）
     return 0;
   }
 
@@ -33,15 +34,19 @@ class HomeTabsScaffold extends StatelessWidget {
               context.go('/play');
               break;
             case 1:
-              context.go('/history');
+              context.go('/uploads');
               break;
             case 2:
+              context.go('/history');
+              break;
+            case 3:
               context.go('/settings');
               break;
           }
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.grid_view), label: '拼图'),
+          NavigationDestination(icon: Icon(Icons.upload_file), label: '上传'),
           NavigationDestination(icon: Icon(Icons.history), label: '历史'),
           NavigationDestination(icon: Icon(Icons.settings), label: '设置'),
         ],

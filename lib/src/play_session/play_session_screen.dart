@@ -2,9 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:file/file.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +43,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
   bool _sessionCompleted = false;
 
   late DateTime _startOfPlay;
+  late final JigsawGame _game;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +72,14 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           actions: [
             IconButton(
               onPressed: () {
+                _showBackgroundPicker(settingsController, palette);
+              },
+              icon:
+                  Icon(Icons.color_lens, size: 28.sp, color: palette.textColor),
+              tooltip: '拼图背景色',
+            ),
+            IconButton(
+              onPressed: () {
                 showReset();
               },
               icon: Icon(Icons.refresh, size: 30.sp, color: palette.textColor),
@@ -84,35 +93,23 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
             SizedBox(width: 16.w),
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
+        body: Container(
                 child: Stack(
                   children: [
-                    GameWidget(
-                      loadingBuilder: (context) => Center(
-                        child: CircularProgressIndicator(
-                          color: palette.primaryColor,
-                        ),
-                      ),
-                      game: JigsawGame(
-                        widget.level,
-                        settingsController.soundsOn.value,
-                        () {
-                          playerWon();
-                        },
-                      ),
-                      backgroundBuilder: (context) =>
-                          Container(color: palette.backgroundMain),
+              ValueListenableBuilder<Color>(
+                valueListenable: settingsController.gameBackgroundColor,
+                builder: (context, bg, _) => GameWidget(
+                  loadingBuilder: (context) => Center(
+                    child: CircularProgressIndicator(
+                      color: bg,
+                    ),
+                  ),
+                  game: _game,
+                  backgroundBuilder: (context) => Container(color: bg),
+                ),
                     ),
                   ],
-                ),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            SizedBox(height: 8.h),
-          ],
+          ),
         ),
       ),
     );
@@ -129,6 +126,17 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
     ]);
 
     _startOfPlay = DateTime.now();
+
+    // 保持 Game 实例稳定，避免因界面重建而重置拼图进度
+    final settingsController =
+        Provider.of<SettingsController>(context, listen: false);
+    _game = JigsawGame(
+      widget.level,
+      settingsController.soundsOn.value,
+      () {
+        playerWon();
+      },
+    );
 
     // 记录开始一局拼图到历史
     PuzzleHistoryStore().startPuzzle(
@@ -178,8 +186,10 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
     ).show();
   }
 
-  void showImage() async {
-    File file = await DefaultCacheManager().getSingleFile(widget.level.image);
+  Future<void> showImage() async {
+    final imageProvider = await _getImage(widget.level.image);
+    if (imageProvider == null) return;
+
     final locked = !_sessionCompleted;
     AwesomeDialog(
       width: 400.h,
@@ -197,31 +207,99 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: locked
-                    ? ImageFiltered(
-                        imageFilter:
-                            ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                        child: Image.file(file, fit: BoxFit.contain),
-                      )
-                    : Image.file(file, fit: BoxFit.contain),
-              ),
-              if (locked)
-                Positioned.fill(
-                  child: Container(color: Colors.black.withValues(alpha: 0.85)),
-                ),
-              if (locked)
-                Center(
-                  child: Icon(
-                    Icons.lock,
-                    size: 64.sp,
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-                ),
+                  child: Image(image: imageProvider, fit: BoxFit.contain)),
             ],
           ),
         ),
       ),
     ).show();
+  }
+
+  /// 根据路径格式返回对应的 ImageProvider：
+  /// - `assets/` 开头：`AssetImage`
+  /// - `http` 或 `https` 开头：`NetworkImage`（通过缓存）
+  /// - 其他：`FileImage`（用于本地文件）
+  Future<ImageProvider?> _getImage(String path) async {
+    if (path.startsWith('assets/')) {
+      return AssetImage(path);
+    } else if (path.startsWith('http')) {
+      // 网络图片使用缓存，避免重复下载
+      final file = await DefaultCacheManager().getSingleFile(path);
+      return FileImage(file);
+    } else {
+      // 默认按本地文件处理
+      final file = File(path);
+      if (await file.exists()) {
+        return FileImage(file);
+      } else {
+        _log.warning('本地图片不存在: $path');
+        return null;
+      }
+    }
+  }
+
+  void _showBackgroundPicker(SettingsController settings, Palette palette) {
+    final options = <Color>[
+      const Color(0xFFF0F2F5), // 默认浅灰
+      Colors.white,
+      Colors.black12,
+      const Color(0xFFE3F2FD), // 淡蓝
+      const Color(0xFFFFF3E0), // 淡橙
+      const Color(0xFFE8F5E9), // 淡绿
+    ];
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: palette.backgroundMain,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '选择拼图背景色',
+                style: TextStyle(
+                  color: palette.textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.sp,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Wrap(
+                spacing: 10.w,
+                runSpacing: 8.h,
+                children: options.map((c) {
+                  final selected = c == settings.gameBackgroundColor.value;
+                  return ChoiceChip(
+                    label: Container(
+                      width: 24,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: c,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.black12),
+                      ),
+                    ),
+                    selected: selected,
+                    selectedColor: c,
+                    backgroundColor: c,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onSelected: (_) {
+                      settings.setGameBackgroundColor(c);
+                      Navigator.of(ctx).pop();
+                    },
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 10.h),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> playerWon() async {
@@ -280,10 +358,5 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
     );
 
     // GoRouter.of(context).go('/play/won', extra: {'score': score});
-  }
-
-  Future<File> _getImage() async {
-    File file = await DefaultCacheManager().getSingleFile(widget.level.image);
-    return file;
   }
 }

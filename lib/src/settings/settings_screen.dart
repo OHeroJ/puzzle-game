@@ -67,6 +67,51 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           SizedBox(height: 20),
+          Text(
+            '拼图背景色',
+            style: TextStyle(
+              color: palette.textColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 12),
+          ValueListenableBuilder<Color>(
+            valueListenable: settings.gameBackgroundColor,
+            builder: (context, current, _) {
+              final options = <Color>[
+                const Color(0xFFF0F2F5), // 默认浅灰
+                Colors.white,
+                Colors.black12,
+                const Color(0xFFE3F2FD), // 淡蓝
+                const Color(0xFFFFF3E0), // 淡橙
+                const Color(0xFFE8F5E9), // 淡绿
+              ];
+              return Wrap(
+                spacing: 10.w,
+                runSpacing: 8.h,
+                children: options.map((c) {
+                  final selected = c.value == current.value;
+                  return ChoiceChip(
+                    label: Container(
+                      width: 24,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: c,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.black12),
+                      ),
+                    ),
+                    selected: selected,
+                    selectedColor: c,
+                    backgroundColor: c,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onSelected: (_) => settings.setGameBackgroundColor(c),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+          SizedBox(height: 20),
         ],
       ),
     );

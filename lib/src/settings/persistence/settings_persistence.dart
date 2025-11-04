@@ -15,6 +15,9 @@ abstract class SettingsPersistence {
 
   Future<bool> getSoundsOn();
 
+  /// 获取游戏页面背景色（ARGB int），为空则使用默认值
+  Future<int?> getGameBackgroundColor();
+
   Future<void> saveMusicOn(bool value);
 
   Future<void> saveMuted(bool value);
@@ -22,4 +25,7 @@ abstract class SettingsPersistence {
   Future<void> savePlayerName(String value);
 
   Future<void> saveSoundsOn(bool value);
+
+  /// 保存游戏页面背景色（ARGB int）
+  Future<void> saveGameBackgroundColor(int value);
 }

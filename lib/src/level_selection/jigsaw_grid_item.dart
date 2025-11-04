@@ -1,5 +1,5 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:puzzle/src/level_selection/jigsaw_info.dart';
 import 'package:puzzle/src/level_selection/piece_image.dart';
 import 'package:provider/provider.dart';
@@ -14,12 +14,14 @@ class JigsawGridItem extends StatelessWidget {
     this.locked = false,
     this.showDelete = false,
     this.onDelete,
+    this.onViewHistory,
   }) : super(key: key);
   final JigsawInfo info;
   final GestureTapCallback? onTap;
   final bool locked;
   final bool showDelete;
   final VoidCallback? onDelete;
+  final VoidCallback? onViewHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class JigsawGridItem extends StatelessWidget {
             color: Colors.black.withValues(alpha: 0.05),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -41,70 +43,143 @@ class JigsawGridItem extends StatelessWidget {
         onTap: onTap,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Positioned.fill(
-                child: locked
-                    ? ImageFiltered(
-                        imageFilter:
-                            ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                        child: PieceImage(pictureUrl: info.smallimage),
-                      )
-                    : PieceImage(pictureUrl: info.smallimage),
-              ),
-              if (locked) ...[
-                Positioned.fill(
-                  child: IgnorePointer(
-                    ignoring: true,
-                    child: Center(
-                      child: Icon(
-                        Icons.lock,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        size: 36,
-                      ),
+              // 顶部大图，参考历史页使用 16:9 比例
+              Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: PieceImage(
+                      pictureUrl: info.smallimage,
+                      unlocked: !locked,
                     ),
                   ),
-                ),
-              ],
-              if (showDelete)
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: onDelete,
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
+                  if (onViewHistory != null)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: onViewHistory,
                           borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(
+                              Icons.history,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
                         ),
-                        padding: const EdgeInsets.all(4),
-                        child: const Icon(Icons.delete,
-                            color: Colors.white, size: 20),
                       ),
                     ),
-                  ),
-                ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 4.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                  ),
-                  child: Text(
-                    '@${info.photographer}',
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
+                  if (locked)
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        ignoring: true,
+                        child: Center(
+                          child: Icon(
+                            Icons.lock,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            size: 36,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (showDelete)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: onDelete,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(Icons.delete,
+                                color: Colors.white, size: 20),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              // 底部信息与按钮区
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 不显示图片名称
+                    Wrap(
+                      spacing: 10.w,
+                      runSpacing: 8.w,
+                      children: [
+                        Chip(
+                          label: Text(
+                            info.photographer.isNotEmpty
+                                ? info.photographer
+                                : '未知分类',
+                            style: TextStyle(color: palette.textColor),
+                          ),
+                          backgroundColor: palette.lightGray,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        Chip(
+                          label: Text(
+                            '${info.gridSize}×${info.gridSize}',
+                            style: TextStyle(color: palette.textColor),
+                          ),
+                          backgroundColor: palette.lightGray,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        if (locked)
+                          Chip(
+                            label: Text(
+                              '未解锁',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            backgroundColor:
+                                Colors.orange.withValues(alpha: 0.1),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: onTap,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: palette.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                        ),
+                        child: const Text('开始'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 import '../style/palette.dart';
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+  final int? filterId;
+  const HistoryScreen({super.key, this.filterId});
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
@@ -40,7 +41,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       '全部',
       ...{..._entries.map((e) => e.photographer).where((e) => e.isNotEmpty)}
     ];
-    final filtered = _entries.where((e) {
+    var filtered = _entries.where((e) {
       final statusOk = _statusFilter == '全部'
           ? true
           : (_statusFilter == '进行中' ? !e.success : e.success);
@@ -48,6 +49,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _categoryFilter == '全部' ? true : (e.photographer == _categoryFilter);
       return statusOk && categoryOk;
     }).toList();
+    // 如果带入了指定图片的过滤 id，仅显示该图片的历史
+    if (widget.filterId != null) {
+      filtered = filtered.where((e) => e.id == widget.filterId).toList();
+    }
+    // 按时间倒序：已完成用 completedAt，否则用 startedAt
+    filtered.sort((a, b) {
+      final aTime = a.completedAt != null
+          ? DateTime.parse(a.completedAt!)
+          : DateTime.parse(a.startedAt);
+      final bTime = b.completedAt != null
+          ? DateTime.parse(b.completedAt!)
+          : DateTime.parse(b.startedAt);
+      return bTime.compareTo(aTime);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -63,6 +78,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         actions: [
           IconButton(
+            onPressed: () => _showFilterSheet(categories),
+            icon: Icon(Icons.filter_list, color: palette.textColor),
+            tooltip: '筛选',
+          ),
+          IconButton(
             onPressed: () async {
               await _store.clear();
               await _load();
@@ -73,105 +93,214 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
       backgroundColor: palette.backgroundMain,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildFilter(
-                  palette,
-                  label: '状态：',
-                  value: _statusFilter,
-                  items: const ['全部', '进行中', '已完成'],
-                  onChanged: (v) => setState(() => _statusFilter = v ?? '全部'),
-                ),
-                SizedBox(width: 12.w),
-                _buildFilter(
-                  palette,
-                  label: '分类：',
-                  value: _categoryFilter,
-                  items: categories,
-                  onChanged: (v) => setState(() => _categoryFilter = v ?? '全部'),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            Expanded(
-              child: filtered.isEmpty
-                  ? Center(
-                      child: Text(
-                        '暂无历史记录',
-                        style: TextStyle(
-                            color: palette.textColor.withValues(alpha: 0.7)),
-                      ),
-                    )
-                  : ListView.separated(
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) => SizedBox(height: 8.h),
-                      itemBuilder: (context, index) {
-                        final e = filtered[index];
-                        return _HistoryTile(
-                            entry: e,
-                            onStart: () async {
-                              final info = e.source == 'asset'
-                                  ? JigsawInfo.fromAsset(
-                                      e.image,
-                                      title: e.title,
-                                      photographer: e.photographer,
-                                    )
-                                  : () {
-                                      final i =
-                                          JigsawInfo(e.image, e.image, e.title);
-                                      i.photographer = e.photographer;
-                                      i.id =
-                                          JigsawInfo.stableIdFromPath(e.image);
-                                      return i;
-                                    }();
-                              info.gridSize = e.gridSize;
-
-                              final entries = await PuzzleHistoryStore().load();
-                              final unlocked = entries
-                                  .any((e) => e.id == info.id && e.success);
-                              info.unlocked = unlocked;
-
-                              GoRouter.of(context)
-                                  .push('/play/loading', extra: info);
-                            });
-                      },
+      body: Column(
+        children: [
+          
+          Expanded(
+            child: filtered.isEmpty
+                ? Center(
+                    child: Text(
+                      '暂无历史记录',
+                      style: TextStyle(
+                          color: palette.textColor.withValues(alpha: 0.7)),
                     ),
-            ),
-          ],
-        ),
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.all(12),
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                    itemBuilder: (context, index) {
+                      final e = filtered[index];
+                      return _HistoryTile(
+                          entry: e,
+                          onStart: () async {
+                            final info = e.source == 'asset'
+                                ? JigsawInfo.fromAsset(
+                                    e.image,
+                                    title: e.title,
+                                    photographer: e.photographer,
+                                  )
+                                : () {
+                                    final i =
+                                        JigsawInfo(e.image, e.image, e.title);
+                                    i.photographer = e.photographer;
+                                    i.id = JigsawInfo.stableIdFromPath(e.image);
+                                    return i;
+                                  }();
+                            info.gridSize = e.gridSize;
+
+                            final entries = await PuzzleHistoryStore().load();
+                            final unlocked = entries
+                                .any((e) => e.id == info.id && e.success);
+                            info.unlocked = unlocked;
+
+                            GoRouter.of(context)
+                                .push('/play/loading', extra: info);
+                          });
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildFilter(Palette palette,
-      {required String label,
-      required String value,
-      required List<String> items,
-      required void Function(String?) onChanged}) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: palette.textColor.withValues(alpha: 0.8)),
-        ),
-        SizedBox(width: 8.w),
-        DropdownButton<String>(
-          value: value,
-          dropdownColor: palette.backgroundMain,
-          items: items
-              .map((c) => DropdownMenuItem<String>(
-                    value: c,
-                    child: Text(c, style: TextStyle(color: palette.textColor)),
-                  ))
-              .toList(),
-          onChanged: onChanged,
-        )
-      ],
+  void _showFilterSheet(List<String> categories) {
+    final palette = context.read<Palette>();
+    String statusTemp = _statusFilter;
+    String categoryTemp = _categoryFilter;
+    final statuses = const ['全部', '进行中', '已完成'];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: palette.backgroundMain,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16.w,
+                right: 16.w,
+                top: 12.h,
+                bottom: MediaQuery.of(context).viewPadding.bottom + 16.h,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: palette.lightGray,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    '筛选',
+                    style: TextStyle(
+                      color: palette.textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text('状态',
+                      style: TextStyle(
+                          color: palette.textColor.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: 8.h),
+                  Wrap(
+                    spacing: 10.w,
+                    runSpacing: 8.h,
+                    children: [
+                      ...statuses.map((s) {
+                        final selected = statusTemp == s;
+                        return ChoiceChip(
+                          label: Text(
+                            s,
+                            style: TextStyle(
+                              color:
+                                  selected ? Colors.white : palette.textColor,
+                              fontWeight:
+                                  selected ? FontWeight.w600 : FontWeight.w400,
+                            ),
+                          ),
+                          selected: selected,
+                          selectedColor: palette.primaryColor,
+                          backgroundColor: palette.lightGray,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          onSelected: (_) =>
+                              setModalState(() => statusTemp = s),
+                        );
+                      }),
+                    ],
+                  ),
+                  SizedBox(height: 12.h),
+                  Text('分类',
+                      style: TextStyle(
+                          color: palette.textColor.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: 8.h),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: categories.map((c) {
+                        final selected = categoryTemp == c;
+                        return Padding(
+                          padding: EdgeInsets.only(right: 8.w),
+                          child: ChoiceChip(
+                            label: Text(
+                              c,
+                              style: TextStyle(
+                                color:
+                                    selected ? Colors.white : palette.textColor,
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                            selected: selected,
+                            selectedColor: palette.primaryColor,
+                            backgroundColor: palette.lightGray,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            onSelected: (_) =>
+                                setModalState(() => categoryTemp = c),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setModalState(() {
+                            statusTemp = '全部';
+                            categoryTemp = '全部';
+                          });
+                        },
+                        child: Text('重置',
+                            style: TextStyle(color: palette.textColor)),
+                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _statusFilter = statusTemp;
+                            _categoryFilter = categoryTemp;
+                          });
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: palette.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10.h, horizontal: 16.w),
+                        ),
+                        child: const Text('应用'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -199,53 +328,78 @@ class _HistoryTile extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              width: 120.w,
-              height: 80.w,
-              child: PieceImage(pictureUrl: entry.image),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        '分类：${entry.photographer.isNotEmpty ? entry.photographer : '未知'}',
-                        style: TextStyle(
-                            color: palette.textColor.withValues(alpha: 0.8))),
-                    SizedBox(height: 4.w),
-                    Text('块数：${entry.gridSize} x ${entry.gridSize}',
-                        style: TextStyle(
-                            color: palette.textColor.withValues(alpha: 0.8))),
-                    SizedBox(height: 4.w),
-                    Text(
-                      entry.success
-                          ? '已完成，用时：${(entry.elapsedMs ?? 0) / 1000}s'
-                          : '进行中',
-                      style: TextStyle(
-                        color: entry.success ? Colors.green : Colors.orange,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
+            // 顶部大图，采用移动端友好的 16:9 比例
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: PieceImage(
+                pictureUrl: entry.image,
+                unlocked: entry.success,
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
-              child: ElevatedButton(
-                onPressed: onStart,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: palette.primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 10.w,
+                    runSpacing: 8.w,
+                    children: [
+                      Chip(
+                        label: Text(
+                          entry.photographer.isNotEmpty
+                              ? entry.photographer
+                              : '未知分类',
+                          style: TextStyle(color: palette.textColor),
+                        ),
+                        backgroundColor: palette.lightGray,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      Chip(
+                        label: Text(
+                          '${entry.gridSize}×${entry.gridSize}',
+                          style: TextStyle(color: palette.textColor),
+                        ),
+                        backgroundColor: palette.lightGray,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      Chip(
+                        label: Text(
+                          entry.success
+                              ? '已完成 ${(entry.elapsedMs ?? 0) / 1000}s'
+                              : '进行中',
+                          style: TextStyle(
+                            color: entry.success ? Colors.green : Colors.orange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        backgroundColor: entry.success
+                            ? Colors.green.withValues(alpha: 0.1)
+                            : Colors.orange.withValues(alpha: 0.1),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ],
                   ),
-                ),
-                child: const Text('开始'),
+                  SizedBox(height: 12.h),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: onStart,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: palette.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                      ),
+                      child: const Text('开始'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

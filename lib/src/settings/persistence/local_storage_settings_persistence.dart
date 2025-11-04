@@ -59,4 +59,16 @@ class LocalStorageSettingsPersistence extends SettingsPersistence {
     final prefs = await instanceFuture;
     await prefs.setBool('soundsOn', value);
   }
+
+  @override
+  Future<int?> getGameBackgroundColor() async {
+    final prefs = await instanceFuture;
+    return prefs.getInt('gameBackgroundColor');
+  }
+
+  @override
+  Future<void> saveGameBackgroundColor(int value) async {
+    final prefs = await instanceFuture;
+    await prefs.setInt('gameBackgroundColor', value);
+  }
 }

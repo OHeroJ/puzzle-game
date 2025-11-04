@@ -31,6 +31,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
   late final LocalImageService _localService;
   late final UploadsStore _uploadsStore;
   Set<int> _completedIds = <int>{};
+  // 记录上传图片的 id，用于在“全部”中识别上传项并取消加锁
+  Set<int> _uploadIds = <int>{};
   VoidCallback? _historyListener;
 
   @override
@@ -89,6 +91,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
     final uploads = await _uploadsStore.toJigsaws();
     if (mounted) {
       setState(() {
+        _uploadIds = uploads.map((e) => e.id).toSet();
         if (_selectedCategory == '我的上传') {
           _localItems = uploads;
         } else if (_selectedCategory == '全部') {
@@ -185,26 +188,27 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                 ),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 50 / 33,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 1.sw > 500 ? 4 : 2,
-                  ),
+                sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final item = _localItems[index];
-                      return JigsawGridItem(
-                        info: item,
-                        locked: !_completedIds.contains(item.id),
-                        showDelete: _selectedCategory == '我的上传',
-                        onDelete: _selectedCategory == '我的上传'
-                            ? () => _onDeleteUpload(item)
-                            : null,
-                        onTap: () {
-                          _showDetailsDialog(context, item, palette);
-                        },
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: JigsawGridItem(
+                          info: item,
+                          // 上传的图片无需加锁；其他图片根据通关记录决定
+                          locked: _uploadIds.contains(item.id)
+                              ? false
+                              : !_completedIds.contains(item.id),
+                          showDelete: false,
+                          onDelete: null,
+                          onTap: () {
+                            _showDetailsDialog(context, item, palette);
+                          },
+                          onViewHistory: () {
+                            GoRouter.of(context).push('/history/image', extra: item.id);
+                          },
+                        ),
                       );
                     },
                     childCount: _localItems.length,
@@ -215,13 +219,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          onPressed: _triggerUpload,
-          label: const Text('上传图片'),
-          icon: const Icon(Icons.upload),
-        ),
+      // 上传入口已迁移至“上传”标签页
       ),
     );
   }
@@ -371,25 +369,5 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
     );
   }
 
-  Future<void> _triggerUpload() async {
-    final entry = await _uploadsStore.pickAndSave();
-    if (entry != null) {
-      await _loadUploadsAndMerge();
-      // 如果当前不在“我的上传”，提示用户已添加
-      if (mounted && _selectedCategory != '我的上传') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已添加到“我的上传”：${entry.title}')),
-        );
-      }
-    }
-  }
-
-  Future<void> _onDeleteUpload(JigsawInfo item) async {
-    await _uploadsStore.remove(item.id);
-    await _loadUploadsAndMerge();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已删除：${item.title}')),
-    );
-  }
+  // 上传与删除已迁移至“上传”标签页
 }

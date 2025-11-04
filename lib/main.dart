@@ -21,8 +21,10 @@ import 'src/level_selection/jigsaw_info.dart';
 import 'src/level_selection/level_selection_screen.dart';
 // import 'src/main_menu/main_menu_screen.dart';
 import 'src/home_tabs/home_tabs_scaffold.dart';
+import 'src/uploads/uploads_screen.dart';
 import 'src/play_session/play_session_screen.dart';
 import 'src/history/history_screen.dart';
+import 'src/history/image_history_screen.dart';
 import 'src/settings/persistence/local_storage_settings_persistence.dart';
 import 'src/settings/persistence/settings_persistence.dart';
 import 'src/settings/settings.dart';
@@ -99,9 +101,21 @@ class MyApp extends StatelessWidget {
                 const LevelSelectionScreen(key: Key('level selection')),
           ),
           GoRoute(
+            path: '/uploads',
+            builder: (context, state) => const UploadsScreen(),
+          ),
+          GoRoute(
             path: '/history',
-            builder: (context, state) =>
-                const HistoryScreen(key: Key('history')),
+            builder: (context, state) => HistoryScreen(
+              key: const Key('history'),
+              filterId: state.extra is int ? state.extra as int : null,
+            ),
+          ),
+          GoRoute(
+            path: '/history/image',
+            builder: (context, state) => ImageHistoryScreen(
+              imageId: state.extra as int,
+            ),
           ),
           GoRoute(
             path: '/settings',

@@ -31,7 +31,8 @@ class PieceImage extends StatelessWidget {
       progress?.call();
       return _buildResult(Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10), topRight: Radius.circular(10)),
           image: DecorationImage(
             image: AssetImage(pictureUrl),
             fit: BoxFit.cover,
@@ -48,7 +49,8 @@ class PieceImage extends StatelessWidget {
         progress?.call();
         return _buildResult(Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
             image:
                 DecorationImage(image: MemoryImage(bytes), fit: BoxFit.cover),
           ),
@@ -68,7 +70,8 @@ class PieceImage extends StatelessWidget {
         progress?.call();
         return _buildResult(Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
             image: DecorationImage(image: FileImage(file), fit: BoxFit.cover),
           ),
         ));
@@ -85,7 +88,8 @@ class PieceImage extends StatelessWidget {
           progress?.call();
           return Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10), topRight: Radius.circular(10)),
               image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
             ),
           );
