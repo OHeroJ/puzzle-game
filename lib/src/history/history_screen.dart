@@ -95,7 +95,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       backgroundColor: palette.backgroundMain,
       body: Column(
         children: [
-          
           Expanded(
             child: filtered.isEmpty
                 ? Center(

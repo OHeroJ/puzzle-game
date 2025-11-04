@@ -206,7 +206,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                             _showDetailsDialog(context, item, palette);
                           },
                           onViewHistory: () {
-                            GoRouter.of(context).push('/history/image', extra: item.id);
+                            GoRouter.of(context)
+                                .push('/history/image', extra: item.id);
                           },
                         ),
                       );
@@ -217,9 +218,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
               ),
               SliverToBoxAdapter(child: SizedBox(height: 30.h)),
             ],
+          ),
         ),
-      ),
-      // 上传入口已迁移至“上传”标签页
+        // 上传入口已迁移至“上传”标签页
       ),
     );
   }
@@ -357,10 +358,9 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
           children: [
             Text(
               "${num * num}",
-                style: TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                  color:
-                      gridSizeValue == num ? Colors.white : palette.textColor,
+                color: gridSizeValue == num ? Colors.white : palette.textColor,
               ),
             ),
           ],

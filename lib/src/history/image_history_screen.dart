@@ -30,9 +30,7 @@ class _ImageHistoryScreenState extends State<ImageHistoryScreen> {
     setState(() => _loading = true);
     final store = PuzzleHistoryStore();
     final all = await store.load();
-    final filtered = all
-        .where((e) => e.id == widget.imageId)
-        .toList()
+    final filtered = all.where((e) => e.id == widget.imageId).toList()
       ..sort((a, b) {
         final aTime = a.completedAt != null
             ? DateTime.parse(a.completedAt!)

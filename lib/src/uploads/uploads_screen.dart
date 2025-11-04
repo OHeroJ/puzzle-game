@@ -117,7 +117,8 @@ class _UploadsScreenState extends State<UploadsScreen> {
                         GoRouter.of(context).push('/play/loading', extra: item);
                       },
                       onViewHistory: () {
-                        GoRouter.of(context).push('/history/image', extra: item.id);
+                        GoRouter.of(context)
+                            .push('/history/image', extra: item.id);
                       },
                     ),
                   );

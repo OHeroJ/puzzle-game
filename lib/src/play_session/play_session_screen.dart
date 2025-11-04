@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:io';
-import 'dart:ui' as ui;
+// import 'dart:ui' as ui;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -34,9 +34,9 @@ class PlaySessionScreen extends StatefulWidget {
 class _PlaySessionScreenState extends State<PlaySessionScreen> {
   static final _log = Logger('PlaySessionScreen');
 
-  static const _celebrationDuration = Duration(milliseconds: 2000);
+  // static const _celebrationDuration = Duration(milliseconds: 2000);
 
-  static const _preCelebrationDuration = Duration(milliseconds: 500);
+  // static const _preCelebrationDuration = Duration(milliseconds: 500);
 
   bool _duringCelebration = false;
   bool isLoading = true;
@@ -94,8 +94,8 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           ],
         ),
         body: Container(
-                child: Stack(
-                  children: [
+          child: Stack(
+            children: [
               ValueListenableBuilder<Color>(
                 valueListenable: settingsController.gameBackgroundColor,
                 builder: (context, bg, _) => GameWidget(
@@ -107,8 +107,8 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                   game: _game,
                   backgroundBuilder: (context) => Container(color: bg),
                 ),
-                    ),
-                  ],
+              ),
+            ],
           ),
         ),
       ),
@@ -190,7 +190,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
     final imageProvider = await _getImage(widget.level.image);
     if (imageProvider == null) return;
 
-    final locked = !_sessionCompleted;
+    // final locked = !_sessionCompleted;
     AwesomeDialog(
       width: 400.h,
       context: context,

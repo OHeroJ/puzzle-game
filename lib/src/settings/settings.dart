@@ -42,10 +42,8 @@ class SettingsController {
       _persistence.getSoundsOn().then((value) => soundsOn.value = value),
       _persistence.getMusicOn().then((value) => musicOn.value = false),
       _persistence.getPlayerName().then((value) => playerName.value = value),
-      _persistence
-          .getGameBackgroundColor()
-          .then((value) => gameBackgroundColor.value =
-              value != null ? Color(value) : const Color(0xFFF0F2F5)),
+      _persistence.getGameBackgroundColor().then((value) => gameBackgroundColor
+          .value = value != null ? Color(value) : const Color(0xFFF0F2F5)),
     ]);
   }
 

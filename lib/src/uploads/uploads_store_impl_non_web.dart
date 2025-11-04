@@ -20,7 +20,8 @@ class UploadsStorePlatform {
   }
 
   Future<void> _save(List<UploadEntry> data) async {
-    await SpUtil().setJSON(UploadsStore.spKey, data.map((e) => e.toJson()).toList());
+    await SpUtil()
+        .setJSON(UploadsStore.spKey, data.map((e) => e.toJson()).toList());
   }
 
   Future<UploadEntry?> pickAndSave({String category = '我的上传'}) async {
@@ -78,7 +79,8 @@ class UploadsStorePlatform {
     if (idx >= 0) {
       final entry = items[idx];
       // 如果多个记录共享同一个文件路径，仅移除记录，不删除文件
-      final samePathCount = items.where((e) => e.pathOrData == entry.pathOrData).length;
+      final samePathCount =
+          items.where((e) => e.pathOrData == entry.pathOrData).length;
       if (entry.storageType == 'file' && samePathCount <= 1) {
         final f = File(entry.pathOrData);
         if (f.existsSync()) {
