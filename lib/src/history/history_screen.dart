@@ -36,23 +36,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    final categories = ['全部', ...{
-      ..._entries.map((e) => e.photographer).where((e) => e.isNotEmpty)
-    }];
+    final categories = [
+      '全部',
+      ...{..._entries.map((e) => e.photographer).where((e) => e.isNotEmpty)}
+    ];
     final filtered = _entries.where((e) {
       final statusOk = _statusFilter == '全部'
           ? true
           : (_statusFilter == '进行中' ? !e.success : e.success);
-      final categoryOk = _categoryFilter == '全部'
-          ? true
-          : (e.photographer == _categoryFilter);
+      final categoryOk =
+          _categoryFilter == '全部' ? true : (e.photographer == _categoryFilter);
       return statusOk && categoryOk;
     }).toList();
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
@@ -116,7 +115,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         return _HistoryTile(
                             entry: e,
                             onStart: () async {
-                          final info = e.source == 'asset'
+                              final info = e.source == 'asset'
                                   ? JigsawInfo.fromAsset(
                                       e.image,
                                       title: e.title,
@@ -130,15 +129,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           JigsawInfo.stableIdFromPath(e.image);
                                       return i;
                                     }();
-                          info.gridSize = e.gridSize;
+                              info.gridSize = e.gridSize;
 
                               final entries = await PuzzleHistoryStore().load();
                               final unlocked = entries
                                   .any((e) => e.id == info.id && e.success);
-                              info.unlocked = unlocked;   
-                          
-                          GoRouter.of(context).push('/play/loading', extra: info);
-                        });
+                              info.unlocked = unlocked;
+
+                              GoRouter.of(context)
+                                  .push('/play/loading', extra: info);
+                            });
                       },
                     ),
             ),
@@ -213,14 +213,7 @@ class _HistoryTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.title.isNotEmpty ? entry.title : '未命名',
-                      style: TextStyle(
-                        color: palette.textColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4.w),
-                    Text('分类：${entry.photographer.isNotEmpty ? entry.photographer : '未知'}',
+                        '分类：${entry.photographer.isNotEmpty ? entry.photographer : '未知'}',
                         style: TextStyle(
                             color: palette.textColor.withValues(alpha: 0.8))),
                     SizedBox(height: 4.w),

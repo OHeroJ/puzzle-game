@@ -24,15 +24,12 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        
         centerTitle: true,
         backgroundColor: palette.backgroundMain,
         title: Text(
           '设置',
-          style: TextStyle(
-            
-              color: palette.textColor,
-              fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: palette.textColor, fontWeight: FontWeight.bold),
         ),
       ),
       backgroundColor: palette.backgroundMain,

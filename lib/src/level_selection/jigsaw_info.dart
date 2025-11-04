@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+
 /// id : ""
 /// difficulty : ""
 /// pictureUrl : ""
@@ -19,11 +20,9 @@ class JigsawInfo {
   JigsawInfo(
     this.image,
     this.smallimage,
-    this.title,
-    {
+    this.title, {
     this.unlocked = false,
-  }
-  );
+  });
 
   JigsawInfo.fromJson(dynamic json) {
     id = json['id'];
@@ -37,7 +36,8 @@ class JigsawInfo {
   /// 使用本地资源构造一个拼图信息。
   /// [path] 为资源路径，如 `assets/images/xxx.png`。
   /// [title] 作为图片标题显示；[photographer] 可作为分类或作者名显示。
-  JigsawInfo.fromAsset(String path, {String title = '', String photographer = ''}) {
+  JigsawInfo.fromAsset(String path,
+      {String title = '', String photographer = ''}) {
     // 使用 MD5 的前 8 位生成稳定 ID，避免 hashCode 在不同运行环境下不稳定
     // 依赖 crypto 包
     // ignore: prefer_interpolation_to_compose_strings

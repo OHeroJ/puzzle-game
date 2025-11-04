@@ -51,9 +51,9 @@ class PrivacyConsentScreen extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 700),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: BoxDecoration(
-              color: palette.backgroundMain.withValues(alpha: 0.95),
+            color: palette.backgroundMain.withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: palette.textColor.withValues(alpha: 0.2)),
+            border: Border.all(color: palette.textColor.withValues(alpha: 0.2)),
             boxShadow: const [
               BoxShadow(
                   color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
@@ -75,7 +75,8 @@ class PrivacyConsentScreen extends StatelessWidget {
               Text(
                 '为保障您的合法权益。请您详细阅读并同意后继续使用。您可点击下方“查看完整隐私政策”。',
                 style: TextStyle(
-                  fontSize: 16, color: palette.textColor.withValues(alpha: 0.85)),
+                    fontSize: 16,
+                    color: palette.textColor.withValues(alpha: 0.85)),
               ),
               const SizedBox(height: 8),
               TextButton(

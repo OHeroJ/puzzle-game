@@ -59,8 +59,8 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
             },
           ),
           centerTitle: true,
-        backgroundColor: palette.backgroundMain,
-        title: Text(
+          backgroundColor: palette.backgroundMain,
+          title: Text(
             '拼图',
             style: TextStyle(
               fontSize: 28.sp,
@@ -199,7 +199,8 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
               Positioned.fill(
                 child: locked
                     ? ImageFiltered(
-                        imageFilter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                        imageFilter:
+                            ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                         child: Image.file(file, fit: BoxFit.contain),
                       )
                     : Image.file(file, fit: BoxFit.contain),

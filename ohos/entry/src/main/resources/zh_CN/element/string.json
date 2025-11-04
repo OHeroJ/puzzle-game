@@ -11,6 +11,14 @@
     {
       "name": "EntryAbility_label",
       "value": "有趣拼图"
+    },
+    {
+      "name": "background_running_reasom",
+      "value": ""
+    },
+    {
+      "name": "background_running_reason",
+      "value": "后台运行"
     }
   ]
 }

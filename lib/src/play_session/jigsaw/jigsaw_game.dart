@@ -44,7 +44,8 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
       final base64Part = jigsawInfo.image.split(',').last;
       final bytes = base64Decode(base64Part);
       image = await getBytesImage(bytes);
-    } else if (jigsawInfo.image.startsWith('file://') || jigsawInfo.image.startsWith('/')) {
+    } else if (jigsawInfo.image.startsWith('file://') ||
+        jigsawInfo.image.startsWith('/')) {
       // local file path
       final path = jigsawInfo.image.startsWith('file://')
           ? jigsawInfo.image.replaceFirst('file://', '')

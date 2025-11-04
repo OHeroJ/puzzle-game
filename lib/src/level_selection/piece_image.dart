@@ -80,25 +80,25 @@ class PieceImage extends StatelessWidget {
     // 默认使用网络图片加载
     return _buildResult(
       CachedNetworkImage(
-      imageUrl: pictureUrl,
-      imageBuilder: (context, imageProvider) {
-        progress?.call();
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-          ),
-        );
-      },
-      progressIndicatorBuilder: progressIndicatorBuilder ??
-          (context, url, downloadProgress) {
-            return Center(
-                child: CircularProgressIndicator(
-              color: palette.textColor,
-              value: downloadProgress.progress,
-            ));
-          },
-      errorWidget: (context, url, error) => Icon(Icons.error),
+        imageUrl: pictureUrl,
+        imageBuilder: (context, imageProvider) {
+          progress?.call();
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+            ),
+          );
+        },
+        progressIndicatorBuilder: progressIndicatorBuilder ??
+            (context, url, downloadProgress) {
+              return Center(
+                  child: CircularProgressIndicator(
+                color: palette.textColor,
+                value: downloadProgress.progress,
+              ));
+            },
+        errorWidget: (context, url, error) => Icon(Icons.error),
       ),
     );
   }

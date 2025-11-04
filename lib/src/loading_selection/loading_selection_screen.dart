@@ -10,7 +10,6 @@ import '../level_selection/piece_image.dart';
 class LoadingSelectionScreen extends StatefulWidget {
   final JigsawInfo level;
 
-
   const LoadingSelectionScreen({super.key, required this.level});
 
   @override
@@ -30,7 +29,6 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
     date = DateTime.now().microsecondsSinceEpoch;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +40,7 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
             pictureUrl: widget.level.smallimage,
             unlocked: _unlocked,
           ),
-          
+
           PieceImage(
             unlocked: _unlocked,
             pictureUrl: widget.level.image,

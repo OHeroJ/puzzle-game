@@ -52,7 +52,7 @@ class JigsawGridItem extends StatelessWidget {
                       )
                     : PieceImage(pictureUrl: info.smallimage),
               ),
-              if (locked) ...[                
+              if (locked) ...[
                 Positioned.fill(
                   child: IgnorePointer(
                     ignoring: true,
@@ -81,7 +81,8 @@ class JigsawGridItem extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         padding: const EdgeInsets.all(4),
-                        child: const Icon(Icons.delete, color: Colors.white, size: 20),
+                        child: const Icon(Icons.delete,
+                            color: Colors.white, size: 20),
                       ),
                     ),
                   ),

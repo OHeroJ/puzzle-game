@@ -16,7 +16,8 @@ class LocalImageItem {
 }
 
 class LocalImageService {
-  List<String> get categories => kLocalImageCategories.keys.toList(growable: false);
+  List<String> get categories =>
+      kLocalImageCategories.keys.toList(growable: false);
 
   List<LocalImageItem> itemsForCategory(String category) {
     final assets = getAssetsByCategory(category);
@@ -39,33 +40,31 @@ class LocalImageService {
   }
 
   List<JigsawInfo> jigsawsForCategory(String category) {
-    return itemsForCategory(category)
-        .map((e) {
-          if (e.path.startsWith('assets/')) {
-            return JigsawInfo.fromAsset(e.path, title: e.title, photographer: e.category);
-          }
-          final info = JigsawInfo(e.path, e.path, e.title);
-          info.photographer = e.category;
-          info.id = JigsawInfo.stableIdFromPath(e.path);
-          info.gridSize = 4;
-          return info;
-        })
-        .toList(growable: false);
+    return itemsForCategory(category).map((e) {
+      if (e.path.startsWith('assets/')) {
+        return JigsawInfo.fromAsset(e.path,
+            title: e.title, photographer: e.category);
+      }
+      final info = JigsawInfo(e.path, e.path, e.title);
+      info.photographer = e.category;
+      info.id = JigsawInfo.stableIdFromPath(e.path);
+      info.gridSize = 4;
+      return info;
+    }).toList(growable: false);
   }
 
   List<JigsawInfo> allJigsaws() {
-    return allItems()
-        .map((e) {
-          if (e.path.startsWith('assets/')) {
-            return JigsawInfo.fromAsset(e.path, title: e.title, photographer: e.category);
-          }
-          final info = JigsawInfo(e.path, e.path, e.title);
-          info.photographer = e.category;
-          info.id = JigsawInfo.stableIdFromPath(e.path);
-          info.gridSize = 4;
-          return info;
-        })
-        .toList(growable: false);
+    return allItems().map((e) {
+      if (e.path.startsWith('assets/')) {
+        return JigsawInfo.fromAsset(e.path,
+            title: e.title, photographer: e.category);
+      }
+      final info = JigsawInfo(e.path, e.path, e.title);
+      info.photographer = e.category;
+      info.id = JigsawInfo.stableIdFromPath(e.path);
+      info.gridSize = 4;
+      return info;
+    }).toList(growable: false);
   }
 
   String _basename(String path) {

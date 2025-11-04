@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 // 改为使用本地图片，不再依赖网络
@@ -36,7 +35,6 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
 
   @override
   void initState() {
-
     _localService = LocalImageService();
     _uploadsStore = UploadsStore();
     _categories = _localService.categories;
@@ -119,115 +117,111 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
       initialIndex: initialIndex < 0 ? 0 : initialIndex,
       length: tabs.length,
       child: Scaffold(
-        appBar: AppBar(   
-          centerTitle: true,
-          backgroundColor: palette.backgroundMain,
-          title: Text(
-            '拼图',
-            style: TextStyle(
-              color: palette.textColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          bottom: TabBar(
-            isScrollable: true,
-            indicatorColor: palette.primaryColor,
-            labelColor: palette.textColor,
-            unselectedLabelColor: palette.textColor.withValues(alpha: 0.6),
-            tabs: tabs.map((c) => Tab(text: c)).toList(),
-            onTap: (index) {
-              final value = tabs[index];
-              setState(() {
-                _selectedCategory = value;
-                if (_selectedCategory == '我的上传') {
-                  _localItems = [];
-                  _loadUploadsAndMerge();
-                } else if (_selectedCategory == '全部') {
-                  _localItems = _buildItemsForCategory(_selectedCategory);
-                  _loadUploadsAndMerge();
-                } else {
-                  _localItems = _buildItemsForCategory(_selectedCategory);
-                }
-              });
-            },
-          ),
-        ),
-        body: Center(
-          child: Container(
-            width: 0.9.sw,
-            child: CustomScrollView(
-              scrollBehavior: MaterialScrollBehavior().copyWith(
-                scrollbars: false,
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              pinned: true,
+              centerTitle: true,
+              backgroundColor: palette.backgroundMain,
+              title: Text(
+                '拼图',
+                style: TextStyle(
+                  color: palette.textColor,
+                  fontWeight: FontWeight.bold,
                 ),
-              slivers: [
-                // TabBar 已移动至 AppBar.bottom，实现吸顶
-              if (_selectedCategory == '我的上传' && _localItems.isEmpty)
-                SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20.w),
-                      child: Text(
-                        '正在加载“我的上传”...',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                            color: palette.textColor.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ),
+              ),
+              bottom: TabBar(
+                dividerColor: Colors.transparent,
+                isScrollable: true,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorPadding: EdgeInsets.symmetric(vertical: 6),
+                indicator: ShapeDecoration(
+                  shape: StadiumBorder(
+                    side: BorderSide(color: palette.primaryColor, width: 2),
                   ),
                 ),
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                unselectedLabelStyle:
+                    const TextStyle(fontWeight: FontWeight.normal),
+                indicatorColor: palette.primaryColor,
+                labelColor: palette.textColor,
+                unselectedLabelColor: palette.textColor.withValues(alpha: 0.6),
+                tabs: tabs.map((c) => Tab(text: c)).toList(),
+                onTap: (index) {
+                  final value = tabs[index];
+                  setState(() {
+                    _selectedCategory = value;
+                    if (_selectedCategory == '我的上传') {
+                      _localItems = [];
+                      _loadUploadsAndMerge();
+                    } else if (_selectedCategory == '全部') {
+                      _localItems = _buildItemsForCategory(_selectedCategory);
+                      _loadUploadsAndMerge();
+                    } else {
+                      _localItems = _buildItemsForCategory(_selectedCategory);
+                    }
+                  });
+                },
+              ),
+            ),
+          ],
+          body: CustomScrollView(
+            slivers: [
+              // TabBar 已移动至 AppBar.bottom，实现吸顶
               if (_localItems.isEmpty)
                 SliverToBoxAdapter(
                   child: Center(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20.w),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                       child: Text(
                         '暂无图片',
                         style: TextStyle(
-                          fontSize: 16.sp,
-                            color: palette.textColor.withValues(alpha: 0.8),
+                          color: palette.textColor.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
                   ),
                 ),
-              SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 50 / 33,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: 1.sw > 500 ? 4 : 3,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final item = _localItems[index];
-                    return JigsawGridItem(
-                      info: item,
-                      locked: !_completedIds.contains(item.id),
-                      showDelete: _selectedCategory == '我的上传',
-                      onDelete: _selectedCategory == '我的上传'
-                          ? () => _onDeleteUpload(item)
-                          : null,
-                      onTap: () {
-                        _showDetailsDialog(context, item, palette);
-                      },
-                    );
-                  },
-                  childCount: _localItems.length,
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 50 / 33,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    crossAxisCount: 1.sw > 500 ? 4 : 2,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final item = _localItems[index];
+                      return JigsawGridItem(
+                        info: item,
+                        locked: !_completedIds.contains(item.id),
+                        showDelete: _selectedCategory == '我的上传',
+                        onDelete: _selectedCategory == '我的上传'
+                            ? () => _onDeleteUpload(item)
+                            : null,
+                        onTap: () {
+                          _showDetailsDialog(context, item, palette);
+                        },
+                      );
+                    },
+                    childCount: _localItems.length,
+                  ),
                 ),
               ),
               SliverToBoxAdapter(child: SizedBox(height: 30.h)),
             ],
-          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        onPressed: _triggerUpload,
-        label: const Text('上传图片'),
-        icon: const Icon(Icons.upload),
-      ),
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          onPressed: _triggerUpload,
+          label: const Text('上传图片'),
+          icon: const Icon(Icons.upload),
+        ),
       ),
     );
   }
@@ -255,7 +249,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
                 Text(
                   '拼图块数',
                   style: TextStyle(
-                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
                     color: palette.textColor,
                   ),
                 ),
@@ -324,7 +318,7 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
               item.gridSize = gridSizeValue;
               final entries = await PuzzleHistoryStore().load();
               final unlocked = entries.any((e) => e.id == item.id && e.success);
-              item.unlocked = unlocked;   
+              item.unlocked = unlocked;
               GoRouter.of(context).push('/play/loading', extra: item);
             },
             style: ElevatedButton.styleFrom(
@@ -352,8 +346,8 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
         f(num);
       },
       child: Container(
-        width: 120.w,
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+        width: 150.w,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.w),
         margin: EdgeInsets.only(left: 10.w, right: 10.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -366,11 +360,10 @@ class _LevelSelectionScreenState extends State<LevelSelectionScreen> {
             Text(
               "${num * num}",
                 style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                fontSize: 28.sp,
+                fontWeight: FontWeight.w600,
                   color:
                       gridSizeValue == num ? Colors.white : palette.textColor,
-                )
+              ),
             ),
           ],
         ),
