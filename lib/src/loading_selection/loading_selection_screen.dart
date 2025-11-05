@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../level_selection/jigsaw_info.dart';
@@ -21,12 +22,26 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
   double p = 0;
   int date = 0;
   bool _unlocked = true; // 是否已通关（用于决定是否显示蒙版）
+  GoRouter? _router; // 缓存路由器，避免在 dispose 后通过 context 查找
 
   @override
   void initState() {
     super.initState();
     _unlocked = widget.level.unlocked;
     date = DateTime.now().microsecondsSinceEpoch;
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // 在进入 PlaySessionScreen 前的加载页即切换为横屏
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 在依赖变更时缓存 GoRouter 引用，避免在组件已被 dispose 时再通过 context 查找
+    _router = GoRouter.maybeOf(context);
   }
 
   @override
@@ -55,9 +70,9 @@ class _LoadingSelectionScreenState extends State<LoadingSelectionScreen> {
               print('diff ${now - date}');
               print("complete: 22");
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                Future.delayed(Duration(milliseconds: 1500), () async {
-                  GoRouter.of(context)
-                      .pushReplacement('/play/session/', extra: widget.level);
+                Future.delayed(const Duration(milliseconds: 1500), () async {
+                  if (!mounted) return; // 如果组件已销毁则不再执行导航
+                  _router?.pushReplacement('/play/session/', extra: widget.level);
                 });
               });
             },

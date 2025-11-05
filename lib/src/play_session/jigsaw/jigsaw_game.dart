@@ -62,7 +62,6 @@ class JigsawGame extends FlameGame with HasCollisionDetection {
       image.width.toDouble(),
       image.height.toDouble(),
     );
-    print("scale:$_scale");
     gridSize = jigsawInfo.gridSize;
     final double widthPerBlock = image.width / gridSize;
     final double heightPerBlock = image.height / gridSize;

@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart' hide Level;
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'jigsaw/grid_painter.dart';
 
 import '../games_services/score.dart';
 import '../history/puzzle_history.dart';
@@ -34,13 +35,9 @@ class PlaySessionScreen extends StatefulWidget {
 class _PlaySessionScreenState extends State<PlaySessionScreen> {
   static final _log = Logger('PlaySessionScreen');
 
-  // static const _celebrationDuration = Duration(milliseconds: 2000);
-
-  // static const _preCelebrationDuration = Duration(milliseconds: 500);
-
   bool _duringCelebration = false;
   bool isLoading = true;
-  bool _sessionCompleted = false;
+  bool _showGrid = false;
 
   late DateTime _startOfPlay;
   late final JigsawGame _game;
@@ -64,12 +61,23 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
           title: Text(
             '拼图',
             style: TextStyle(
-              fontSize: 28.sp,
+              fontSize: 28,
               color: palette.textColor,
               fontWeight: FontWeight.bold,
             ),
           ),
           actions: [
+            IconButton(
+              onPressed: () {
+                setState(() => _showGrid = !_showGrid);
+              },
+              icon: Icon(
+                _showGrid ? Icons.grid_on : Icons.grid_off,
+                size: 26,
+                color: palette.textColor,
+              ),
+              tooltip: _showGrid ? '隐藏网格' : '显示网格',
+            ),
             IconButton(
               onPressed: () {
                 _showBackgroundPicker(settingsController, palette);
@@ -93,22 +101,26 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
             SizedBox(width: 16.w),
           ],
         ),
-        body: Container(
-          child: Stack(
-            children: [
-              ValueListenableBuilder<Color>(
+        body: ValueListenableBuilder<Color>(
                 valueListenable: settingsController.gameBackgroundColor,
                 builder: (context, bg, _) => GameWidget(
                   loadingBuilder: (context) => Center(
                     child: CircularProgressIndicator(
-                      color: bg,
+                color: palette.primaryColor,
                     ),
                   ),
                   game: _game,
-                  backgroundBuilder: (context) => Container(color: bg),
-                ),
-              ),
-            ],
+            backgroundBuilder: (context) => _showGrid
+                ? CustomPaint(
+                    painter: JigsawGridPainter(
+                      backgroundColor: bg,
+                      gridSize: widget.level.gridSize,
+                      lineColor: palette.textColor,
+                    ),
+                    size: Size.infinite,
+                    isComplex: true,
+                  )
+                : Container(color: bg),
           ),
         ),
       ),
@@ -255,7 +267,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       ),
       builder: (ctx) {
         return Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -264,13 +276,13 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                 style: TextStyle(
                   color: palette.textColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18.sp,
+                  fontSize: 18,
                 ),
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 12),
               Wrap(
-                spacing: 10.w,
-                runSpacing: 8.h,
+                spacing: 10,
+                runSpacing: 8,
                 children: options.map((c) {
                   final selected = c == settings.gameBackgroundColor.value;
                   return ChoiceChip(
@@ -294,7 +306,7 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
                   );
                 }).toList(),
               ),
-              SizedBox(height: 10.h),
+              SizedBox(height: 10),
             ],
           ),
         );
@@ -345,18 +357,11 @@ class _PlaySessionScreenState extends State<PlaySessionScreen> {
       },
     ).show();
 
-    // 标记本次会话完成，用于去掉原图蒙层
-    setState(() {
-      _sessionCompleted = true;
-    });
-
     // 持久化通关历史（用时等）
     final elapsedMs = DateTime.now().difference(_startOfPlay).inMilliseconds;
     await PuzzleHistoryStore().completePuzzle(
       widget.level.id,
       elapsedMs: elapsedMs,
     );
-
-    // GoRouter.of(context).go('/play/won', extra: {'score': score});
   }
 }
